@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="The Carto-Rogue: 등고선 탐사대 — survey a procedural contour map and reach the Ancient Trig Pillar." />
+    <title>The Carto-Rogue: 등고선 탐사대</title>
+    <!-- Inline icon (trig-point triangle on parchment) so the browser never requests a missing favicon.ico. -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23f4ecd8'/%3E%3Cpath d='M8 2.5 14 13.5H2Z' fill='none' stroke='%239b2d20' stroke-width='2' stroke-linejoin='round'/%3E%3Ccircle cx='8' cy='10' r='1.5' fill='%233a2e2b'/%3E%3C/svg%3E"
+    />
+    <!-- Galmuri9 (SIL OFL 1.1, by quiple): the open-source pixel font used for Korean interface text. -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri@2.40.3/dist/galmuri.css" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #1c1512;
+        overscroll-behavior: none;
+        touch-action: none;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      /* main.ts sizes and centres the canvas at whole device-pixel offsets (flex centring can land on half pixels). */
+      #game {
+        position: absolute;
+        left: 0;
+        top: 0;
+        display: block;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        outline: none;
+        touch-action: none;
+        /* Letterbox colour when fullscreen stretches the canvas box (the image keeps its aspect). */
+        background: #1c1512;
+        object-fit: contain;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="game" width="1280" height="800" tabindex="0" aria-label="The Carto-Rogue game canvas"></canvas>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,363 @@
+// English / Korean string tables and the active-language preference.
+// Every player-facing string goes through t(). English is the default everywhere (tests run in
+// English); the browser build calls initLanguage() to restore the saved choice or follow the
+// browser's language. Strings with Hangul are drawn with the Galmuri9 web font (see font.ts).
+
+export type Lang = 'en' | 'ko';
+
+export const LANG_STORAGE_KEY = 'carto-rogue:lang';
+
+const EN = {
+  // Field log (<= 30 characters after substitution).
+  logSoundOff: 'Sound off.',
+  logSoundOn: 'Sound on.',
+  logBegin: 'Expedition #{seed} begins.',
+  logSeek: 'Seek the Trig Pillar summit.',
+  logReached: 'Trig Pillar reached!',
+  logCollapse: 'You collapse, exhausted.',
+  logTooSpent: 'Too spent. Press again to go.',
+  logEdge: 'The edge of the survey sheet.',
+  logWater: 'Water blocks the way.',
+  logCliff: 'A sheer cliff. No way through.',
+  logCacheGain: 'Cache: +{n} stamina',
+  logLowStamina: 'Stamina low. Find a cache!',
+  logSummitSighted: 'Trig Pillar sighted!',
+  logPanorama: 'Panoramic survey! +{tiles} tiles',
+  logPanoramaPeaks: 'Panorama +{tiles} tiles, {peaks}',
+  onePeak: '1 peak',
+  manyPeaks: '{n} peaks',
+  logPeak: 'Peak sighted: {m} m',
+  logPeaks: '{n} peaks sighted, top {m} m',
+  logCacheSpotted: 'Supply cache spotted.',
+  logCachesSpotted: '{n} supply caches spotted.',
+  logLangSet: 'Language: English.',
+  // Floating map labels.
+  floatStamina: '+{n} STAMINA',
+  floatTrig: 'TRIG PILLAR',
+  floatCache: 'CACHE',
+  // HUD.
+  altimeter: 'ALTIMETER',
+  asl: 'ASL',
+  sightRadius: 'SIGHT RADIUS',
+  tilesN: '{n} TILES',
+  panorama: 'PANORAMA',
+  slope: 'SLOPE',
+  flat: 'FLAT',
+  moderate: 'MODERATE',
+  steepAlarm: 'STEEP!',
+  stamina: 'STAMINA',
+  lastStep: 'LAST STEP',
+  low: 'LOW!',
+  slopeFlat: 'FLAT',
+  slopeGentle: 'GENTLE',
+  slopeSteep: 'STEEP',
+  slopeCliff: 'CLIFF',
+  stepCost: 'STEP COST',
+  compass: 'COMPASS',
+  atPillar: 'AT THE PILLAR',
+  trigBearing: 'TRIG {b}°',
+  trigHunch: 'TRIG HUNCH',
+  surveyed: 'SURVEYED',
+  turn: 'TURN',
+  time: 'TIME',
+  caches: 'CACHES',
+  seed: 'SEED',
+  fieldLog: 'FIELD LOG',
+  awaiting: 'AWAITING ORDERS...',
+  arrows: 'ARROWS',
+  move: 'MOVE',
+  newMap: 'NEW MAP',
+  mute: 'MUTE',
+  muted: 'MUTED',
+  confirm: 'CONFIRM',
+  // Title card.
+  tagline: 'A SURVEY ROGUELITE OF CONTOURS AND FOG',
+  premise: 'SURVEY THE FOG. REACH THE ANCIENT TRIG PILLAR.',
+  howToPlay: 'HOW TO PLAY',
+  mapLegend: 'MAP LEGEND',
+  ruleFlat: 'FLAT, DOWNHILL OR ALONG A CONTOUR',
+  ruleGentle: 'GENTLE UPHILL',
+  ruleSteep: 'STEEP UPHILL',
+  ruleBlock: 'SHEER CLIFFS AND WATER BLOCK YOU',
+  ruleCache: 'SUPPLY CACHES RESTORE STAMINA',
+  ruleSight: 'HIGHER GROUND = WIDER SIGHT',
+  ruleSightTiles: '{a} / {b} / {c} TILES',
+  ruleStamina: 'EVERY STEP SPENDS STAMINA (START {max}). AT 0 THE SURVEYOR COLLAPSES,',
+  ruleLastStep: 'UNLESS A SUPPLY CACHE OR THE TRIG PILLAR CATCHES THAT LAST STEP.',
+  legendContour: 'CONTOUR  {m} M',
+  legendIndex: 'INDEX CONTOUR  {m} M',
+  legendCliff: 'CLIFF HACHURE',
+  legendWater: 'WATER',
+  legendCache: 'SUPPLY CACHE',
+  legendTrig: 'ANCIENT TRIG PILLAR',
+  titleFootnote: 'R STARTS A FRESH EXPEDITION WITH A NEW RANDOM SEED AT ANY TIME.',
+  pressBegin: 'PRESS ENTER OR SPACE TO BEGIN',
+  contourInterval: 'CONTOUR INTERVAL {m} M',
+  sheetNo: 'SHEET NO. {seed}',
+  // End cards.
+  causeExhaustion: 'CAUSE: EXHAUSTION',
+  finalEntry: 'EXPEDITION LOG · FINAL ENTRY',
+  collapsed: 'THE SURVEYOR HAS COLLAPSED',
+  inkBleeds: 'THE INK BLEEDS OUT...',
+  mapped: 'MAPPED',
+  turns: 'TURNS',
+  maxAltitude: 'MAX ALTITUDE',
+  grade: 'GRADE',
+  expeditionComplete: 'EXPEDITION COMPLETE',
+  summitReached: 'SUMMIT REACHED',
+  ancientTrig: '— ANCIENT TRIG PILLAR —',
+  pillarOccupied: 'TRIG PILLAR OCCUPIED',
+  percentMapped: 'PERCENT MAPPED',
+  turnsTaken: 'TURNS TAKEN',
+  staminaLeft: 'STAMINA LEFT',
+  endPrompt: 'PRESS R, ENTER OR SPACE FOR A NEW EXPEDITION',
+  // Buttons, toasts and the archives ledger.
+  copySeed: 'COPY SEED',
+  shareResult: 'SHARE RESULT',
+  archives: 'ARCHIVES',
+  toastLink: 'LINK COPIED!',
+  toastResult: 'RESULT COPIED!',
+  toastFailed: 'COPY FAILED',
+  archivesTitle: 'EXPEDITION ARCHIVES',
+  archivesSub: 'LEDGER OF THE SURVEY OFFICE',
+  recExpeditions: 'TOTAL EXPEDITIONS',
+  recSummits: 'SUMMITS CONQUERED',
+  recBestSurvey: 'BEST SURVEYED',
+  recBestGrade: 'HIGHEST GRADE',
+  recTiles: 'TOTAL TILES MAPPED',
+  recFewestTurns: 'FEWEST TURNS TO SUMMIT',
+  recEmpty: 'NO EXPEDITIONS ON RECORD YET.',
+  recNone: '—',
+  archivesClose: 'PRESS L OR ESC TO CLOSE',
+  archivesHint: 'L  ARCHIVES',
+  // Share text.
+  shareSummit: 'Summit',
+  shareConquered: 'Conquered',
+  shareFailed: 'Failed',
+  shareTurns: 'Turns',
+  shareExplored: 'Explored',
+  shareGrade: 'Grade',
+  // Sheet header / fog lettering on the map.
+  sheetTitle: 'SURVEY SHEET No. {seed}',
+  sheetSpec: 'CONTOUR INTERVAL {c} M · INDEX {i} M · HEIGHTS IN METRES',
+  fieldCopy: 'FIELD COPY',
+  legendRoute: 'ROUTE',
+  legendCliffShort: 'CLIFF',
+  legendWaterShort: 'WATER',
+  legendCacheShort: 'CACHE',
+  legendSpot: 'SPOT HT',
+  legendTrigShort: 'TRIG',
+  scale: 'SCALE 1:25 000',
+  metres: 'METRES',
+  unsurveyed: 'UNSURVEYED GROUND',
+} as const;
+
+export type MessageKey = keyof typeof EN;
+
+const KO: Record<MessageKey, string> = {
+  logSoundOff: '소리 꺼짐.',
+  logSoundOn: '소리 켜짐.',
+  logBegin: '원정 #{seed} 출발.',
+  logSeek: '삼각점 정상을 찾아라.',
+  logReached: '삼각점 정상 도달!',
+  logCollapse: '탈진하여 쓰러졌다.',
+  logTooSpent: '기력 부족. 다시 누르면 강행.',
+  logEdge: '측량 도면의 끝이다.',
+  logWater: '물이 길을 막는다.',
+  logCliff: '깎아지른 절벽. 지날 수 없다.',
+  logCacheGain: '보급: 스태미나 +{n}',
+  logLowStamina: '스태미나 부족! 보급을 찾아라',
+  logSummitSighted: '삼각점 발견!',
+  logPanorama: '파노라마 측량! +{tiles}칸',
+  logPanoramaPeaks: '파노라마 +{tiles}칸, {peaks}',
+  onePeak: '봉우리 1',
+  manyPeaks: '봉우리 {n}',
+  logPeak: '봉우리 발견: {m}m',
+  logPeaks: '봉우리 {n}개, 최고 {m}m',
+  logCacheSpotted: '보급 캠프 발견.',
+  logCachesSpotted: '보급 캠프 {n}곳 발견.',
+  logLangSet: '언어: 한국어.',
+  floatStamina: '스태미나 +{n}',
+  floatTrig: '삼각점',
+  floatCache: '보급 캠프',
+  altimeter: '고도계',
+  asl: '해발',
+  sightRadius: '시야 반경',
+  tilesN: '{n}칸',
+  panorama: '파노라마',
+  slope: '경사',
+  flat: '평탄',
+  moderate: '완만',
+  steepAlarm: '급경사!',
+  stamina: '스태미나',
+  lastStep: '직전 걸음',
+  low: '부족!',
+  slopeFlat: '평탄',
+  slopeGentle: '완만',
+  slopeSteep: '급경사',
+  slopeCliff: '절벽',
+  stepCost: '걸음 비용',
+  compass: '나침반',
+  atPillar: '삼각점 도착',
+  trigBearing: '삼각점 {b}°',
+  trigHunch: '방향 짐작',
+  surveyed: '측량률',
+  turn: '턴',
+  time: '시간',
+  caches: '보급',
+  seed: '시드',
+  fieldLog: '야장',
+  awaiting: '지시 대기 중...',
+  arrows: '방향키',
+  move: '이동',
+  newMap: '새 지도',
+  mute: '음소거',
+  muted: '음소거',
+  confirm: '확인',
+  tagline: '등고선과 안개의 측량 로그라이트',
+  premise: '안개를 측량하고, 고대 삼각점에 도달하라.',
+  howToPlay: '플레이 방법',
+  mapLegend: '범례',
+  ruleFlat: '평지 · 내리막 · 등고선을 따라 걷기',
+  ruleGentle: '완만한 오르막',
+  ruleSteep: '가파른 오르막',
+  ruleBlock: '절벽과 물은 지나갈 수 없다',
+  ruleCache: '보급 캠프에서 스태미나 회복',
+  ruleSight: '높은 곳일수록 넓은 시야',
+  ruleSightTiles: '{a} / {b} / {c}칸',
+  ruleStamina: '걸음마다 스태미나를 쓴다 (시작 {max}). 0이 되면 측량사가 쓰러진다.',
+  ruleLastStep: '단, 마지막 걸음이 보급 캠프나 삼각점에 닿으면 무사하다.',
+  legendContour: '주곡선  {m} M',
+  legendIndex: '계곡선  {m} M',
+  legendCliff: '절벽 기호',
+  legendWater: '물',
+  legendCache: '보급 캠프',
+  legendTrig: '고대 삼각점',
+  titleFootnote: 'R 키로 언제든 새 시드의 원정을 시작할 수 있다.',
+  pressBegin: 'ENTER 또는 SPACE로 출발',
+  contourInterval: '등고선 간격 {m} M',
+  sheetNo: '도엽 번호 {seed}',
+  causeExhaustion: '원인: 탈진',
+  finalEntry: '원정 일지 · 마지막 기록',
+  collapsed: '측량사가 쓰러졌다',
+  inkBleeds: '잉크가 번져 나간다...',
+  mapped: '측량률',
+  turns: '턴 수',
+  maxAltitude: '최고 고도',
+  grade: '등급',
+  expeditionComplete: '원정 완료',
+  summitReached: '정상 정복',
+  ancientTrig: '— 고대 삼각점 —',
+  pillarOccupied: '삼각점 점령',
+  percentMapped: '측량률',
+  turnsTaken: '소요 턴',
+  staminaLeft: '남은 스태미나',
+  endPrompt: 'R · ENTER · SPACE: 새 원정',
+  copySeed: '링크 복사',
+  shareResult: '결과 복사',
+  archives: '원정 기록실',
+  toastLink: '링크를 복사했다!',
+  toastResult: '결과를 복사했다!',
+  toastFailed: '복사 실패',
+  archivesTitle: '원정 기록실',
+  archivesSub: '측량국 원정 대장',
+  recExpeditions: '총 원정',
+  recSummits: '정상 정복',
+  recBestSurvey: '최고 측량률',
+  recBestGrade: '최고 등급',
+  recTiles: '누적 측량 칸',
+  recFewestTurns: '최단 정복 턴',
+  recEmpty: '아직 원정 기록이 없다.',
+  recNone: '—',
+  archivesClose: 'L 또는 ESC: 닫기',
+  archivesHint: 'L  원정 기록실',
+  shareSummit: '정상',
+  shareConquered: '정복',
+  shareFailed: '실패',
+  shareTurns: '턴',
+  shareExplored: '탐사',
+  shareGrade: '등급',
+  sheetTitle: '측량 도엽 제{seed}호',
+  sheetSpec: '주곡선 {c}M · 계곡선 {i}M · 높이 단위 미터',
+  fieldCopy: '현장용',
+  legendRoute: '경로',
+  legendCliffShort: '절벽',
+  legendWaterShort: '물',
+  legendCacheShort: '보급',
+  legendSpot: '표고점',
+  legendTrigShort: '삼각점',
+  scale: '축척 1:25 000',
+  metres: '미터',
+  unsurveyed: '미측량 지역',
+};
+
+const TABLES: Record<Lang, Record<MessageKey, string>> = { en: EN, ko: KO };
+
+let current: Lang = 'en';
+let version = 0;
+const listeners = new Set<(lang: Lang) => void>();
+
+export function getLang(): Lang {
+  return current;
+}
+
+/** Bumped on every language change, so caches of rendered text can key on it. */
+export function langVersion(): number {
+  return version;
+}
+
+export function setLang(lang: Lang, persist = true): void {
+  if (lang === current) return;
+  current = lang;
+  version++;
+  if (persist) {
+    try {
+      localStorage.setItem(LANG_STORAGE_KEY, lang);
+    } catch {
+      // Storage may be blocked (private mode, sandboxed iframe); the choice just won't persist.
+    }
+  }
+  for (const fn of listeners) fn(lang);
+}
+
+export function toggleLang(): Lang {
+  setLang(current === 'en' ? 'ko' : 'en');
+  return current;
+}
+
+export function onLangChange(fn: (lang: Lang) => void): () => void {
+  listeners.add(fn);
+  return () => listeners.delete(fn);
+}
+
+export function isLang(value: unknown): value is Lang {
+  return value === 'en' || value === 'ko';
+}
+
+/** Restore the saved language, else follow the browser (Korean browsers start in Korean). */
+export function initLanguage(): Lang {
+  let saved: string | null;
+  try {
+    saved = localStorage.getItem(LANG_STORAGE_KEY);
+  } catch {
+    saved = null;
+  }
+  if (isLang(saved)) {
+    setLang(saved, false);
+  } else if (typeof navigator !== 'undefined' && /^ko\b/i.test(navigator.language ?? '')) {
+    setLang('ko', false);
+  }
+  return current;
+}
+
+/** Look up `key` in the active language and substitute {name} placeholders. */
+export function t(key: MessageKey, params?: Readonly<Record<string, string | number>>, lang: Lang = current): string {
+  const template = TABLES[lang][key];
+  if (!params) return template;
+  return template.replace(/\{(\w+)\}/g, (whole, name: string) => (name in params ? String(params[name]) : whole));
+}
+
+/** Both tables, for tests that check coverage and placeholders. */
+export function messageTables(): Readonly<Record<Lang, Readonly<Record<MessageKey, string>>>> {
+  return TABLES;
+}
