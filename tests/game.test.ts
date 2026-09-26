@@ -28,8 +28,11 @@ import {
   visionRadiusFor,
 } from '../src/game';
 import { setLang } from '../src/i18n';
-import { keyToAction, parseSeed } from '../src/input';
+import { keyToAction, keyToUiKey, parseSeed } from '../src/input';
 import { generateMap, minCostTo } from '../src/map';
+import { PauseMenu } from '../src/pause';
+import { RecordKeeper } from '../src/records';
+import type { ExpeditionResult } from '../src/records';
 import { computeEdges, localSlopeAt, reachableFrom, stepCost, tileIndex } from '../src/terrain';
 import { DIRS, DIR_LIST } from '../src/types';
 import type { AudioEngine, Dir, DiscoveryKind, GameState, MapData, Peak, Point, SlopeClass } from '../src/types';
@@ -1428,5 +1431,189 @@ describe('typed seed (ENTER SEED)', () => {
     expect(viaLink.state.seed).toBe(h.s().seed);
     expect(viaLink.state.player).toEqual(h.s().player);
     expect(Array.from(viaLink.state.revealed)).toEqual(Array.from(h.s().revealed));
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Pause menu
+// ---------------------------------------------------------------------------
+
+describe('pause menu state machine', () => {
+  it('opens on RESUME, toggles the highlight, and resumes from the menu or with Escape', () => {
+    const menu = new PauseMenu();
+    expect(menu.isOpen).toBe(false);
+    expect(menu.activate(5)).toBeNull();
+    menu.open(100);
+    expect(menu.isOpen).toBe(true);
+    expect(menu.since).toBe(100);
+    expect(menu.view).toBe('menu');
+    expect(menu.selected).toBe('resume');
+    menu.step();
+    expect(menu.selected).toBe('title');
+    menu.step();
+    expect(menu.activate(5)).toBe('resume');
+    expect(menu.back()).toBe('resume');
+    menu.close();
+    expect(menu.isOpen).toBe(false);
+  });
+
+  it('leaves at once from a zero-turn expedition, but asks first after a step', () => {
+    const menu = new PauseMenu();
+    menu.open(0);
+    menu.focus('title');
+    expect(menu.activate(0)).toBe('exit');
+
+    menu.close();
+    menu.open(0);
+    menu.focus('title');
+    expect(menu.activate(3)).toBeNull();
+    expect(menu.view).toBe('confirm');
+    // The confirmation defaults to CANCEL: a double press cannot abandon by accident.
+    expect(menu.selected).toBe('cancel');
+    expect(menu.activate(3)).toBeNull();
+    expect(menu.view).toBe('menu');
+    expect(menu.selected).toBe('title');
+
+    expect(menu.activate(3)).toBeNull();
+    expect(menu.back()).toBeNull(); // Escape pops back to the menu...
+    expect(menu.view).toBe('menu');
+    expect(menu.activate(3)).toBeNull();
+    menu.step(); // ...and ← / → reach CONFIRM.
+    expect(menu.selected).toBe('abandon');
+    expect(menu.activate(3)).toBe('exit');
+  });
+
+  it('maps Escape and P (also on the Korean layout) to the pause key', () => {
+    expect(keyToUiKey('Escape', 'Escape')).toBe('close');
+    expect(keyToUiKey('KeyP', 'p')).toBe('pause');
+    expect(keyToUiKey('', 'ㅔ')).toBe('pause');
+  });
+});
+
+describe('game pause / resume', () => {
+  it('only pauses an expedition in progress', () => {
+    const h = setup({}, { start: false });
+    expect(h.game.pause(h.tick())).toBe(false);
+    h.game.handleAction('confirm', h.tick());
+    expect(h.game.pause(h.tick())).toBe(true);
+    expect(h.game.pause(h.tick())).toBe(false); // already paused
+    expect(h.game.isPaused).toBe(true);
+  });
+
+  it('traps every movement and confirm input while paused', () => {
+    const h = setup();
+    stepRight(h);
+    const before = { x: h.s().player.x, y: h.s().player.y, turns: h.s().turns, stamina: h.s().stamina, log: h.s().log.length };
+    h.game.pause(h.tick());
+    for (const a of ['up', 'right', 'down', 'left', 'confirm'] as const) {
+      h.game.handleAction(a, h.tick());
+      h.game.handleAction(a, h.tick(), true);
+    }
+    const s = h.s();
+    expect({ x: s.player.x, y: s.player.y, turns: s.turns, stamina: s.stamina, log: s.log.length }).toEqual(before);
+    expect(h.audio.count('footstep')).toBe(1);
+    expect(h.audio.count('bump')).toBe(0);
+    expect(s.phase).toBe('playing');
+  });
+
+  it('still mutes, and R still restarts (unpaused) while the menu is open', () => {
+    const h = setup();
+    h.game.pause(h.tick());
+    h.game.handleAction('mute', h.tick());
+    expect(h.s().muted).toBe(true);
+    const seed = h.s().seed;
+    h.game.handleAction('restart', h.tick());
+    expect(h.s().seed).not.toBe(seed);
+    expect(h.game.isPaused).toBe(false);
+    expect(h.s().phase).toBe('playing');
+  });
+
+  it('stops the expedition clock while paused', () => {
+    const h = setup();
+    const start = h.s().startTime;
+    h.game.pause(10_000);
+    h.game.resume(70_000);
+    expect(h.s().startTime).toBe(start + 60_000);
+    expect(h.s().pausedAt).toBeNull();
+  });
+
+  it('does not let a key held from before the pause keep walking after resume', () => {
+    const h = setup();
+    h.game.pause(h.tick());
+    h.game.resume(h.tick());
+    const x = h.s().player.x;
+    stepRight(h, true); // auto-repeat of the still-held key
+    expect(h.s().player.x).toBe(x);
+    stepRight(h); // a fresh press walks
+    expect(h.s().player.x).toBe(x + 1);
+  });
+
+  it('returns to the title on a fresh sheet with a clean slate', () => {
+    const h = setup();
+    stepRight(h);
+    h.game.pause(h.tick());
+    const seed = h.s().seed;
+    h.audio.reset();
+    h.game.returnToTitle(h.tick());
+    const s = h.s();
+    expect(s.phase).toBe('title');
+    expect(s.seed).not.toBe(seed);
+    expect(s.turns).toBe(0);
+    expect(s.pausedAt).toBeNull();
+    expect(s.startTime).toBe(0);
+    expect(s.trail).toHaveLength(1);
+    expect(h.audio.count('stopAll')).toBe(1);
+    // The next confirm starts that sheet as usual.
+    h.game.handleAction('confirm', h.tick());
+    expect(h.s().phase).toBe('playing');
+  });
+});
+
+describe('record keeping across the pause menu', () => {
+  const keeper = (h: ReturnType<typeof setup>) => {
+    const results: ExpeditionResult[] = [];
+    const k = new RecordKeeper(h.s(), (r) => results.push(r));
+    return { k, results };
+  };
+
+  it('never records a zero-turn expedition left through the menu', () => {
+    const h = setup();
+    const { k, results } = keeper(h);
+    h.game.pause(h.tick());
+    h.game.returnToTitle(h.tick());
+    k.sync(h.s());
+    k.sync(h.s());
+    k.abandon();
+    expect(results).toEqual([]);
+  });
+
+  it('records an abandoned expedition exactly once, whatever follows', () => {
+    const h = setup();
+    const { k, results } = keeper(h);
+    stepRight(h);
+    stepRight(h);
+    h.game.pause(h.tick());
+    h.game.returnToTitle(h.tick());
+    k.sync(h.s()); // immediate resolution after the swap
+    k.sync(h.s()); // next frame
+    k.abandon(); // page teardown
+    k.abandon();
+    expect(results).toHaveLength(1);
+    expect(results[0]).toMatchObject({ outcome: 'abandoned', turns: 2, grade: null });
+
+    // The title state that replaced it is its own (zero-turn) expedition: still nothing more.
+    h.game.returnToTitle(h.tick());
+    k.sync(h.s());
+    expect(results).toHaveLength(1);
+  });
+
+  it('records a teardown mid-expedition once, and not again when the next frame syncs', () => {
+    const h = setup();
+    const { k, results } = keeper(h);
+    stepRight(h);
+    k.abandon();
+    k.sync(h.s());
+    k.abandon();
+    expect(results).toHaveLength(1);
   });
 });

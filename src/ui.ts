@@ -1,6 +1,7 @@
 // Interface state that lives outside the game rules: clickable canvas buttons, the archives
 // ledger, toasts, tap ripples and window modes. main.ts writes it from input events; hud.ts and
 // renderer.ts read it while drawing (and hud.ts registers the button rectangles each frame).
+import { PauseMenu } from './pause';
 import { emptyRecords } from './records';
 import type { CareerRecords } from './records';
 
@@ -12,7 +13,12 @@ export type ButtonId =
   | 'share'
   | 'archives'
   | 'closeArchives'
-  | 'seedEntry';
+  | 'seedEntry'
+  | 'pause'
+  | 'pauseResume'
+  | 'pauseToTitle'
+  | 'pauseAbandon'
+  | 'pauseCancel';
 
 export interface UiButton {
   id: ButtonId;
@@ -37,6 +43,8 @@ export interface UiState {
   fullscreen: boolean;
   fullscreenAvailable: boolean;
   records: CareerRecords;
+  /** The in-expedition pause menu (open while the game is paused). */
+  pause: PauseMenu;
 }
 
 export const TOAST_MS = 1800;
@@ -52,6 +60,7 @@ export const ui: UiState = {
   fullscreen: false,
   fullscreenAvailable: false,
   records: emptyRecords(),
+  pause: new PauseMenu(),
 };
 
 export function clearButtons(): void {

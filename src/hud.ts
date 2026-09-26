@@ -381,7 +381,7 @@ function formatPercent(p: number): string {
 
 function elapsedMs(state: GameState, now: number): number {
   if (state.phase === 'title' || state.startTime <= 0) return 0;
-  return Math.max(0, (state.endTime ?? now) - state.startTime);
+  return Math.max(0, (state.endTime ?? state.pausedAt ?? now) - state.startTime);
 }
 
 function cachesCollected(state: GameState): number {
@@ -935,15 +935,14 @@ function drawFooterStatic(ctx: Ctx): void {
   plate(ctx, b, 'dark', false, 111);
   const key = PALETTE.parchment;
   const txt = PALETTE.brass;
+  // Compact hints: the icon buttons on the right take the rest of the bar.
   drawRuns(ctx, b.x + 9, b.y + 9, [
     ['WASD', key],
-    ['/', DIM_TEXT],
-    [t('arrows'), key],
     [` ${t('move')}`, txt],
   ]);
   drawRuns(ctx, b.x + 9, b.y + 23, [
     ['R', key],
-    [` ${t('newMap')}  `, txt],
+    [` ${t('footNew')} `, txt],
     ['M', key],
     [` ${t('mute')}`, txt],
   ]);
@@ -954,6 +953,20 @@ const FOOT_ICON_Y = SECTIONS.footer.y + 9;
 const SPEAKER_BOX: Box = { x: SECTIONS.footer.x + SECTIONS.footer.w - 36, y: FOOT_ICON_Y - 1, w: 28, h: 29 };
 const FULLSCREEN_BOX: Box = { x: SPEAKER_BOX.x - 22, y: FOOT_ICON_Y + 1, w: 18, h: 18 };
 const LANG_BOX: Box = { x: FULLSCREEN_BOX.x - 44, y: FOOT_ICON_Y + 1, w: 40, h: 18 };
+const MENU_BOX: Box = { x: LANG_BOX.x - 22, y: FOOT_ICON_Y + 1, w: 18, h: 18 };
+
+/** Pause-menu button: three brass bars. Live only while an expedition is being played. */
+function drawMenuButton(ctx: Ctx, state: GameState): void {
+  const b = MENU_BOX;
+  const live = state.phase === 'playing';
+  const c = live ? PALETTE.brassLight : DIM_TEXT;
+  fill(ctx, b.x, b.y, b.w, b.h, FACE_SHADOW);
+  outline(ctx, b.x, b.y, b.w, b.h, ui.pause.isOpen ? PALETTE.brassLight : PALETTE.brassDark);
+  for (let k = 0; k < 3; k++) fill(ctx, b.x + 4, b.y + 5 + k * 4, b.w - 8, 2, c);
+  if (!live) return;
+  hoverFrame(ctx, b, 'pause');
+  addButton('pause', b.x - 2, b.y - 3, b.w + 4, b.h + 6);
+}
 
 /** Hover frame shared by the footer buttons. */
 function hoverFrame(ctx: Ctx, b: Box, id: ButtonId): void {
@@ -1516,6 +1529,7 @@ export function drawHud(ctx: CanvasRenderingContext2D, state: GameState, now: nu
   drawSpeaker(ctx, state.muted, now);
   drawLangButton(ctx);
   drawFullscreenButton(ctx);
+  drawMenuButton(ctx, state);
   ctx.imageSmoothingEnabled = smoothing;
 }
 
@@ -2657,12 +2671,89 @@ function drawToast(ctx: Ctx, now: number): void {
   ctx.globalAlpha = prev;
 }
 
-/** Interface layers above the cards: the archives ledger and toasts. Draw after drawOverlay. */
+// ----- Pause menu -----
+
+const PAUSE_W = 420;
+const PAUSE_H = 250;
+const PAUSE_BTN_H = 30;
+
+/** Parchment card with a riveted brass rim (drawn once per language into the card cache). */
+function paintPauseCard(g: Ctx): void {
+  const w = PAUSE_W;
+  const h = PAUSE_H;
+  paintPaper(g, w, h, 2718);
+  paintNeatline(g, w, h, PALETTE.inkFaded);
+  // Brass rim over the paper edge.
+  outline(g, 0, 0, w, h, PALETTE.brassShadow);
+  outline(g, 1, 1, w - 2, h - 2, PALETTE.brass, 2);
+  fill(g, 1, 1, w - 2, 1, PALETTE.brassLight);
+  fill(g, 1, 1, 1, h - 2, PALETTE.brassLight);
+  outline(g, 3, 3, w - 6, h - 6, PALETTE.brassDark);
+  for (const [rx, ry] of [
+    [4, 4],
+    [w - 7, 4],
+    [4, h - 7],
+    [w - 7, h - 7],
+  ] as const) {
+    rivet(g, rx, ry);
+  }
+}
+
+/** One pause-card button; the highlighted one gets a red rule, a pointer and bolder paper. */
+function pauseButton(ctx: Ctx, id: ButtonId, label: string, x: number, y: number, w: number, selected: boolean, danger: boolean): void {
+  const h = PAUSE_BTN_H;
+  fill(ctx, x + 2, y + 2, w, h, PALETTE.parchmentShade);
+  fill(ctx, x, y, w, h, PALETTE.ink);
+  fill(ctx, x + 1, y + 1, w - 2, h - 2, selected ? PALETTE.parchment : PALETTE.parchmentDark);
+  fill(ctx, x + 1, y + h - 3, w - 2, 2, PALETTE.parchmentShade);
+  const ink = danger ? PALETTE.redInk : PALETTE.ink;
+  if (selected) {
+    outline(ctx, x + 2, y + 2, w - 4, h - 5, danger ? PALETTE.redInkBright : PALETTE.redInk, 2);
+    drawText(ctx, '→', x + 10, y + 10, { color: PALETTE.redInk });
+  }
+  drawText(ctx, label, x + Math.floor(w / 2) + 1, y + 8, { scale: 2, color: selected ? ink : PALETTE.inkSoft, align: 'center' });
+  addButton(id, x, y, w, h);
+}
+
+function drawPauseCard(ctx: Ctx, now: number): void {
+  const menu = ui.pause;
+  const e = easeOutCubic((now - menu.since) / 220);
+  veil(ctx, e);
+  const prev = ctx.globalAlpha;
+  ctx.globalAlpha = prev * e;
+  const x = MAP_ORIGIN_X + Math.floor((MAP_PX_W - PAUSE_W - CARD_SHADOW) / 2);
+  const y = MAP_ORIGIN_Y + Math.floor((MAP_PX_H - PAUSE_H - CARD_SHADOW) / 2) + Math.round((1 - e) * 16);
+  blitCard(ctx, 'pause', PAUSE_W, PAUSE_H, x, y, paintPauseCard);
+  const mid = x + Math.floor(PAUSE_W / 2);
+  if (menu.view === 'menu') {
+    drawText(ctx, t('pausedTitle'), mid, y + 30, { scale: 2, color: PALETTE.ink, align: 'center', shadow: PALETTE.parchmentShade });
+    rule(ctx, mid, y + 56, 140, PALETTE.inkFaded, PALETTE.redInk);
+    const bw = 280;
+    const bx = mid - bw / 2;
+    pauseButton(ctx, 'pauseResume', t('pauseResume'), bx, y + 78, bw, menu.selected === 'resume', false);
+    pauseButton(ctx, 'pauseToTitle', t('pauseToTitle'), bx, y + 122, bw, menu.selected === 'title', false);
+    drawText(ctx, t('pauseHint'), mid, y + PAUSE_H - 44, { color: PALETTE.inkFaded, align: 'center' });
+  } else {
+    drawText(ctx, t('abandonQuestion'), mid, y + 34, { scale: 2, color: PALETTE.ink, align: 'center', shadow: PALETTE.parchmentShade });
+    drawText(ctx, t('abandonWarning'), mid, y + 64, { color: PALETTE.redInk, align: 'center' });
+    rule(ctx, mid, y + 84, 140, PALETTE.inkFaded, PALETTE.redInk);
+    const bw = 150;
+    const gap = 20;
+    const bx = mid - bw - gap / 2;
+    pauseButton(ctx, 'pauseAbandon', t('abandonConfirm'), bx, y + 112, bw, menu.selected === 'abandon', true);
+    pauseButton(ctx, 'pauseCancel', t('abandonCancel'), bx + bw + gap, y + 112, bw, menu.selected === 'cancel', false);
+    drawText(ctx, t('confirmHint'), mid, y + PAUSE_H - 44, { color: PALETTE.inkFaded, align: 'center' });
+  }
+  ctx.globalAlpha = prev;
+}
+
+/** Interface layers above the cards: the archives ledger, the pause menu and toasts. Draw after drawOverlay. */
 export function drawUi(ctx: CanvasRenderingContext2D, _state: GameState, now: number): void {
   const smoothing = ctx.imageSmoothingEnabled;
   ctx.imageSmoothingEnabled = false;
   refreshTextCaches();
   if (ui.archivesOpen) drawArchives(ctx, now);
+  if (ui.pause.isOpen) drawPauseCard(ctx, now);
   drawToast(ctx, now);
   ctx.imageSmoothingEnabled = smoothing;
 }

@@ -4,11 +4,12 @@
 import type { Action, Dir } from './types';
 
 /** Interface keys handled outside the game rules. */
-export type UiKey = 'archives' | 'fullscreen' | 'close';
+export type UiKey = 'archives' | 'fullscreen' | 'close' | 'pause';
 
 const UI_BY_CODE: ReadonlyMap<string, UiKey> = new Map<string, UiKey>([
   ['KeyL', 'archives'],
   ['KeyF', 'fullscreen'],
+  ['KeyP', 'pause'],
   ['Escape', 'close'],
 ]);
 
@@ -17,11 +18,13 @@ const UI_BY_KEY: ReadonlyMap<string, UiKey> = new Map<string, UiKey>([
   ['ㅣ', 'archives'],
   ['f', 'fullscreen'],
   ['ㄹ', 'fullscreen'],
+  ['p', 'pause'],
+  ['ㅔ', 'pause'],
   ['Escape', 'close'],
   ['Esc', 'close'],
 ]);
 
-/** Map a keydown to an interface key (archives ledger, fullscreen, close), or null. */
+/** Map a keydown to an interface key (archives ledger, fullscreen, pause, close), or null. */
 export function keyToUiKey(code: string, key: string): UiKey | null {
   const byCode = UI_BY_CODE.get(code);
   if (byCode !== undefined) return byCode;

@@ -227,6 +227,7 @@ function createState(map: MapData, phase: Phase, now: number, muted: boolean): G
     localSlope: 'flat',
     startTime: phase === 'title' ? 0 : now,
     endTime: null,
+    pausedAt: null,
     effects: [],
     log: [],
     muted,
@@ -276,7 +277,7 @@ export class Game {
 
   /** Route one player action. `repeat` marks a held-key auto-repeat event. */
   handleAction(action: Action, now: number, repeat = false): void {
-    if (!repeat) this.repeatHalted = false;
+    if (!repeat && !this.isPaused) this.repeatHalted = false;
     if (action === 'mute') {
       if (!repeat) this.toggleMute(now);
       return;
@@ -285,6 +286,8 @@ export class Game {
       if (!repeat) this.restart(now);
       return;
     }
+    // The pause menu traps every other action: nothing moves and no turn passes.
+    if (this.isPaused) return;
     if (action === 'confirm' && repeat) return;
 
     switch (this.state.phase) {
@@ -324,7 +327,50 @@ export class Game {
 
   /** Start a brand-new expedition on a fresh map and go straight to 'playing'. */
   newExpedition(now: number, seed?: number): void {
-    const map = this.mapFactory(seed ?? this.freshSeed());
+    this.replaceState(this.mapFactory(seed ?? this.freshSeed()), 'playing', now);
+    this.logWelcome(now);
+  }
+
+  // -------------------------------------------------------------------------
+  // Pause menu
+  // -------------------------------------------------------------------------
+
+  /** True while the pause menu has frozen the expedition. */
+  get isPaused(): boolean {
+    return this.state.pausedAt !== null;
+  }
+
+  /** Freeze an expedition in progress (only during 'playing'). Returns whether it paused. */
+  pause(now: number): boolean {
+    const s = this.state;
+    if (s.phase !== 'playing' || s.pausedAt !== null) return false;
+    s.pausedAt = now;
+    return true;
+  }
+
+  /**
+   * Unfreeze: the expedition clock skips the paused span, and a key still held from before the
+   * pause cannot walk on through auto-repeat (a fresh press is needed).
+   */
+  resume(now: number): void {
+    const s = this.state;
+    if (s.pausedAt === null) return;
+    s.startTime += Math.max(0, now - s.pausedAt);
+    s.pausedAt = null;
+    this.repeatHalted = true;
+  }
+
+  /**
+   * Leave the expedition for the title card on a fresh sheet. The old state object is replaced
+   * wholesale, which is how the record keeper learns that an expedition was abandoned.
+   */
+  returnToTitle(now: number): void {
+    this.audio.stopAll();
+    this.replaceState(this.mapFactory(this.freshSeed()), 'title', now);
+  }
+
+  /** Fresh state on `map` in `phase`, with every per-run bookkeeping field reset. */
+  private replaceState(map: MapData, phase: Phase, now: number): void {
     this.lastMoveTime = -Infinity;
     this.lastBumpText = '';
     this.lastBumpLogTime = -Infinity;
@@ -332,9 +378,8 @@ export class Game {
     this.repeatHalted = false;
     this.lastPanoramaTurn = -Infinity;
     this.panoramaLine = null;
-    this.state = createState(map, 'playing', now, this.audio.muted);
+    this.state = createState(map, phase, now, this.audio.muted);
     this.primeSurroundings();
-    this.logWelcome(now);
   }
 
   // -------------------------------------------------------------------------

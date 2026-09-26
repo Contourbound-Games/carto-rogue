@@ -207,6 +207,11 @@ export interface GameState {
   startTime: number;
   /** performance.now() when the expedition ended (victory/defeat); null while ongoing. */
   endTime: number | null;
+  /**
+   * performance.now() when the pause menu froze the expedition; null while not paused. Only ever set
+   * during 'playing': turns, inputs and the expedition clock stop until Game.resume().
+   */
+  pausedAt: number | null;
   effects: Effect[];
   /** Newest last; capped to a handful of entries. */
   log: LogEntry[];

@@ -7,12 +7,11 @@ import { Game } from './game';
 import { initLanguage, t, toggleLang } from './i18n';
 import { clientToVirtual, directionToward, keyToAction, keyToUiKey, parseSeed, swipeDirection } from './input';
 import { generateMap } from './map';
-import { applyExpedition, loadRecords, saveRecords } from './records';
-import type { ExpeditionOutcome } from './records';
+import { applyExpedition, loadRecords, RecordKeeper, saveRecords } from './records';
 import { Renderer } from './renderer';
+import type { PauseCommand, PauseItem } from './pause';
 import { SeedEntry } from './seed-entry';
 import { copyText, seedText, shareText } from './share';
-import type { GameState } from './types';
 import { addTap, buttonAt, closeArchives, openArchives, showToast, ui } from './ui';
 import type { ButtonId } from './ui';
 
@@ -31,6 +30,15 @@ declare global {
 }
 
 const LOG_PREFIX = '[carto-rogue]';
+
+type PauseButtonId = 'pauseResume' | 'pauseToTitle' | 'pauseAbandon' | 'pauseCancel';
+/** Pause-card buttons and the menu item each one stands for. */
+const PAUSE_BUTTON_ITEMS: Readonly<Record<PauseButtonId, PauseItem>> = {
+  pauseResume: 'resume',
+  pauseToTitle: 'title',
+  pauseAbandon: 'abandon',
+  pauseCancel: 'cancel',
+};
 /** Holding a finger / button on the map keeps walking toward it after this delay... */
 const HOLD_DELAY_MS = 320;
 /** ...one step per this interval (a little slower than a held key, so it stays controllable). */
@@ -125,53 +133,6 @@ function drawFatal(error: unknown): void {
   });
 }
 
-/**
- * Keeps the career archives in step with the game: an expedition is recorded once when it ends
- * (victory or collapse), or as abandoned when it is replaced (R) or the page closes after at
- * least one step.
- */
-class RecordKeeper {
-  private tracked: GameState;
-  private recorded = false;
-
-  constructor(state: GameState) {
-    this.tracked = state;
-  }
-
-  sync(state: GameState): void {
-    if (state !== this.tracked) {
-      this.abandon();
-      this.tracked = state;
-      this.recorded = false;
-    }
-    const final = state.finalStats;
-    if (!this.recorded && final) this.record(state, final.outcome, final.grade);
-  }
-
-  /**
-   * The tracked expedition is being left behind: record its result if it ended (R can land before
-   * the next frame saw the ending), else record it as abandoned once it took a step.
-   */
-  abandon(): void {
-    if (this.recorded) return;
-    const final = this.tracked.finalStats;
-    if (final) this.record(this.tracked, final.outcome, final.grade);
-    else if (this.tracked.turns > 0) this.record(this.tracked, 'abandoned', null);
-  }
-
-  private record(state: GameState, outcome: ExpeditionOutcome, grade: string | null): void {
-    this.recorded = true;
-    ui.records = applyExpedition(ui.records, {
-      outcome,
-      percentMapped: (state.revealedCount / (MAP_W * MAP_H)) * 100,
-      tilesMapped: state.revealedCount,
-      turns: state.turns,
-      grade,
-    });
-    saveRecords(ui.records);
-  }
-}
-
 function start(): void {
   const canvas = findCanvas();
   canvas.width = VIRTUAL_WIDTH;
@@ -199,7 +160,10 @@ function start(): void {
   const renderer = new Renderer(canvas);
   // A shared ?seed= link drops the player straight onto that sheet.
   const game = new Game(audio, generateMap, { seed: urlSeed, now: performance.now(), startPlaying: urlSeed !== undefined });
-  const records = new RecordKeeper(game.state);
+  const records = new RecordKeeper(game.state, (result) => {
+    ui.records = applyExpedition(ui.records, result);
+    saveRecords(ui.records);
+  });
   window.addEventListener('pagehide', () => records.abandon());
 
   if (params.has('debug')) {
@@ -269,7 +233,39 @@ function start(): void {
         ui.hover = null;
         if (game.state.phase === 'title') dialog.open();
         return;
+      case 'pause':
+        openPause(now);
+        return;
+      case 'pauseResume':
+      case 'pauseToTitle':
+      case 'pauseAbandon':
+      case 'pauseCancel':
+        ui.pause.focus(PAUSE_BUTTON_ITEMS[id]);
+        runPause(ui.pause.activate(game.state.turns), now);
+        return;
     }
+  };
+
+  // ----- Pause menu -----
+  // The menu is UI state; the game only learns that it is frozen (Game.pause / resume).
+  const openPause = (now: number): void => {
+    if (ui.pause.isOpen || !game.pause(now)) return;
+    // Drop every in-flight input the instant the menu opens, so nothing steps on resume.
+    endPress();
+    ui.hover = null;
+    ui.pause.open(now);
+  };
+  const runPause = (command: PauseCommand, now: number): void => {
+    if (command === 'resume') {
+      ui.pause.close();
+      game.resume(now);
+    } else if (command === 'exit') {
+      ui.pause.close();
+      game.returnToTitle(now);
+      // Resolve the left-behind expedition now, not on the next frame (page teardown safety).
+      records.sync(game.state);
+    }
+    canvas.focus({ preventScroll: true });
   };
 
   const onCardScreen = (): boolean => {
@@ -303,6 +299,28 @@ function start(): void {
     if (uiKey === 'fullscreen') {
       e.preventDefault();
       if (!e.repeat) toggleFullscreen();
+      return;
+    }
+    if (ui.pause.isOpen) {
+      // The pause menu is modal: arrows / WASD select, Enter / Space choose, Esc / P back out;
+      // M still mutes and R still restarts at once. Nothing else reaches the game.
+      e.preventDefault();
+      if (action === 'mute') game.handleAction('mute', now, e.repeat);
+      else if (action === 'restart') {
+        if (!e.repeat) {
+          ui.pause.close();
+          game.handleAction('restart', now);
+        }
+      } else if (!e.repeat) {
+        if (uiKey === 'close' || uiKey === 'pause') runPause(ui.pause.back(), now);
+        else if (action === 'confirm') runPause(ui.pause.activate(game.state.turns), now);
+        else if (action !== null) ui.pause.step();
+      }
+      return;
+    }
+    if ((uiKey === 'close' || uiKey === 'pause') && game.state.phase === 'playing') {
+      e.preventDefault();
+      if (!e.repeat) openPause(now);
       return;
     }
     if (uiKey === 'archives') {
@@ -353,14 +371,14 @@ function start(): void {
     endPress();
     const v = toVirtual(e);
     const button = buttonAt(v.x, v.y);
-    const tile = !button && !ui.archivesOpen && game.state.phase === 'playing' ? tileAt(v) : null;
+    const tile = !button && !ui.archivesOpen && !ui.pause.isOpen && game.state.phase === 'playing' ? tileAt(v) : null;
     const current: Press = { id: e.pointerId, clientX: e.clientX, clientY: e.clientY, button, tile, held: 0, timer: 0 };
     press = current;
     if (tile) {
       const started = performance.now();
       current.timer = window.setInterval(() => {
         const now = performance.now();
-        if (press !== current || now - started < HOLD_DELAY_MS || game.state.phase !== 'playing') return;
+        if (press !== current || now - started < HOLD_DELAY_MS || game.state.phase !== 'playing' || ui.pause.isOpen) return;
         current.held++;
         addTap(current.tile?.x ?? tile.x, current.tile?.y ?? tile.y, now);
         // Held steps behave like a held key: they stop at fatal steps and fresh discoveries.
@@ -374,6 +392,8 @@ function start(): void {
     const v = toVirtual(e);
     if (e.pointerType === 'mouse') {
       ui.hover = buttonAt(v.x, v.y);
+      // Hovering a pause-card button highlights it, as the arrow keys would.
+      if (ui.hover && ui.hover in PAUSE_BUTTON_ITEMS) ui.pause.focus(PAUSE_BUTTON_ITEMS[ui.hover as PauseButtonId]);
       canvas.style.cursor = ui.hover ? 'pointer' : game.state.phase === 'playing' && tileAt(v) ? 'crosshair' : 'default';
     }
     // Sliding a held finger retargets the walk.
@@ -393,7 +413,7 @@ function start(): void {
     const v = toVirtual(e);
     const swipe = p.held === 0 ? swipeDirection(e.clientX - p.clientX, e.clientY - p.clientY) : null;
     if (swipe && !p.button) {
-      if (ui.archivesOpen) return;
+      if (ui.archivesOpen || ui.pause.isOpen) return;
       const phase = game.state.phase;
       if (phase === 'playing' || phase === 'title') game.handleAction(swipe, now);
       return;
@@ -407,6 +427,8 @@ function start(): void {
       closeArchives();
       return;
     }
+    // Taps beside the pause card do nothing (the card's own buttons were handled above).
+    if (ui.pause.isOpen) return;
     const phase = game.state.phase;
     if (phase === 'title') {
       game.handleAction('confirm', now);

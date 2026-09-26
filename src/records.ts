@@ -1,6 +1,9 @@
 // Career records ("Expedition Archives"), kept in localStorage across sessions.
 // The pure update function is separate from storage so it can be unit tested.
 
+import { MAP_H, MAP_W } from './config';
+import type { GameState } from './types';
+
 export const RECORDS_STORAGE_KEY = 'carto_rogue_records_v1';
 
 /** Grades from worst to best (victories are S/A/B/C, a collapse is always F). */
@@ -96,5 +99,57 @@ export function saveRecords(rec: CareerRecords): void {
     localStorage.setItem(RECORDS_STORAGE_KEY, JSON.stringify(rec));
   } catch {
     // Blocked storage: the archives simply last for this session.
+  }
+}
+
+/**
+ * Keeps the career archives in step with the game: every expedition is resolved exactly once.
+ * It is recorded when it ends (victory or collapse), or as abandoned when it is left behind after
+ * at least one step: replaced by R or a new sheet, abandoned from the pause menu, or the page
+ * closing. Zero-turn expeditions are never recorded. `sync` and `abandon` are idempotent, so
+ * repeated clicks, fast inputs and page teardown cannot record an expedition twice.
+ */
+export class RecordKeeper {
+  private tracked: GameState;
+  private recorded = false;
+
+  constructor(
+    state: GameState,
+    private readonly onRecord: (result: ExpeditionResult) => void,
+  ) {
+    this.tracked = state;
+  }
+
+  /** Call whenever the game state may have changed (every frame, and right after a swap). */
+  sync(state: GameState): void {
+    if (state !== this.tracked) {
+      this.abandon();
+      this.tracked = state;
+      this.recorded = false;
+    }
+    const final = state.finalStats;
+    if (!this.recorded && final) this.record(state, final.outcome, final.grade);
+  }
+
+  /**
+   * The tracked expedition is being left behind: record its result if it ended (R can land before
+   * the next frame saw the ending), else record it as abandoned once it took a step.
+   */
+  abandon(): void {
+    if (this.recorded) return;
+    const final = this.tracked.finalStats;
+    if (final) this.record(this.tracked, final.outcome, final.grade);
+    else if (this.tracked.turns > 0) this.record(this.tracked, 'abandoned', null);
+  }
+
+  private record(state: GameState, outcome: ExpeditionOutcome, grade: string | null): void {
+    this.recorded = true;
+    this.onRecord({
+      outcome,
+      percentMapped: (state.revealedCount / (MAP_W * MAP_H)) * 100,
+      tilesMapped: state.revealedCount,
+      turns: state.turns,
+      grade,
+    });
   }
 }
