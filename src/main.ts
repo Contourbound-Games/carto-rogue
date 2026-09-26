@@ -10,6 +10,7 @@ import { generateMap } from './map';
 import { applyExpedition, loadRecords, saveRecords } from './records';
 import type { ExpeditionOutcome } from './records';
 import { Renderer } from './renderer';
+import { SeedEntry } from './seed-entry';
 import { copyText, seedText, shareText } from './share';
 import type { GameState } from './types';
 import { addTap, buttonAt, closeArchives, openArchives, showToast, ui } from './ui';
@@ -175,7 +176,12 @@ function start(): void {
   const canvas = findCanvas();
   canvas.width = VIRTUAL_WIDTH;
   canvas.height = VIRTUAL_HEIGHT;
-  const refit = (): void => fitCanvas(canvas);
+  let seedEntry: SeedEntry | null = null;
+  // While the seed dialog is open the mobile keyboard resizes the viewport; the canvas is left
+  // exactly where it is (no jump) and refitted once the dialog closes.
+  const refit = (): void => {
+    if (!seedEntry?.isOpen) fitCanvas(canvas);
+  };
   refit();
   window.addEventListener('resize', refit);
   // Mobile browsers resize the visual viewport (URL bar, rotation) without always firing window resize.
@@ -200,6 +206,21 @@ function start(): void {
     window.__carto = { game, renderer, audio, ui };
     console.info(`${LOG_PREFIX} debug handles exposed on window.__carto (seed ${game.state.seed})`);
   }
+
+  // ----- Seed entry dialog -----
+  const afterSeedDialog = (): void => {
+    refit();
+    canvas.focus({ preventScroll: true });
+  };
+  seedEntry = new SeedEntry({
+    onSubmit: (seed) => {
+      audio.unlock();
+      game.startSeed(performance.now(), seed);
+      afterSeedDialog();
+    },
+    onCancel: afterSeedDialog,
+  });
+  const dialog = seedEntry;
 
   // ----- Fullscreen -----
   ui.fullscreenAvailable = document.fullscreenEnabled === true && typeof canvas.requestFullscreen === 'function';
@@ -244,6 +265,10 @@ function start(): void {
       case 'closeArchives':
         closeArchives();
         return;
+      case 'seedEntry':
+        ui.hover = null;
+        if (game.state.phase === 'title') dialog.open();
+        return;
     }
   };
 
@@ -254,6 +279,8 @@ function start(): void {
 
   // ----- Keyboard -----
   window.addEventListener('keydown', (e) => {
+    // The seed dialog owns the keyboard: every key types into its input, none reaches the game.
+    if (dialog.isOpen) return;
     audio.unlock();
     // Leave browser / OS shortcuts (Ctrl+R reload, Cmd+W, Alt+Tab...) alone.
     if (e.ctrlKey || e.metaKey || e.altKey) return;

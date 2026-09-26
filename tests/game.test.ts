@@ -1410,3 +1410,23 @@ describe('seed links and language', () => {
     expect(panoramaText(40, 0)).toBe('Panoramic survey! +40 tiles');
   });
 });
+
+describe('typed seed (ENTER SEED)', () => {
+  it('startSeed begins a fresh expedition on exactly that seed, like a ?seed= link', () => {
+    const h = setup({}, { start: false });
+    expect(h.s().phase).toBe('title');
+    h.game.startSeed(1000, 721405);
+    expect(h.seeds.at(-1)).toBe(721405);
+    expect(h.s().phase).toBe('playing');
+    expect(h.s().seed).toBe(721405);
+    expect(h.s().turns).toBe(0);
+    expect(h.s().stamina).toBe(MAX_STAMINA);
+    expect(h.audio.count('stopAll')).toBe(1);
+    expect(h.audio.count('expeditionStart')).toBe(1);
+
+    const viaLink = new Game(new MockAudio(), (seed) => ({ ...buildMap(), seed }), { seed: 721405, now: 1000, startPlaying: true });
+    expect(viaLink.state.seed).toBe(h.s().seed);
+    expect(viaLink.state.player).toEqual(h.s().player);
+    expect(Array.from(viaLink.state.revealed)).toEqual(Array.from(h.s().revealed));
+  });
+});

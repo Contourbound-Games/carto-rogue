@@ -2426,7 +2426,7 @@ const BTN_H = 26;
 const BTN_PAD = 10;
 const BTN_ICON_W = 14;
 
-type ButtonIcon = 'pin' | 'share' | 'seal';
+type ButtonIcon = 'pin' | 'share' | 'seal' | 'keypad';
 
 interface ButtonSpec {
   id: ButtonId;
@@ -2462,6 +2462,11 @@ function drawButtonIcon(ctx: Ctx, icon: ButtonIcon, x: number, y: number, face: 
     line(ctx, x + 5, y + 14, x + 11, y + 8, PALETTE.redInk);
     fill(ctx, x + 7, y + 7, 5, 1, PALETTE.redInk);
     fill(ctx, x + 11, y + 7, 1, 5, PALETTE.redInk);
+  } else if (icon === 'keypad') {
+    // A 3x3 numeric keypad.
+    for (let r = 0; r < 3; r++) {
+      for (let c = 0; c < 3; c++) fill(ctx, x + 1 + c * 4, y + 8 + r * 4, 3, 3, r === 2 && c === 2 ? PALETTE.redInk : PALETTE.inkSoft);
+    }
   } else {
     // A tiny wax seal.
     disc(ctx, x + 6, y + 13, 5, PALETTE.redInk);
@@ -2523,6 +2528,7 @@ function drawTitleButtons(ctx: Ctx, cx: number, y: number): void {
   buttonRow(ctx, [
     langToggleSpec(),
     { id: 'copySeed', runs: [[t('copySeed'), PALETTE.ink]], icon: 'pin' },
+    { id: 'seedEntry', runs: [[t('enterSeed'), PALETTE.inkSoft]], icon: 'keypad' },
     { id: 'archives', runs: [[t('archives'), PALETTE.ink]], icon: 'seal' },
   ], cx, y);
 }

@@ -352,8 +352,13 @@ export class Game {
 
   /** R (any phase) or confirm on an end card: silence lingering sounds and start over. */
   private restart(now: number): void {
+    this.startSeed(now, this.freshSeed());
+  }
+
+  /** Begin a fresh expedition on the given seed (R, or a typed seed): lingering sounds stop, the start jingle plays. */
+  startSeed(now: number, seed: number): void {
     this.audio.stopAll();
-    this.newExpedition(now, this.freshSeed());
+    this.newExpedition(now, seed);
     this.audio.expeditionStart();
   }
 

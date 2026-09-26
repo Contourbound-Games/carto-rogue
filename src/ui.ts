@@ -4,7 +4,15 @@
 import { emptyRecords } from './records';
 import type { CareerRecords } from './records';
 
-export type ButtonId = 'lang' | 'mute' | 'fullscreen' | 'copySeed' | 'share' | 'archives' | 'closeArchives';
+export type ButtonId =
+  | 'lang'
+  | 'mute'
+  | 'fullscreen'
+  | 'copySeed'
+  | 'share'
+  | 'archives'
+  | 'closeArchives'
+  | 'seedEntry';
 
 export interface UiButton {
   id: ButtonId;
