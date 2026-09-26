@@ -20,3 +20,6 @@ desktop.ini
 
 # Local screenshot captures
 screenshots/
+
+# Promotional media (large binaries) and its capture tooling
+promo/
