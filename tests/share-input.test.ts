@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { clientToVirtual, directionToward, keyToUiKey, swipeDirection, SWIPE_MIN_PX } from '../src/input';
-import { GAME_TITLE, seedUrl, shareText } from '../src/share';
+import { GAME_TITLE, PUBLIC_GAME_URL, seedText, shareText } from '../src/share';
 import type { ExpeditionStats } from '../src/types';
 
 const stats = (over: Partial<ExpeditionStats> = {}): ExpeditionStats => ({
@@ -17,29 +17,22 @@ const stats = (over: Partial<ExpeditionStats> = {}): ExpeditionStats => ({
   ...over,
 });
 
-describe('seed links', () => {
-  it('replaces the query and drops the hash', () => {
-    expect(seedUrl('https://example.com/play/index.html?seed=1&debug=1#x', 721405)).toBe(
-      'https://example.com/play/index.html?seed=721405',
-    );
-    expect(seedUrl('http://localhost:5173/', 42)).toBe('http://localhost:5173/?seed=42');
+describe('sharing', () => {
+  it('always points at the public itch.io page, never the embedded iframe host', () => {
+    expect(PUBLIC_GAME_URL).toBe('https://carto-studio.itch.io/the-carto-rogue');
+    expect(seedText(721405)).toBe(`${GAME_TITLE} #721405 | https://carto-studio.itch.io/the-carto-rogue`);
+    expect(shareText(1, stats())).not.toMatch(/itch\.zone|localhost/);
   });
 
-  it('falls back for unparsable bases', () => {
-    expect(seedUrl('not a url?x=1', 7)).toBe('not a url?seed=7');
-  });
-});
-
-describe('share text', () => {
-  it('matches the Wordle-style format', () => {
-    expect(shareText(721405, stats(), 'https://x.io/?seed=721405', 'en')).toBe(
-      `${GAME_TITLE} #721405 | Summit: Conquered | Turns: 67 | Explored: 15.5% | Grade: S | https://x.io/?seed=721405`,
+  it('matches the Wordle-style result format', () => {
+    expect(shareText(721405, stats(), 'en')).toBe(
+      `${GAME_TITLE} #721405 | Summit: Conquered | Turns: 67 | Explored: 15.5% | Grade: S | ${PUBLIC_GAME_URL}`,
     );
   });
 
   it('reports failures and localises the labels', () => {
-    const text = shareText(9, stats({ outcome: 'defeat', grade: 'F', percentMapped: 3 }), 'u', 'ko');
-    expect(text).toBe(`${GAME_TITLE} #9 | 정상: 실패 | 턴: 67 | 탐사: 3.0% | 등급: F | u`);
+    const text = shareText(9, stats({ outcome: 'defeat', grade: 'F', percentMapped: 3 }), 'ko');
+    expect(text).toBe(`${GAME_TITLE} #9 | 정상: 실패 | 턴: 67 | 탐사: 3.0% | 등급: F | ${PUBLIC_GAME_URL}`);
   });
 });
 

@@ -2,7 +2,7 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="description" content="The Carto-Rogue: 등고선 탐사대 — survey a procedural contour map and reach the Ancient Trig Pillar." />
     <title>The Carto-Rogue: 등고선 탐사대</title>
     <!-- Inline icon (trig-point triangle on parchment) so the browser never requests a missing favicon.ico. -->
@@ -28,11 +28,12 @@
         user-select: none;
         -webkit-tap-highlight-color: transparent;
       }
-      /* main.ts sizes and centres the canvas at whole device-pixel offsets (flex centring can land on half pixels). */
+      /* main.ts sizes the canvas in whole device pixels and centres it with fixed 50% / translate(-50%, -50%). */
       #game {
-        position: absolute;
-        left: 0;
-        top: 0;
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
         display: block;
         image-rendering: pixelated;
         image-rendering: crisp-edges;

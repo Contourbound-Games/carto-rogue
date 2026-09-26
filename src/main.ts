@@ -10,7 +10,7 @@ import { generateMap } from './map';
 import { applyExpedition, loadRecords, saveRecords } from './records';
 import type { ExpeditionOutcome } from './records';
 import { Renderer } from './renderer';
-import { copyText, currentPageUrl, seedUrl, shareText } from './share';
+import { copyText, seedText, shareText } from './share';
 import type { GameState } from './types';
 import { addTap, buttonAt, closeArchives, openArchives, showToast, ui } from './ui';
 import type { ButtonId } from './ui';
@@ -48,30 +48,37 @@ function seedFromUrl(params: URLSearchParams): number | undefined {
 }
 
 /**
- * Scale the fixed 1280x800 canvas to fit the window while keeping its aspect ratio, measured in
- * DEVICE pixels so HiDPI screens are handled like any other. From 2 device px per virtual px up the
- * scale snaps down to a whole number so every canvas pixel is the same size; between 1 and 2 the
- * fractional fit is kept (a whole-number 1x would waste up to half the window). Size and offsets
- * are rounded to whole device pixels, so the image never straddles a pixel boundary. Any upscale
- * stays crisp ('pixelated'); only a true downscale (a window smaller than 1280x800 device px)
- * filters smoothly, which keeps 1 px contour lines from dropping out entirely. In fullscreen the
- * browser stretches the canvas box and letterboxes the image (object-fit: contain).
+ * Scale the fixed 1280x800 canvas to fit the visible viewport while keeping its aspect ratio.
+ *
+ * The size is chosen in DEVICE pixels so HiDPI screens stay crisp: from 2 device px per virtual px
+ * up the scale snaps down to a whole number (every canvas pixel the same size); between 1 and 2 the
+ * fractional fit is kept. Any upscale stays 'pixelated'; only a true downscale filters smoothly,
+ * which keeps 1 px contour lines from dropping out entirely.
+ *
+ * Placement is plain CSS centring (fixed at 50% / 50%, translated back by half its own size), so
+ * the canvas is centred in CSS pixels on every device-pixel ratio, including DPR 2.5-3 phones where
+ * device-pixel offset arithmetic went wrong. In fullscreen the browser's own :fullscreen rules take
+ * over (inset 0, no transform) and letterbox the image with object-fit: contain.
  */
 function fitCanvas(canvas: HTMLCanvasElement): void {
   const dpr = window.devicePixelRatio > 0 ? window.devicePixelRatio : 1;
-  const fit = Math.min(window.innerWidth / VIRTUAL_WIDTH, window.innerHeight / VIRTUAL_HEIGHT);
+  const vv = window.visualViewport;
+  const viewW = vv && vv.width > 0 ? vv.width : window.innerWidth;
+  const viewH = vv && vv.height > 0 ? vv.height : window.innerHeight;
+  const fit = Math.min(viewW / VIRTUAL_WIDTH, viewH / VIRTUAL_HEIGHT);
   let scale = (Number.isFinite(fit) && fit > 0 ? fit : 1) * dpr; // device px per virtual px
   if (scale >= 2) scale = Math.floor(scale + 1e-9);
-  // Rounded down (the epsilon absorbs float error) so the canvas never overhangs a fractional viewport.
-  const width = Math.max(1, Math.floor(VIRTUAL_WIDTH * scale + 1e-6));
-  const height = Math.max(1, Math.floor(VIRTUAL_HEIGHT * scale + 1e-6));
-  const left = Math.max(0, Math.floor((window.innerWidth * dpr - width) / 2));
-  const top = Math.max(0, Math.floor((window.innerHeight * dpr - height) / 2));
-  canvas.style.width = `${width / dpr}px`;
-  canvas.style.height = `${height / dpr}px`;
-  canvas.style.left = `${left / dpr}px`;
-  canvas.style.top = `${top / dpr}px`;
-  canvas.style.imageRendering = scale >= 1 ? 'pixelated' : 'auto';
+  // Whole device pixels, rounded down (the epsilon absorbs float error) so it never overhangs.
+  const width = Math.max(1, Math.floor(VIRTUAL_WIDTH * scale + 1e-6)) / dpr;
+  const height = Math.max(1, Math.floor(VIRTUAL_HEIGHT * scale + 1e-6)) / dpr;
+  const style = canvas.style;
+  style.position = 'fixed';
+  style.left = '50%';
+  style.top = '50%';
+  style.transform = 'translate(-50%, -50%)';
+  style.width = `${width}px`;
+  style.height = `${height}px`;
+  style.imageRendering = scale >= 1 ? 'pixelated' : 'auto';
 }
 
 /**
@@ -171,6 +178,9 @@ function start(): void {
   const refit = (): void => fitCanvas(canvas);
   refit();
   window.addEventListener('resize', refit);
+  // Mobile browsers resize the visual viewport (URL bar, rotation) without always firing window resize.
+  window.visualViewport?.addEventListener('resize', refit);
+  window.addEventListener('orientationchange', refit);
   watchPixelRatio(refit);
 
   initLanguage();
@@ -208,7 +218,6 @@ function start(): void {
   const copyAndToast = (text: string, okKey: 'toastLink' | 'toastResult'): void => {
     void copyText(text).then((ok) => showToast(ok ? t(okKey) : t('toastFailed'), ok ? 'good' : 'bad', performance.now()));
   };
-  const linkForCurrentSeed = (): string => seedUrl(currentPageUrl(), game.state.seed);
 
   const runButton = (id: ButtonId, now: number): void => {
     switch (id) {
@@ -222,11 +231,11 @@ function start(): void {
         toggleFullscreen();
         return;
       case 'copySeed':
-        copyAndToast(linkForCurrentSeed(), 'toastLink');
+        copyAndToast(seedText(game.state.seed), 'toastLink');
         return;
       case 'share': {
         const stats = game.state.finalStats;
-        if (stats) copyAndToast(shareText(game.state.seed, stats, linkForCurrentSeed()), 'toastResult');
+        if (stats) copyAndToast(shareText(game.state.seed, stats), 'toastResult');
         return;
       }
       case 'archives':

@@ -1,27 +1,24 @@
-// Seed links and Wordle-style result summaries, plus a clipboard helper that also works in
-// embedded iframes where the async Clipboard API is blocked.
+// Seed and result summaries for sharing, plus a clipboard helper that also works in embedded
+// iframes where the async Clipboard API is blocked.
 import { t } from './i18n';
 import type { Lang } from './i18n';
 import type { ExpeditionStats } from './types';
 
 export const GAME_TITLE = 'The Carto-Rogue: 등고선 탐사대';
 
-/** `base` with its query string replaced by ?seed=<seed> (the hash is dropped). */
-export function seedUrl(base: string, seed: number): string {
-  try {
-    const url = new URL(base);
-    url.search = '';
-    url.hash = '';
-    url.searchParams.set('seed', String(seed));
-    return url.toString();
-  } catch {
-    const bare = base.split(/[?#]/)[0];
-    return `${bare}?seed=${seed}`;
-  }
+/**
+ * The public game page every share points to. The game itself runs inside itch.io's iframe on
+ * an internal host (html-classic.itch.zone), whose address must never be handed out.
+ */
+export const PUBLIC_GAME_URL = 'https://carto-studio.itch.io/the-carto-rogue';
+
+/** "The Carto-Rogue: 등고선 탐사대 #721405 | https://carto-studio.itch.io/the-carto-rogue" */
+export function seedText(seed: number): string {
+  return `${GAME_TITLE} #${seed} | ${PUBLIC_GAME_URL}`;
 }
 
-/** "The Carto-Rogue: 등고선 탐사대 #721405 | Summit: Conquered | Turns: 67 | Explored: 15.5% | Grade: S | <url>" */
-export function shareText(seed: number, stats: ExpeditionStats, url: string, lang?: Lang): string {
+/** "The Carto-Rogue: 등고선 탐사대 #721405 | Summit: Conquered | Turns: 67 | Explored: 15.5% | Grade: S | <public url>" */
+export function shareText(seed: number, stats: ExpeditionStats, lang?: Lang): string {
   const summit = stats.outcome === 'victory' ? t('shareConquered', undefined, lang) : t('shareFailed', undefined, lang);
   const explored = `${(Math.round(Math.max(0, Math.min(100, stats.percentMapped)) * 10) / 10).toFixed(1)}%`;
   return [
@@ -30,13 +27,8 @@ export function shareText(seed: number, stats: ExpeditionStats, url: string, lan
     `${t('shareTurns', undefined, lang)}: ${stats.turns}`,
     `${t('shareExplored', undefined, lang)}: ${explored}`,
     `${t('shareGrade', undefined, lang)}: ${stats.grade}`,
-    url,
+    PUBLIC_GAME_URL,
   ].join(' | ');
-}
-
-/** The page URL to share: the current location (outside the browser, a placeholder origin). */
-export function currentPageUrl(): string {
-  return typeof location !== 'undefined' ? location.href : 'https://localhost/';
 }
 
 /** Hidden-textarea fallback; must run inside a user gesture. */
