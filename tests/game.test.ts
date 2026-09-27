@@ -528,7 +528,7 @@ describe('caches and stamina', () => {
     expect(s().stamina).toBe(50 - 1 + CACHE_RESTORE);
     expect(s().cacheCollected).toEqual([true]);
     expect(audio.count('cacheCollected')).toBe(1);
-    expect(logTexts(s())).toContain(`Cache: +${CACHE_RESTORE} stamina`);
+    expect(logTexts(s())).toContain(`Supply Camp: +${CACHE_RESTORE} stamina`);
     const kinds = s().effects.map((e) => e.kind);
     expect(kinds).toContain('cache-sparkle');
     expect(s().effects.find((e) => e.kind === 'float-text')?.text).toBe(`+${CACHE_RESTORE} STAMINA`);
@@ -544,7 +544,7 @@ describe('caches and stamina', () => {
     game.handleAction('right', 1000);
     expect(s().stamina).toBe(MAX_STAMINA);
     expect(s().effects.find((e) => e.kind === 'float-text')?.text).toBe('+11 STAMINA');
-    expect(logTexts(s())).toContain('Cache: +11 stamina');
+    expect(logTexts(s())).toContain('Supply Camp: +11 stamina');
   });
 
   it('collects a cache before checking for collapse (rule 3 order)', () => {
@@ -694,7 +694,7 @@ describe('terminal steps', () => {
     expect(s().phase).toBe('collapsing');
     expect(s().cacheSighted).toEqual([true]);
     expect(audio.calls).toEqual(['footstep', 'defeat']);
-    expect(logTexts(s()).slice(-2)).toEqual(['Supply cache spotted.', 'You collapse, exhausted.']);
+    expect(logTexts(s()).slice(-2)).toEqual(['Supply Camp spotted.', 'You collapse, exhausted.']);
   });
 
   it('keeps discovery chimes on ordinary steps', () => {
@@ -983,7 +983,7 @@ describe('discoveries', () => {
     expect(texts).toContain('Trig Pillar sighted!');
     // The peak is tracked, but its line would only crowd the summit sighting out of the 4-line log.
     expect(texts.some((t) => t.startsWith('Peak'))).toBe(false);
-    expect(texts).toContain('Supply cache spotted.');
+    expect(texts).toContain('Supply Camp spotted.');
     const label = s().effects.find((e) => e.kind === 'float-text');
     expect(label).toMatchObject({ x: 44, y: 30 });
     expect(s().effects.some((e) => e.kind === 'summit-flare')).toBe(false);
@@ -1164,25 +1164,25 @@ describe('discoveries', () => {
     const labels = s().effects.filter((e) => e.kind === 'float-text');
     expect(labels.map((e) => [e.text, e.x, e.y])).toEqual([
       ['TRIG PILLAR', 44, 30],
-      ['CACHE', 44, 31],
-      ['CACHE', 44, 29],
+      ['SUPPLY CAMP', 44, 31],
+      ['SUPPLY CAMP', 44, 29],
     ]);
     for (const e of labels.slice(1)) {
       expect(e).toMatchObject({ color: PALETTE.brassDark, start: 1000, duration: labels[0].duration });
     }
-    expect(logTexts(s())).toContain('2 supply caches spotted.');
+    expect(logTexts(s())).toContain('2 Supply Camps spotted.');
     // Walking out of view and back does not label them again.
     game.handleAction('left', 1200);
     game.handleAction('left', 1400);
     game.handleAction('right', 1600);
     game.handleAction('right', 1800);
-    expect(s().effects.filter((e) => e.kind === 'float-text' && e.text === 'CACHE')).toHaveLength(2);
+    expect(s().effects.filter((e) => e.kind === 'float-text' && e.text === 'SUPPLY CAMP')).toHaveLength(2);
   });
 
   it('drops the sighting label of a cache once it is collected', () => {
     const { s, move } = setup({ caches: [{ x: 44, y: 31 }] });
     move('right');
-    expect(s().effects.filter((e) => e.text === 'CACHE')).toHaveLength(1);
+    expect(s().effects.filter((e) => e.text === 'SUPPLY CAMP')).toHaveLength(1);
     // Collected well inside the label's lifetime: only the pickup text floats over the cache.
     move('right', 'right', 'right', 'down');
     expect(s().cacheCollected).toEqual([true]);

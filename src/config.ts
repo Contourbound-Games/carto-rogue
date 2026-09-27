@@ -124,4 +124,6 @@ export const PALETTE = {
   fog: '#ebe0c5',
   fogSpeck: '#dccfae',
   green: '#5d6b3a',
+  /** Sight lines on the sheet (and their legend): the amber of the altimeter's sight-band marks, as ink. */
+  sightInk: '#a0661a',
 } as const;

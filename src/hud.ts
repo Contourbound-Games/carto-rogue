@@ -40,6 +40,7 @@ import { getLang, langVersion, t } from './i18n';
 import type { MessageKey } from './i18n';
 import { gradeRank } from './records';
 import { mulberry32 } from './rng';
+import { SIGHT_EYE_ART } from './sprites';
 import { addButton, clearButtons, TOAST_MS, ui } from './ui';
 import type { ButtonId } from './ui';
 import { tileIndex, toMeters } from './terrain';
@@ -1695,6 +1696,16 @@ function symIndexContour(g: Ctx, x: number, y: number): void {
   polyline(g, wavyPoints(x, y + 8, 40, 3, 0.4), PALETTE.ink, 2);
 }
 
+/** Sight line: a 2 px amber contour broken by the eye its labels carry on the sheet. */
+function symSightLine(g: Ctx, x: number, y: number): void {
+  const pts = wavyPoints(x, y + 8, 40, 3, 0.4);
+  polyline(g, pts.filter(([px]) => px <= x + 12), PALETTE.sightInk, 2);
+  polyline(g, pts.filter(([px]) => px >= x + 28), PALETTE.sightInk, 2);
+  SIGHT_EYE_ART.forEach((row, ry) => {
+    for (let rx = 0; rx < row.length; rx++) if (row[rx] === 'o') px(g, x + 15 + rx, y + 6 + ry, PALETTE.sightInk);
+  });
+}
+
 /** Cliff hachure ticks: [left root column along the rim, length, tip column 0 | 1]. */
 const CLIFF_TICKS: readonly (readonly [number, number, 0 | 1])[] = [
   [5, 4, 0],
@@ -1939,6 +1950,7 @@ function paintTitleCard(g: Ctx): void {
   const legend: [(gg: Ctx, x: number, y: number) => void, string][] = [
     [symContour, t('legendContour', { m: CONTOUR_M })],
     [symIndexContour, t('legendIndex', { m: CONTOUR_M * INDEX_CONTOUR_EVERY })],
+    [symSightLine, t('legendSight', { a: toMeters(VISION_MID_MIN), b: toMeters(VISION_HIGH_MIN) })],
     [symCliff, t('legendCliff')],
     [symWater, t('legendWater')],
     [symCache, t('legendCache')],

@@ -443,6 +443,12 @@ const PILLAR: SpriteArt = [
   'ooooooooo',
 ];
 
+/**
+ * Sight eye (11 x 5, 'o' = ink): the almond eye printed before a sight line's height on the sheet
+ * and on its legend symbol. Wider than tall, with a pupil, so it never reads as a leading zero.
+ */
+export const SIGHT_EYE_ART: SpriteArt = ['...ooooo...', '.oo.....oo.', 'o...ooo...o', '.oo.....oo.', '...ooooo...'];
+
 /** Small pillar for the sheet legend (5 x 8), same stone palette. */
 const PILLAR_MINI: SpriteArt = ['ooooo', 'owlmo', 'ooooo', '.olD.', '.olD.', '.olD.', 'owmDo', 'ooooo'];
 

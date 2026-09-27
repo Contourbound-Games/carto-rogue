@@ -36,7 +36,7 @@ describe('i18n', () => {
     expect(t('steepAlarm')).toBe('급경사!');
     expect(t('moderate')).toBe('완만');
     expect(t('flat')).toBe('평탄');
-    expect(t('floatCache')).toBe('보급 캠프');
+    expect(t('floatCache')).toBe('보급캠프');
     expect(t('altimeter')).toBe('고도계');
     expect(t('stamina')).toBe('스태미나');
     expect(t('compass')).toBe('나침반');
@@ -70,6 +70,8 @@ describe('i18n', () => {
       t('logPanoramaPeaks', { tiles: 4800, peaks: t('manyPeaks', { n: 12 }) }),
       t('logPeaks', { n: 12, m: 1200 }),
       t('logCachesSpotted', { n: 6 }),
+      t('logLowStamina'),
+      t('logCacheGain', { n: 40 }),
     ];
     for (const line of samples) expect(line.length, line).toBeLessThanOrEqual(30);
   });

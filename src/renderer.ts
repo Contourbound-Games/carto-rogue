@@ -30,6 +30,8 @@ import {
   VIRTUAL_HEIGHT,
   VIRTUAL_WIDTH,
   VISION_HIGH,
+  VISION_HIGH_MIN,
+  VISION_MID_MIN,
   WATER_LEVEL,
 } from './config';
 import { GLYPH_H, drawText, fontEpoch, measureText } from './font';
@@ -37,11 +39,13 @@ import { drawHud, drawOverlay, drawUi } from './hud';
 import { langVersion, t } from './i18n';
 import { TAP_RIPPLE_MS, ui } from './ui';
 import { hashSeed, mulberry32 } from './rng';
+import { visionRadiusFor } from './game';
 import { tileIndex, toMeters } from './terrain';
 import { DIRS } from './types';
 import type { Effect, EffectKind, GameState, MapData, Peak, Point } from './types';
 import {
   DitherPatterns,
+  SIGHT_EYE_ART,
   bayerT,
   createSpriteBank,
   fillDisc,
@@ -123,6 +127,8 @@ const WATER_HATCH_HEX = mixHex(PALETTE.water, PALETTE.waterInk, 0.42);
 const WATER_DEEP_HEX = mixHex(PALETTE.water, PALETTE.waterInk, 0.1);
 const MINOR_CONTOUR_HEX = mixHex(PALETTE.inkSoft, PALETTE.inkFaded, 0.3);
 const INDEX_CONTOUR_HEX = PALETTE.ink;
+/** Sight lines: the heights where the sight radius widens, one per band edge. */
+const SIGHT_HEIGHTS: readonly number[] = [VISION_MID_MIN, VISION_HIGH_MIN];
 /** Older survey outside the current line of sight is blended this far toward FADE_TARGET. */
 const FADE_TARGET_HEX = '#efe6cf';
 const FADE_AMOUNT = 0.3;
@@ -505,12 +511,19 @@ function chamferFromLand(water: Uint8Array): Uint16Array {
   return d;
 }
 
+/** Contour mark values (see markContours). */
+const MARK_MINOR = 1;
+const MARK_INDEX = 2;
+const MARK_SIGHT = 3;
+
 /**
- * Contour marks: 1 = minor contour pixel, 2 = index contour pixel (2 px thick).
- * A land pixel is on a contour where its contour level differs from its right or bottom
- * land neighbour; index lines also mark the neighbour so they straddle the boundary.
+ * Contour marks: 1 = minor contour pixel, 2 = index contour pixel (2 px thick), 3 = sight line
+ * pixel (2 px thick). A land pixel is on a contour where its contour level differs from its right
+ * or bottom land neighbour; index lines also mark the neighbour so they straddle the boundary.
+ * Sight lines follow the band edges of visionRadiusFor itself, so every tile centre lies on the
+ * side of the line that sets its sight radius; they take over the contour they coincide with.
  */
-function markContours(lvl: Int16Array, water: Uint8Array): Uint8Array {
+function markContours(lvl: Int16Array, water: Uint8Array, elev: Float32Array): Uint8Array {
   const mark = new Uint8Array(NPIX);
   const crossesIndex = (a: number, b: number): boolean => {
     const lo = Math.min(a, b);
@@ -525,15 +538,27 @@ function markContours(lvl: Int16Array, water: Uint8Array): Uint8Array {
       const a = lvl[p];
       if (x < W - 1 && !water[p + 1] && lvl[p + 1] !== a) {
         if (crossesIndex(a, lvl[p + 1])) {
-          mark[p] = 2;
-          mark[p + 1] = 2;
-        } else if (mark[p] === 0) mark[p] = 1;
+          mark[p] = MARK_INDEX;
+          mark[p + 1] = MARK_INDEX;
+        } else if (mark[p] === 0) mark[p] = MARK_MINOR;
       }
       if (y < H - 1 && !water[p + W] && lvl[p + W] !== a) {
         if (crossesIndex(a, lvl[p + W])) {
-          mark[p] = 2;
-          mark[p + W] = 2;
-        } else if (mark[p] === 0) mark[p] = 1;
+          mark[p] = MARK_INDEX;
+          mark[p + W] = MARK_INDEX;
+        } else if (mark[p] === 0) mark[p] = MARK_MINOR;
+      }
+    }
+  }
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const p = y * W + x;
+      if (water[p]) continue;
+      const r = visionRadiusFor(elev[p]);
+      for (const q of [x < W - 1 ? p + 1 : -1, y < H - 1 ? p + W : -1]) {
+        if (q < 0 || water[q] || visionRadiusFor(elev[q]) === r) continue;
+        mark[p] = MARK_SIGHT;
+        mark[q] = MARK_SIGHT;
       }
     }
   }
@@ -594,25 +619,75 @@ interface SpotHeight {
   ly: number;
 }
 
+/** Which lines a label pass annotates, and how. */
+interface LineLabelSpec {
+  /** Mark value of the labelled lines (MARK_INDEX or MARK_SIGHT). */
+  mark: number;
+  /** Label text at a line pixel, or null to place none there. */
+  text: (p: number) => string | null;
+  /** Width of the label box (px) for a text. */
+  width: (text: string) => number;
+  /** At most this many labels on the sheet, and this many per connected line. */
+  max: number;
+  perLine: number;
+  /** Salt for the tie-breaking jitter. */
+  salt: number;
+}
+
+/** Index contours: their height in metres, up to two per line. */
+function indexLabelSpec(lvl: Int16Array): LineLabelSpec {
+  return {
+    mark: MARK_INDEX,
+    text: (p) => {
+      const lv = lvl[p];
+      const level = lv % INDEX_CONTOUR_EVERY === 0 ? lv : (lv + 1) % INDEX_CONTOUR_EVERY === 0 ? lv + 1 : -1;
+      return level <= 0 ? null : String(Math.round(level * CONTOUR_INTERVAL * MAX_ELEV_M));
+    },
+    width: (text) => measureText(text) + 4,
+    max: 12,
+    perLine: 2,
+    salt: 0x1abe1,
+  };
+}
+
+const SIGHT_EYE_W = SIGHT_EYE_ART[0].length;
+
+/** Sight lines: eye mark and height (480 / 840), one per line, a few per sheet. */
+function sightLabelSpec(elev: Float32Array): LineLabelSpec {
+  return {
+    mark: MARK_SIGHT,
+    text: (p) => {
+      // The straddling pixel pair sits either side of the edge: the height is the nearest band edge.
+      let best = SIGHT_HEIGHTS[0];
+      for (const h of SIGHT_HEIGHTS) if (Math.abs(elev[p] - h) < Math.abs(elev[p] - best)) best = h;
+      return String(toMeters(best));
+    },
+    width: (text) => SIGHT_EYE_W + measureText(text) + 7,
+    max: 6,
+    perLine: 1,
+    salt: 0x5167,
+  };
+}
+
 /**
- * Choose a handful of upright index-contour labels: on long index lines, where the line
+ * Choose a handful of upright line labels: on long lines of the spec's kind, where the line
  * runs roughly horizontally, on land, away from objects, cliffs, the sheet edge and each other.
  */
-function placeContourLabels(
+function placeLineLabels(
   map: MapData,
   spotPeaks: readonly Peak[],
   elev: Float32Array,
   water: Uint8Array,
-  lvl: Int16Array,
   mark: Uint8Array,
   reserved: readonly LabelBox[],
+  spec: LineLabelSpec,
 ): LabelBox[] {
-  // Connected components of index-contour pixels (8-connected).
+  // Connected components of the labelled lines' pixels (8-connected).
   const comp = new Int32Array(NPIX).fill(-1);
   const sizes: number[] = [];
   const stack = new Int32Array(NPIX);
   for (let p0 = 0; p0 < NPIX; p0++) {
-    if (mark[p0] !== 2 || comp[p0] !== -1) continue;
+    if (mark[p0] !== spec.mark || comp[p0] !== -1) continue;
     const id = sizes.length;
     let top = 0;
     let size = 0;
@@ -630,7 +705,7 @@ function placeContourLabels(
           const nx = x + dx;
           if (nx < 0 || nx >= W) continue;
           const q = ny * W + nx;
-          if (mark[q] === 2 && comp[q] === -1) {
+          if (mark[q] === spec.mark && comp[q] === -1) {
             comp[q] = id;
             stack[top++] = q;
           }
@@ -644,7 +719,7 @@ function placeContourLabels(
     x: o.x * TILE + TILE / 2,
     y: o.y * TILE + TILE / 2,
   }));
-  const rng = mulberry32(hashSeed(map.seed, 0x1abe1));
+  const rng = mulberry32(hashSeed(map.seed, spec.salt));
 
   interface Candidate extends LabelBox {
     comp: number;
@@ -656,17 +731,15 @@ function placeContourLabels(
   for (let y = 16; y < H - 16; y += 3) {
     for (let x = 24; x < W - 24; x += 3) {
       const p = y * W + x;
-      if (mark[p] !== 2) continue;
+      if (mark[p] !== spec.mark) continue;
       const c = comp[p];
       if (sizes[c] < 170) continue;
       const gx = elev[p + 3] - elev[p - 3];
       const gy = elev[p + 3 * W] - elev[p - 3 * W];
       if (Math.abs(gy) < 1.7 * Math.abs(gx) || Math.abs(gy) < 1e-4) continue;
-      const lv = lvl[p];
-      const level = lv % INDEX_CONTOUR_EVERY === 0 ? lv : (lv + 1) % INDEX_CONTOUR_EVERY === 0 ? lv + 1 : -1;
-      if (level <= 0) continue;
-      const text = String(Math.round(level * CONTOUR_INTERVAL * MAX_ELEV_M));
-      const w = measureText(text) + 4;
+      const text = spec.text(p);
+      if (text === null) continue;
+      const w = spec.width(text);
       const h = 9;
       const bx = x - (w >> 1);
       const by = y - 4;
@@ -712,9 +785,9 @@ function placeContourLabels(
   const chosen: Candidate[] = [];
   const perComp = new Map<number, number>();
   for (const cand of candidates) {
-    if (chosen.length >= 12) break;
+    if (chosen.length >= spec.max) break;
     const n = perComp.get(cand.comp) ?? 0;
-    if (n >= 2) continue;
+    if (n >= spec.perLine) continue;
     let fits = true;
     for (const o of chosen) {
       const d = Math.hypot(o.cx - cand.cx, o.cy - cand.cy);
@@ -827,7 +900,7 @@ function buildMapPixels(
   const minLevel = Math.floor(WATER_LEVEL / CONTOUR_INTERVAL);
   for (let p = 0; p < NPIX; p++) lvl[p] = Math.max(minLevel, Math.floor(elev[p] / CONTOUR_INTERVAL));
   const dist = chamferFromLand(water);
-  const mark = markContours(lvl, water);
+  const mark = markContours(lvl, water, elev);
   lap('contours');
 
   const spotsReserved: LabelBox[] = spotPeaks.map((pk) => ({
@@ -837,9 +910,11 @@ function buildMapPixels(
     h: 26,
     text: '',
   }));
-  const labels = placeContourLabels(map, spotPeaks, elev, water, lvl, mark, spotsReserved);
+  // Sight lines are labelled first: their few labels are what tell the player what the amber line is.
+  const sightLabels = placeLineLabels(map, spotPeaks, elev, water, mark, spotsReserved, sightLabelSpec(elev));
+  const labels = placeLineLabels(map, spotPeaks, elev, water, mark, [...spotsReserved, ...sightLabels], indexLabelSpec(lvl));
   const knock = new Uint8Array(NPIX);
-  for (const lb of labels) {
+  for (const lb of [...labels, ...sightLabels]) {
     for (let y = lb.y; y < lb.y + lb.h; y++) knock.fill(1, y * W + lb.x, y * W + lb.x + lb.w);
   }
   lap('labels');
@@ -857,6 +932,7 @@ function buildMapPixels(
   const cInk = packHex(PALETTE.ink);
   const cMinor = packHex(MINOR_CONTOUR_HEX);
   const cIndex = packHex(INDEX_CONTOUR_HEX);
+  const cSight = packHex(PALETTE.sightInk);
   const cSpeck = packHex(PALETTE.inkPale);
   const seed = map.seed | 0;
   const waveSeed = (seed % 997) * 0.37;
@@ -929,7 +1005,7 @@ function buildMapPixels(
       const tk = ticks[p];
       if (!knock[p]) {
         if (tk === TICK_PIXEL) col = cInk;
-        else if (m !== 0 && tk !== TICK_HALO) col = m === 2 ? cIndex : cMinor;
+        else if (m !== 0 && tk !== TICK_HALO) col = m === MARK_SIGHT ? cSight : m === MARK_INDEX ? cIndex : cMinor;
       }
       out[p] = col;
     }
@@ -940,6 +1016,13 @@ function buildMapPixels(
 
   scratch.ctx.putImageData(img, 0, 0);
   for (const lb of labels) drawText(scratch.ctx, lb.text, lb.x + 2, lb.y + 1, { color: PALETTE.ink });
+  scratch.ctx.fillStyle = PALETTE.sightInk;
+  for (const lb of sightLabels) {
+    SIGHT_EYE_ART.forEach((row, ry) => {
+      for (let rx = 0; rx < SIGHT_EYE_W; rx++) if (row[rx] === 'o') scratch.ctx.fillRect(lb.x + 2 + rx, lb.y + 2 + ry, 1, 1);
+    });
+    drawText(scratch.ctx, lb.text, lb.x + SIGHT_EYE_W + 4, lb.y + 1, { color: PALETTE.sightInk });
+  }
   const final = new Uint32Array(scratch.ctx.getImageData(0, 0, W, H).data.buffer);
   lap('finish');
   return final;
