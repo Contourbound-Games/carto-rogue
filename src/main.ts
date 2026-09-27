@@ -12,8 +12,8 @@ import { Renderer } from './renderer';
 import type { PauseCommand, PauseItem } from './pause';
 import { SeedEntry } from './seed-entry';
 import { copyText, seedText, shareText } from './share';
-import { addTap, buttonAt, closeArchives, openArchives, showToast, ui } from './ui';
-import type { ButtonId } from './ui';
+import { addTap, buttonAt, closeArchives, openArchives, reportFor, showToast, ui } from './ui';
+import type { ButtonId, EndChoice } from './ui';
 
 /** Handles exposed as window.__carto when the page is opened with ?debug (automated testing). */
 export interface CartoDebugHandles {
@@ -243,7 +243,32 @@ function start(): void {
         ui.pause.focus(PAUSE_BUTTON_ITEMS[id]);
         runPause(ui.pause.activate(game.state.turns), now);
         return;
+      case 'retrySheet':
+        runEndChoice('retry', now);
+        return;
+      case 'newExpedition':
+        runEndChoice('new', now);
+        return;
+      case 'toggleCard':
+        toggleReportCard();
+        return;
+      case 'reportCard':
+        // The card itself: a tap on its paper does nothing (only its buttons act).
+        return;
     }
+  };
+
+  // ----- Expedition report (end cards) -----
+  const runEndChoice = (choice: EndChoice, now: number): void => {
+    if (!onEndCard()) return;
+    if (choice === 'retry') game.retrySheet(now);
+    else game.handleAction('restart', now);
+    canvas.focus({ preventScroll: true });
+  };
+  const toggleReportCard = (): void => {
+    if (!onEndCard()) return;
+    const report = reportFor(game.state);
+    report.cardHidden = !report.cardHidden;
   };
 
   // ----- Pause menu -----
@@ -272,6 +297,7 @@ function start(): void {
     const phase = game.state.phase;
     return phase === 'title' || phase === 'gameover' || phase === 'victory';
   };
+  const onEndCard = (): boolean => game.state.phase === 'gameover' || game.state.phase === 'victory';
 
   // ----- Keyboard -----
   window.addEventListener('keydown', (e) => {
@@ -327,6 +353,29 @@ function start(): void {
       e.preventDefault();
       if (!e.repeat && onCardScreen()) openArchives(now);
       return;
+    }
+    if (onEndCard()) {
+      // The report: H tucks the card away, arrows pick retry / new, Enter / Space run the pick.
+      // R stays "new expedition" (handled by the game below), M still mutes.
+      const report = reportFor(game.state);
+      if (uiKey === 'card') {
+        e.preventDefault();
+        if (!e.repeat) toggleReportCard();
+        return;
+      }
+      if (action === 'up' || action === 'down' || action === 'left' || action === 'right') {
+        e.preventDefault();
+        if (!e.repeat) {
+          report.choice = report.choice === 'retry' ? 'new' : 'retry';
+          report.cardHidden = false;
+        }
+        return;
+      }
+      if (action === 'confirm') {
+        e.preventDefault();
+        if (!e.repeat) runEndChoice(report.choice, now);
+        return;
+      }
     }
     if (action === null) return;
     e.preventDefault();
@@ -420,7 +469,9 @@ function start(): void {
     }
     const hit = buttonAt(v.x, v.y);
     if (p.button) {
-      if (hit === p.button) runButton(hit, now);
+      // A tap still aimed at the sheet as the end card slides in never lands on its buttons.
+      const guarded = onEndCard() && now - game.state.phaseStart <= END_CARD_TAP_GUARD_MS;
+      if (hit === p.button && !guarded) runButton(hit, now);
       return;
     }
     if (ui.archivesOpen) {
@@ -433,7 +484,9 @@ function start(): void {
     if (phase === 'title') {
       game.handleAction('confirm', now);
     } else if (phase === 'gameover' || phase === 'victory') {
-      if (now - game.state.phaseStart > END_CARD_TAP_GUARD_MS) game.handleAction('confirm', now);
+      // Tapping the sheet beside the report tucks the card away (or brings it back); only the
+      // card's buttons start another expedition, so studying the map never starts one by accident.
+      if (now - game.state.phaseStart > END_CARD_TAP_GUARD_MS && tileAt(v)) toggleReportCard();
     } else if (phase === 'playing' && p.held === 0) {
       const tile = tileAt(v);
       if (tile) {

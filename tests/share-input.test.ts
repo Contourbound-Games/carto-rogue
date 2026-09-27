@@ -14,6 +14,7 @@ const stats = (over: Partial<ExpeditionStats> = {}): ExpeditionStats => ({
   percentMapped: 15.456,
   elapsedMs: 12000,
   grade: 'S',
+  breakdown: null,
   ...over,
 });
 

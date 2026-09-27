@@ -154,6 +154,17 @@ export interface LogEntry {
   tone: LogTone;
 }
 
+/**
+ * The three parts of a victory grade, exactly as gradeVictory scored them (each 0..1), and the
+ * weighted score (0..1) whose thresholds give the letter.
+ */
+export interface GradeBreakdown {
+  route: number;
+  reserve: number;
+  survey: number;
+  score: number;
+}
+
 export interface ExpeditionStats {
   outcome: 'victory' | 'defeat';
   turns: number;
@@ -168,6 +179,8 @@ export interface ExpeditionStats {
   elapsedMs: number;
   /** Cartographer's grade: 'S', 'A', 'B' or 'C' for a victory; a defeat is always graded 'F'. */
   grade: string;
+  /** How a victory's grade was scored (from the unrounded survey share); null for a defeat. */
+  breakdown: GradeBreakdown | null;
 }
 
 export interface GameState {
@@ -196,6 +209,8 @@ export interface GameState {
   peakSighted: boolean[];
   /** Every tile the player has stood on, in order, starting with the spawn. */
   trail: Point[];
+  /** Stamina cost (1, 3 or 8) of each step: stepCosts[k] is the step trail[k] -> trail[k + 1]. */
+  stepCosts: number[];
   /** Highest tile elevation stood on so far (0..1). */
   maxElevation: number;
   lastMove: { cost: number; slope: SlopeClass } | null;

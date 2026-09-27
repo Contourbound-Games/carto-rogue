@@ -41,11 +41,12 @@ import type { MessageKey } from './i18n';
 import { gradeRank } from './records';
 import { mulberry32 } from './rng';
 import { SIGHT_EYE_ART } from './sprites';
-import { addButton, clearButtons, TOAST_MS, ui } from './ui';
+import { GRADE_THRESHOLDS, GRADE_WEIGHTS, RESERVE_FULL_MARKS, SURVEY_FULL_MARKS, gradePoints } from './game';
+import { addButton, clearButtons, reportFor, TOAST_MS, ui } from './ui';
 import type { ButtonId } from './ui';
 import { tileIndex, toMeters } from './terrain';
 import { DIR_LIST, DIRS } from './types';
-import type { Dir, ExpeditionStats, GameState, LogTone, MapData, SlopeClass } from './types';
+import type { Dir, ExpeditionStats, GameState, GradeBreakdown, LogTone, MapData, Point, SlopeClass } from './types';
 
 type Ctx = CanvasRenderingContext2D;
 type Pt = readonly [number, number];
@@ -162,10 +163,8 @@ function dither(ctx: Ctx, x: number, y: number, w: number, h: number, color: str
   }
 }
 
-/** Peak opacity of the darkening veil behind the full-screen cards. */
+/** Peak opacity of the darkening veil behind the full-screen cards (the end reports have none). */
 const VEIL_OPACITY = 0.62;
-/** Lighter veil for the victory card, so the summit radiance, rays and route read around it. */
-const VICTORY_VEIL_OPACITY = 0.4;
 
 /**
  * Darkening veil behind the title / end cards. `t` (0..1) is the card's fade-in progress,
@@ -2159,29 +2158,42 @@ function statsFor(state: GameState, now: number): ExpeditionStats {
     percentMapped: (state.revealedCount / (MAP_W * MAP_H)) * 100,
     elapsedMs: elapsedMs(state, now),
     grade: '?',
+    breakdown: null,
   };
 }
 
-function statRows(ctx: Ctx, rows: readonly [string, string][], x: number, y: number, w: number, rowH: number): void {
-  rows.forEach(([name, value], k) => {
+/** Name ....... value rows at 2x; a row's optional third entry inks its value in that colour. */
+function statRows(
+  ctx: Ctx,
+  rows: readonly (readonly [string, string, string?])[],
+  x: number,
+  y: number,
+  w: number,
+  rowH: number,
+): void {
+  rows.forEach(([name, value, color], k) => {
     const ry = y + k * rowH;
     drawText(ctx, name, x, ry, { scale: 2, color: PALETTE.inkSoft });
-    drawText(ctx, value, x + w, ry, { scale: 2, color: PALETTE.ink, align: 'right' });
+    drawText(ctx, value, x + w, ry, { scale: 2, color: color ?? PALETTE.ink, align: 'right' });
     for (let xx = x + measureText(name, 2) + 6; xx < x + w - measureText(value, 2) - 6; xx += 4) {
       px(ctx, xx, ry + 12, PALETTE.inkPale);
     }
   });
 }
 
-const DEFEAT_W = 660;
-const DEFEAT_H = 430;
+// Both end cards are expedition reports of one size, tucked into a corner of the sheet so the
+// surveyed route and the terrain around it stay readable beside them.
+const DEFEAT_W = 600;
+const DEFEAT_H = 440;
 const VICTORY_W = 600;
-const VICTORY_H = 400;
+const VICTORY_H = 440;
+/** Baseline of the footer line (cause / pillar note on the left, sheet number on the right). */
+const REPORT_FOOT_Y = 26;
 
 function paintDefeatCard(g: Ctx): void {
   paintPaper(g, DEFEAT_W, DEFEAT_H, 404);
   paintNeatline(g, DEFEAT_W, DEFEAT_H, PALETTE.inkFaded);
-  drawText(g, t('causeExhaustion'), 36, DEFEAT_H - 40, { color: PALETTE.inkFaded });
+  drawText(g, t('causeExhaustion'), 36, DEFEAT_H - REPORT_FOOT_Y, { color: PALETTE.inkFaded });
   const mid = Math.floor(DEFEAT_W / 2);
   drawText(g, t('finalEntry'), mid, 34, { color: PALETTE.inkFaded, align: 'center' });
   drawText(g, t('collapsed'), mid, 52, {
@@ -2197,11 +2209,11 @@ function paintDefeatCard(g: Ctx): void {
 
 /**
  * Blots that soak into the defeat card as it appears: [x, y, radius, delay 0..1]. The lower
- * two sit above and outside the restart prompt so their drips never reach its letters.
+ * two sit in the bottom corners, outside the button rows, so their drips never reach a label.
  */
 const BLOTS: readonly (readonly [number, number, number, number])[] = [
-  [44, DEFEAT_H - 116, 11, 0],
-  [DEFEAT_W - 50, DEFEAT_H - 120, 8, 0.3],
+  [30, DEFEAT_H - 66, 9, 0],
+  [DEFEAT_W - 32, DEFEAT_H - 70, 7, 0.3],
   [DEFEAT_W - 46, 46, 5, 0.55],
   [44, 58, 4, 0.75],
 ];
@@ -2297,13 +2309,13 @@ function paintVictoryCard(g: Ctx): void {
   symTrig(g, mid + Math.floor(tw / 2) + 22, 53);
   drawText(g, t('ancientTrig'), mid, 88, { scale: 2, color: PALETTE.redInk, align: 'center' });
   rule(g, mid, 112, 240, PALETTE.inkFaded, PALETTE.redInk);
-  drawText(g, t('pillarOccupied'), 36, VICTORY_H - 40, { color: PALETTE.inkFaded });
+  drawText(g, t('pillarOccupied'), 36, VICTORY_H - REPORT_FOOT_Y, { color: PALETTE.inkFaded });
 }
 
 /** Clear sheet wanted between the summit and the victory card (the radiance disc is ~42 px). */
 const SUMMIT_CLEARANCE = 48;
 
-/** Surveyed tiles whose centres lie under the box (x, y, w, h); route tiles count three times. */
+/** Surveyed tiles whose centres lie under the box (x, y, w, h); route tiles count nine times. */
 function surveyUnder(state: GameState, x: number, y: number, w: number, h: number): number {
   const tx0 = Math.max(0, Math.ceil((x - MAP_ORIGIN_X) / TILE - 0.5));
   const tx1 = Math.min(MAP_W, Math.ceil((x + w - MAP_ORIGIN_X) / TILE - 0.5));
@@ -2313,22 +2325,23 @@ function surveyUnder(state: GameState, x: number, y: number, w: number, h: numbe
   for (let ty = ty0; ty < ty1; ty++) {
     for (let tx = tx0; tx < tx1; tx++) n += state.revealed[tileIndex(tx, ty)];
   }
-  for (const p of state.trail) if (p.x >= tx0 && p.x < tx1 && p.y >= ty0 && p.y < ty1) n += 2;
+  // The route is what the report is read by, so a corner hiding less of it wins over plain survey.
+  for (const p of state.trail) if (p.x >= tx0 && p.x < tx1 && p.y >= ty0 && p.y < ty1) n += 8;
   return n;
 }
 
 /**
- * Top-left of the victory card, in one of the four map-area corners (inside the neatline,
- * shadow included). The corner that leaves the summit radiance clearest wins (a summit under
- * every corner goes to the one it sits least deep in); among corners that all leave it clear,
- * the one hiding the least of the survey and its route, then the one farthest from the summit.
+ * Top-left of an end card (card w x h), in one of the four map-area corners (inside the neatline,
+ * shadow included). The corner that leaves the focus tile (the summit after a victory, the place
+ * of collapse after a defeat) clearest wins (a focus under every corner goes to the one it sits
+ * least deep in); among corners that all leave it clear, the one hiding the least of the survey
+ * and its route, then the one farthest from the focus.
  */
-function victoryCardOrigin(state: GameState): Pt {
-  const { summit } = state.map;
-  const sx = MAP_ORIGIN_X + (summit.x + 0.5) * TILE;
-  const sy = MAP_ORIGIN_Y + (summit.y + 0.5) * TILE;
-  const w = VICTORY_W + CARD_SHADOW;
-  const h = VICTORY_H + CARD_SHADOW;
+function reportCardOrigin(state: GameState, cardW: number, cardH: number, focus: Point): Pt {
+  const sx = MAP_ORIGIN_X + (focus.x + 0.5) * TILE;
+  const sy = MAP_ORIGIN_Y + (focus.y + 0.5) * TILE;
+  const w = cardW + CARD_SHADOW;
+  const h = cardH + CARD_SHADOW;
   const left = MAP_ORIGIN_X + CARD_INSET;
   const right = MAP_ORIGIN_X + MAP_PX_W - CARD_INSET - w;
   const top = MAP_ORIGIN_Y + CARD_INSET;
@@ -2369,69 +2382,198 @@ function drawSheetNo(ctx: Ctx, state: GameState, right: number, y: number): void
   drawText(ctx, t('sheetNo', { seed: state.seed }), right, y, { color: PALETTE.inkFaded, align: 'right' });
 }
 
-/** Restart prompt on both end cards (R, Enter and Space all start a new expedition). */
-
-function drawPrompt(ctx: Ctx, text: string, x: number, y: number, state: GameState, now: number): void {
-  const since = now - state.phaseStart;
-  if (since < 400 || (since - 400) % 1100 < 760) {
-    drawText(ctx, text, x, y, { scale: 2, color: PALETTE.redInk, align: 'center', shadow: PALETTE.parchmentShade });
+/** Steps of each cost (flat, gentle, steep) and the stamina they took, from the recorded step costs. */
+function stepTally(state: GameState): { flat: [number, number]; gentle: [number, number]; steep: [number, number] } {
+  const tally = { flat: [0, 0] as [number, number], gentle: [0, 0] as [number, number], steep: [0, 0] as [number, number] };
+  for (const c of state.stepCosts) {
+    const row = c >= COST_STEEP ? tally.steep : c >= COST_GENTLE ? tally.gentle : tally.flat;
+    row[0]++;
+    row[1] += c;
   }
+  return tally;
+}
+
+/** Card position for this end: the chosen corner, sliding in from the sheet's middle. */
+function reportPlacement(state: GameState, now: number, w: number, h: number): { x: number; y: number; restY: number } {
+  const focus = state.phase === 'victory' ? state.map.summit : state.player;
+  const [x, restY] = reportCardOrigin(state, w, h, focus);
+  const inward = restY + h / 2 < MAP_ORIGIN_Y + MAP_PX_H / 2 ? 1 : -1;
+  return { x, y: restY + inward * Math.round((1 - endCardAnim(state, now)) * 40), restY };
+}
+
+/** With the card tucked away only a SHOW REPORT tab stays, at the card's corner of the sheet. */
+function drawReportTab(ctx: Ctx, x: number, y: number, w: number, h: number): void {
+  const spec: ButtonSpec = { id: 'toggleCard', runs: [[t('showReport'), PALETTE.redInk]] };
+  const bw = buttonWidth(spec);
+  const right = x + w / 2 > MAP_ORIGIN_X + MAP_PX_W / 2;
+  const bottom = y + h / 2 > MAP_ORIGIN_Y + MAP_PX_H / 2;
+  paperButton(ctx, spec, right ? x + w + CARD_SHADOW - bw - 2 : x, bottom ? y + h + CARD_SHADOW - BTN_H - 2 : y);
+}
+
+/** The summary line, the map key and both button rows at the foot of either report card. */
+function drawReportFoot(ctx: Ctx, state: GameState, s: ExpeditionStats, x: number, y: number, w: number, h: number): void {
+  const report = reportFor(state);
+  const cx = x + Math.floor(w / 2);
+  drawText(
+    ctx,
+    t('reportLine', {
+      t: s.turns,
+      time: formatTime(s.elapsedMs),
+      c: `${s.cachesCollected}/${s.cachesTotal}`,
+      m: toMeters(s.maxElevation),
+    }),
+    x + 36,
+    y + h - 164,
+    { color: PALETTE.inkSoft },
+  );
+  drawReportKey(ctx, x + 36, y + h - 148);
+  buttonRow(ctx, [
+    { id: 'retrySheet', runs: [[t('retrySheet'), PALETTE.redInk]], selected: report.choice === 'retry' },
+    { id: 'newExpedition', runs: [[t('newExpedition'), PALETTE.ink]], selected: report.choice === 'new' },
+  ], cx, y + h - 124);
+  buttonRow(ctx, [
+    { id: 'copySeed', runs: [[t('copySeed'), PALETTE.ink]], icon: 'pin' },
+    { id: 'share', runs: [[t('shareResult'), PALETTE.ink]], icon: 'share' },
+    { id: 'toggleCard', runs: [[t('hideCard'), PALETTE.inkSoft]] },
+  ], cx, y + h - 90);
+  drawText(ctx, t('endPrompt'), cx, y + h - 54, { color: PALETTE.inkFaded, align: 'center' });
+  drawSheetNo(ctx, state, x + w - 36, y + h - REPORT_FOOT_Y);
+}
+
+/**
+ * Key to the report map, in the sheet's own symbols: the route inked by step cost (dashed 1,
+ * solid 3, heavy 8), Supply Camps visited / seen / never found, and the ground never surveyed.
+ */
+function drawReportKey(ctx: Ctx, x: number, y: number): void {
+  const gap = 12;
+  const label = (text: string, lx: number): number => {
+    drawText(ctx, text, lx, y + 2, { color: PALETTE.inkSoft });
+    return lx + measureText(text) + gap;
+  };
+  const mid = y + 5;
+  let cx = x;
+  for (let k = 0; k < 3; k++) fill(ctx, cx + k * 5, mid - 1, 3, 2, PALETTE.redInk);
+  cx = label(`${COST_FLAT}`, cx + 16);
+  fill(ctx, cx, mid - 1, 14, 2, PALETTE.redInk);
+  cx = label(`${COST_GENTLE}`, cx + 17);
+  fill(ctx, cx, mid - 2, 14, 4, PALETTE.redInk);
+  cx = label(`${COST_STEEP}`, cx + 17) + 4;
+  // Supply Camps, as the sheet draws them after an expedition.
+  drawArt(ctx, ART_CRATE, OBJECT_COLORS, cx, y - 2, 1);
+  line(ctx, cx + 11, y + 4, cx + 12, y + 5, PALETTE.green);
+  line(ctx, cx + 12, y + 5, cx + 15, y + 1, PALETTE.green);
+  cx = label(t('keyVisited'), cx + 18);
+  drawArt(ctx, ART_CRATE, OBJECT_COLORS, cx, y - 2, 1);
+  cx = label(t('keySeen'), cx + 13);
+  const a = ctx.globalAlpha;
+  ctx.globalAlpha = a * REPORT_GHOST_ALPHA;
+  drawArt(ctx, ART_CRATE, OBJECT_COLORS, cx, y - 2, 1);
+  ctx.globalAlpha = a;
+  drawText(ctx, '?', cx + 10, y - 3, { color: PALETTE.inkFaded });
+  cx = label(t('keyMissed'), cx + 17);
+  // Unsurveyed ground: the sheet seen through the fog.
+  fill(ctx, cx, y - 1, 14, 10, PALETTE.fog);
+  for (let k = 0; k < 14; k += 3) px(ctx, cx + k, y + 7 - Math.floor(k / 2), PALETTE.fogSpeck);
+  outline(ctx, cx, y - 1, 14, 10, PALETTE.inkPale);
+  label(t('keyUnseen'), cx + 18);
+}
+
+/** Supply Camps never sighted are drawn at this opacity on the report map and in its key. */
+export const REPORT_GHOST_ALPHA = 0.45;
+
+/** Row height of the grade breakdown (name, bar and points, then a small note beneath). */
+const BREAKDOWN_ROW_H = 38;
+const BREAKDOWN_LABEL_W = 104;
+const BREAKDOWN_BAR_W = 140;
+const BREAKDOWN_POINTS_W = 68;
+
+/**
+ * Route / Reserve / Survey as they were graded: a bar for each part (0..1), its whole points out
+ * of 40 / 35 / 25, what it measured, then the total out of 100 and the grade thresholds.
+ */
+function drawBreakdown(ctx: Ctx, b: GradeBreakdown, s: ExpeditionStats, x: number, y: number): void {
+  const pts = gradePoints(b);
+  const full = (w: number): number => Math.round(w * 100);
+  const rows: [string, number, number, number, string][] = [
+    [t('gradeRoute'), b.route, pts.route, full(GRADE_WEIGHTS.route),
+      t('gradeRouteNote', { p: Math.round(b.route * 100), n: s.staminaSpent })],
+    [t('gradeReserve'), b.reserve, pts.reserve, full(GRADE_WEIGHTS.reserve),
+      t('gradeReserveNote', { n: Math.max(0, Math.round(s.staminaLeft)), full: RESERVE_FULL_MARKS })],
+    [t('gradeSurvey'), b.survey, pts.survey, full(GRADE_WEIGHTS.survey),
+      t('gradeSurveyNote', { p: formatPercent(s.percentMapped).replace('%', ''), full: SURVEY_FULL_MARKS })],
+  ];
+  const barX = x + BREAKDOWN_LABEL_W;
+  const right = barX + BREAKDOWN_BAR_W + BREAKDOWN_POINTS_W;
+  rows.forEach(([name, value, points, max, note], k) => {
+    const ry = y + k * BREAKDOWN_ROW_H;
+    drawText(ctx, name, x, ry, { scale: 2, color: PALETTE.ink });
+    outline(ctx, barX, ry + 2, BREAKDOWN_BAR_W, 11, PALETTE.ink);
+    fill(ctx, barX + 1, ry + 3, BREAKDOWN_BAR_W - 2, 9, PALETTE.parchmentShade);
+    const fillW = Math.round((BREAKDOWN_BAR_W - 2) * clamp01(value));
+    if (fillW > 0) fill(ctx, barX + 1, ry + 3, fillW, 9, PALETTE.redInk);
+    drawText(ctx, `${points}/${max}`, right, ry, { scale: 2, color: PALETTE.ink, align: 'right' });
+    drawText(ctx, note, x, ry + 19, { color: PALETTE.inkSoft });
+  });
+  const sy = y + rows.length * BREAKDOWN_ROW_H;
+  drawText(ctx, t('gradeScore'), x, sy, { scale: 2, color: PALETTE.ink });
+  drawText(ctx, `${pts.total}/100`, right, sy, { scale: 2, color: PALETTE.redInk, align: 'right' });
+  for (let xx = x + measureText(t('gradeScore'), 2) + 6; xx < right - measureText(`${pts.total}/100`, 2) - 6; xx += 4) {
+    px(ctx, xx, sy + 12, PALETTE.inkPale);
+  }
+  const [[, s0], [, a0], [, b0]] = GRADE_THRESHOLDS;
+  drawText(ctx, t('gradeScale', { s: full(s0), a: full(a0), b: full(b0) }), x, sy + 19, { color: PALETTE.inkSoft });
 }
 
 function drawGameOver(ctx: Ctx, state: GameState, now: number): void {
   const e = endCardAnim(state, now);
   const s = statsFor(state, now);
-  veil(ctx, e);
+  const { x, y, restY } = reportPlacement(state, now, DEFEAT_W, DEFEAT_H);
+  if (reportFor(state).cardHidden) {
+    drawReportTab(ctx, x, restY, DEFEAT_W, DEFEAT_H);
+    return;
+  }
   const prev = ctx.globalAlpha;
   ctx.globalAlpha = prev * e;
-  // Card plus shadow centred on the map area, like the title card.
-  const x = MAP_ORIGIN_X + Math.floor((MAP_PX_W - DEFEAT_W - CARD_SHADOW) / 2);
-  const y = MAP_ORIGIN_Y + Math.floor((MAP_PX_H - DEFEAT_H - CARD_SHADOW) / 2) + Math.round((1 - e) * 40);
+  // The paper swallows taps (only its buttons act); tapping the sheet beside it hides it.
+  addButton('reportCard', x, y, DEFEAT_W, DEFEAT_H);
   blitCard(ctx, 'defeat', DEFEAT_W, DEFEAT_H, x, y, paintDefeatCard);
   drawBleed(ctx, x, y, clamp01((now - state.phaseStart) / 1600));
-  const rows: [string, string][] = [
+  // Where the stamina went: steep steps are what usually empties the pack.
+  const steps = stepTally(state);
+  const rows: [string, string, string?][] = [
+    [t('staminaSpent'), `${s.staminaSpent}`],
+    [t('stepsSteep'), t('stepsValue', { n: steps.steep[0], cost: steps.steep[1] }), PALETTE.redInk],
+    [t('stepsGentle'), t('stepsValue', { n: steps.gentle[0], cost: steps.gentle[1] })],
+    [t('stepsFlat'), t('stepsValue', { n: steps.flat[0], cost: steps.flat[1] })],
     [t('mapped'), formatPercent(s.percentMapped)],
-    [t('turns'), `${s.turns}`],
-    [t('time'), formatTime(s.elapsedMs)],
-    [t('caches'), `${s.cachesCollected}/${s.cachesTotal}`],
-    [t('maxAltitude'), `${toMeters(s.maxElevation)} M`],
   ];
-  statRows(ctx, rows, x + 70, y + 132, 330, 32);
-  const sx = x + DEFEAT_W - 150;
-  const sy = y + 204;
+  statRows(ctx, rows, x + 40, y + 126, 330, 28);
+  const sx = x + DEFEAT_W - 118;
+  const sy = y + 190;
   drawStamp(ctx, s.grade, 'ink', sx, sy, 50);
   drawText(ctx, t('grade'), sx + 1, sy + 62, { scale: 2, color: PALETTE.inkSoft, align: 'center' });
-  drawEndButtons(ctx, state, now, x + Math.floor(DEFEAT_W / 2), y + DEFEAT_H - 118);
-  drawPrompt(ctx, t('endPrompt'), x + Math.floor(DEFEAT_W / 2), y + DEFEAT_H - 78, state, now);
-  drawSheetNo(ctx, state, x + DEFEAT_W - 36, y + DEFEAT_H - 40);
+  drawReportFoot(ctx, state, s, x, y, DEFEAT_W, DEFEAT_H);
   ctx.globalAlpha = prev;
 }
 
 function drawVictory(ctx: Ctx, state: GameState, now: number): void {
   const e = endCardAnim(state, now);
   const s = statsFor(state, now);
-  veil(ctx, e, VICTORY_VEIL_OPACITY);
+  const { x, y, restY } = reportPlacement(state, now, VICTORY_W, VICTORY_H);
+  if (reportFor(state).cardHidden) {
+    drawReportTab(ctx, x, restY, VICTORY_W, VICTORY_H);
+    return;
+  }
   const prev = ctx.globalAlpha;
   ctx.globalAlpha = prev * e;
-  const [x, restY] = victoryCardOrigin(state);
-  // Slide in from the sheet's middle toward the corner, so the card never crosses the neatline.
-  const inward = restY + VICTORY_H / 2 < MAP_ORIGIN_Y + MAP_PX_H / 2 ? 1 : -1;
-  const y = restY + inward * Math.round((1 - e) * 40);
+  addButton('reportCard', x, y, VICTORY_W, VICTORY_H);
   blitCard(ctx, 'victory', VICTORY_W, VICTORY_H, x, y, paintVictoryCard);
-  const rows: [string, string][] = [
-    [t('percentMapped'), formatPercent(s.percentMapped)],
-    [t('turnsTaken'), `${s.turns}`],
-    [t('time'), formatTime(s.elapsedMs)],
-    [t('staminaLeft'), `${Math.max(0, Math.round(s.staminaLeft))}/${MAX_STAMINA}`],
-    [t('caches'), `${s.cachesCollected}/${s.cachesTotal}`],
-    [t('maxAltitude'), `${toMeters(s.maxElevation)} M`],
-  ];
-  statRows(ctx, rows, x + 40, y + 128, 340, 28);
+  if (s.breakdown) drawBreakdown(ctx, s.breakdown, s, x + 36, y + 124);
   // The wax seal drops in shortly after the card settles.
   const since = now - state.phaseStart;
   const sealT = clamp01((since - 350) / 220);
-  const sx = x + VICTORY_W - 120;
-  const sealY = y + 198;
+  const sx = x + VICTORY_W - 96;
+  const sealY = y + 188;
   if (sealT > 0) {
     const sy = sealY - Math.round((1 - easeOutCubic(sealT)) * 18);
     const a = ctx.globalAlpha;
@@ -2440,9 +2582,7 @@ function drawVictory(ctx: Ctx, state: GameState, now: number): void {
     drawText(ctx, t('grade'), sx + 1, sealY + 72, { scale: 2, color: PALETTE.inkSoft, align: 'center' });
     ctx.globalAlpha = a;
   }
-  drawEndButtons(ctx, state, now, x + Math.floor(VICTORY_W / 2), y + VICTORY_H - 104);
-  drawPrompt(ctx, t('endPrompt'), x + Math.floor(VICTORY_W / 2), y + VICTORY_H - 72, state, now);
-  drawSheetNo(ctx, state, x + VICTORY_W - 36, y + VICTORY_H - 40);
+  drawReportFoot(ctx, state, s, x, y, VICTORY_W, VICTORY_H);
   ctx.globalAlpha = prev;
 }
 
@@ -2459,6 +2599,8 @@ interface ButtonSpec {
   /** Text runs [text, colour]; drawn at 2x. */
   runs: readonly [string, string][];
   icon?: ButtonIcon;
+  /** Keyboard selection (end cards): drawn like a hovered button, with a double red rule. */
+  selected?: boolean;
 }
 
 /** Map-pin glyph for "copy seed link": '#' red ink, 'o' the hole. */
@@ -2514,13 +2656,14 @@ function buttonWidth(spec: ButtonSpec): number {
 function paperButton(ctx: Ctx, spec: ButtonSpec, x: number, y: number): number {
   const w = buttonWidth(spec);
   const hover = ui.hover === spec.id;
-  const face = hover ? PALETTE.parchment : PALETTE.parchmentDark;
+  const face = hover || spec.selected ? PALETTE.parchment : PALETTE.parchmentDark;
   fill(ctx, x + 2, y + 2, w, BTN_H, PALETTE.parchmentShade);
   fill(ctx, x, y, w, BTN_H, PALETTE.ink);
   fill(ctx, x + 1, y + 1, w - 2, BTN_H - 2, face);
   fill(ctx, x + 1, y + 1, w - 2, 1, '#fbf6e9');
   fill(ctx, x + 1, y + BTN_H - 3, w - 2, 2, PALETTE.parchmentShade);
-  if (hover) outline(ctx, x + 2, y + 2, w - 4, BTN_H - 5, PALETTE.redInk);
+  if (hover || spec.selected) outline(ctx, x + 2, y + 2, w - 4, BTN_H - 5, PALETTE.redInk);
+  if (spec.selected) outline(ctx, x - 2, y - 2, w + 4, BTN_H + 4, PALETTE.redInk);
   let tx = x + BTN_PAD;
   if (spec.icon) {
     drawButtonIcon(ctx, spec.icon, tx, y - 4, face);
@@ -2556,13 +2699,6 @@ function drawTitleButtons(ctx: Ctx, cx: number, y: number): void {
     { id: 'copySeed', runs: [[t('copySeed'), PALETTE.ink]], icon: 'pin' },
     { id: 'seedEntry', runs: [[t('enterSeed'), PALETTE.inkSoft]], icon: 'keypad' },
     { id: 'archives', runs: [[t('archives'), PALETTE.ink]], icon: 'seal' },
-  ], cx, y);
-}
-
-function drawEndButtons(ctx: Ctx, _state: GameState, _now: number, cx: number, y: number): void {
-  buttonRow(ctx, [
-    { id: 'copySeed', runs: [[t('copySeed'), PALETTE.ink]], icon: 'pin' },
-    { id: 'share', runs: [[t('shareResult'), PALETTE.ink]], icon: 'share' },
   ], cx, y);
 }
 

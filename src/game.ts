@@ -34,6 +34,7 @@ import type {
   EffectKind,
   ExpeditionStats,
   GameState,
+  GradeBreakdown,
   LogEntry,
   LogTone,
   MapData,
@@ -178,15 +179,71 @@ export interface GradeInput {
  * at the cost of the other two, so every play style can earn a good grade.
  */
 export function gradeVictory(input: GradeInput): string {
+  return gradeForScore(gradeBreakdown(input).score);
+}
+
+/** Weight of each grade part in the score (they sum to 1). */
+export const GRADE_WEIGHTS = { route: 0.4, reserve: 0.35, survey: 0.25 } as const;
+/** Lowest score for each victory grade, best first; anything lower is a C. */
+export const GRADE_THRESHOLDS: readonly (readonly [string, number])[] = [
+  ['S', 0.8],
+  ['A', 0.62],
+  ['B', 0.45],
+];
+
+/** Stamina left, and percent of the sheet surveyed, that earn full marks for reserve and survey. */
+export const RESERVE_FULL_MARKS = 50;
+export const SURVEY_FULL_MARKS = 25;
+
+/** The parts and score gradeVictory grades by (see there for the formula). */
+export function gradeBreakdown(input: GradeInput): GradeBreakdown {
   const route =
     input.directCost > 0 && input.staminaSpent > 0 ? Math.min(1, input.directCost / input.staminaSpent) : 1;
-  const reserve = Math.min(1, Math.max(0, input.staminaLeft) / 50);
-  const survey = Math.min(1, Math.max(0, input.percentMapped) / 25);
-  const score = 0.4 * route + 0.35 * reserve + 0.25 * survey;
-  if (score >= 0.8) return 'S';
-  if (score >= 0.62) return 'A';
-  if (score >= 0.45) return 'B';
+  const reserve = Math.min(1, Math.max(0, input.staminaLeft) / RESERVE_FULL_MARKS);
+  const survey = Math.min(1, Math.max(0, input.percentMapped) / SURVEY_FULL_MARKS);
+  const score = GRADE_WEIGHTS.route * route + GRADE_WEIGHTS.reserve * reserve + GRADE_WEIGHTS.survey * survey;
+  return { route, reserve, survey, score };
+}
+
+/** Victory letter for a score (S / A / B / C). */
+export function gradeForScore(score: number): string {
+  for (const [grade, min] of GRADE_THRESHOLDS) if (score >= min) return grade;
   return 'C';
+}
+
+/** A breakdown in whole points for display: out of 40 / 35 / 25 for the parts and 100 in all. */
+export interface GradePoints {
+  route: number;
+  reserve: number;
+  survey: number;
+  total: number;
+}
+
+/**
+ * Whole points for the report. The total is floor(score * 100), so it clears a grade's threshold
+ * (80 / 62 / 45) exactly when the score does; the parts are the largest-remainder rounding of their
+ * exact points to that total, so they always add up to it and each is at most 1 from its exact value
+ * (exactly 1 only where float error leaves the score just under whole parts, e.g. 40 + 35 + 5 scored
+ * 0.7999..., whose total must then read 79 to match the A it earned).
+ */
+export function gradePoints(b: GradeBreakdown): GradePoints {
+  const total = Math.floor(b.score * 100);
+  const exact = [b.route * GRADE_WEIGHTS.route, b.reserve * GRADE_WEIGHTS.reserve, b.survey * GRADE_WEIGHTS.survey].map(
+    (v) => v * 100,
+  );
+  const parts = exact.map((v) => Math.floor(v));
+  let left = total - parts.reduce((a, v) => a + v, 0);
+  // Largest fractions first; ties go to the earlier part.
+  const order = [0, 1, 2].sort((i, j) => exact[j] - parts[j] - (exact[i] - parts[i]) || i - j);
+  for (let k = 0; left > 0 && k < 3; k++, left--) parts[order[k]]++;
+  // Float error can leave the floors one above the total: take it from the smallest fraction.
+  for (let k = 2; left < 0 && k >= 0; k--) {
+    if (parts[order[k]] > 0) {
+      parts[order[k]]--;
+      left++;
+    }
+  }
+  return { route: parts[0], reserve: parts[1], survey: parts[2], total };
 }
 
 /** A complete, fresh GameState for `map` with the player standing on the spawn tile. */
@@ -221,6 +278,7 @@ function createState(map: MapData, phase: Phase, now: number, muted: boolean): G
     summitSighted: false,
     peakSighted: map.peaks.map(() => false),
     trail: [{ x, y }],
+    stepCosts: [],
     maxElevation: map.elevation[tileIndex(x, y)],
     lastMove: null,
     neighborCosts: { up: null, right: null, down: null, left: null },
@@ -400,6 +458,14 @@ export class Game {
     this.startSeed(now, this.freshSeed());
   }
 
+  /**
+   * Retry this sheet: a fresh expedition on the current seed, regenerated exactly as any other start
+   * on that seed (same terrain, same rules, graded and recorded like any expedition).
+   */
+  retrySheet(now: number): void {
+    this.startSeed(now, this.state.seed);
+  }
+
   /** Begin a fresh expedition on the given seed (R, or a typed seed): lingering sounds stop, the start jingle plays. */
   startSeed(now: number, seed: number): void {
     this.audio.stopAll();
@@ -452,15 +518,17 @@ export class Game {
     const s = this.state;
     const rawPercent = (s.revealedCount / (MAP_W * MAP_H)) * 100;
     const staminaLeft = Math.max(0, s.stamina);
-    const grade =
+    // The breakdown is kept as graded (unrounded survey share), so the report always matches the letter.
+    const breakdown =
       outcome === 'victory'
-        ? gradeVictory({
+        ? gradeBreakdown({
             percentMapped: rawPercent,
             staminaLeft,
             staminaSpent: s.staminaSpent,
             directCost: s.map.stats.directCost,
           })
-        : 'F';
+        : null;
+    const grade = breakdown ? gradeForScore(breakdown.score) : 'F';
     return {
       outcome,
       turns: s.turns,
@@ -472,6 +540,7 @@ export class Game {
       percentMapped: Math.round(rawPercent * 10) / 10,
       elapsedMs: s.endTime !== null ? Math.max(0, s.endTime - s.startTime) : 0,
       grade,
+      breakdown,
     };
   }
 
@@ -512,6 +581,7 @@ export class Game {
     player.facing = dir;
     player.moveStart = now;
     s.trail.push({ x: nx, y: ny });
+    s.stepCosts.push(cost);
     if (elevation > s.maxElevation) s.maxElevation = elevation;
     s.lastMove = { cost, slope };
     this.audio.footstep(elevation, slope);

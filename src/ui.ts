@@ -4,6 +4,7 @@
 import { PauseMenu } from './pause';
 import { emptyRecords } from './records';
 import type { CareerRecords } from './records';
+import type { GameState } from './types';
 
 export type ButtonId =
   | 'lang'
@@ -18,7 +19,24 @@ export type ButtonId =
   | 'pauseResume'
   | 'pauseToTitle'
   | 'pauseAbandon'
-  | 'pauseCancel';
+  | 'pauseCancel'
+  | 'retrySheet'
+  | 'newExpedition'
+  | 'toggleCard'
+  | 'reportCard';
+
+/** The two ways on from an end card: this sheet again, or a fresh one. */
+export type EndChoice = 'retry' | 'new';
+
+/** Expedition report (end-card) interface state, kept for one finished expedition. */
+export interface ReportUi {
+  /** The expedition this state belongs to; a new one resets it. */
+  of: GameState | null;
+  /** Keyboard selection between the two end-card actions. */
+  choice: EndChoice;
+  /** Card tucked away so the whole sheet can be studied. */
+  cardHidden: boolean;
+}
 
 export interface UiButton {
   id: ButtonId;
@@ -45,6 +63,7 @@ export interface UiState {
   records: CareerRecords;
   /** The in-expedition pause menu (open while the game is paused). */
   pause: PauseMenu;
+  report: ReportUi;
 }
 
 export const TOAST_MS = 1800;
@@ -61,7 +80,22 @@ export const ui: UiState = {
   fullscreenAvailable: false,
   records: emptyRecords(),
   pause: new PauseMenu(),
+  report: { of: null, choice: 'new', cardHidden: false },
 };
+
+/**
+ * The report state for this finished expedition, fresh for each one: after a collapse the
+ * selection starts on retrying the sheet (the learning loop), after a summit on a new expedition.
+ */
+export function reportFor(state: GameState): ReportUi {
+  const r = ui.report;
+  if (r.of !== state) {
+    r.of = state;
+    r.choice = state.phase === 'gameover' ? 'retry' : 'new';
+    r.cardHidden = false;
+  }
+  return r;
+}
 
 export function clearButtons(): void {
   ui.buttons.length = 0;

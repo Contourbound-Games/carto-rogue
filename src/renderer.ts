@@ -14,6 +14,9 @@
 import {
   COLLAPSE_ANIM_MS,
   CONTOUR_INTERVAL,
+  COST_FLAT,
+  COST_GENTLE,
+  COST_STEEP,
   INDEX_CONTOUR_EVERY,
   MAP_H,
   MAP_ORIGIN_X,
@@ -35,7 +38,7 @@ import {
   WATER_LEVEL,
 } from './config';
 import { GLYPH_H, drawText, fontEpoch, measureText } from './font';
-import { drawHud, drawOverlay, drawUi } from './hud';
+import { REPORT_GHOST_ALPHA, drawHud, drawOverlay, drawUi } from './hud';
 import { langVersion, t } from './i18n';
 import { TAP_RIPPLE_MS, ui } from './ui';
 import { hashSeed, mulberry32 } from './rng';
@@ -1459,6 +1462,29 @@ function buildSheetLayers(map: MapData, scratch: Surface): SheetLayers {
   return { base, faded, fog, spots, fogGlyphs, sampleStep: step, timings };
 }
 
+/**
+ * Ground never surveyed, as the expedition report shows it: the faded sheet seen through the fog,
+ * a 50/50 mix of the faded map and the fog texture (every byte lane averaged, alpha kept opaque).
+ */
+function buildHindsight(faded: Uint32Array, fog: Uint32Array): Uint32Array {
+  const out = new Uint32Array(NPIX);
+  for (let p = 0; p < NPIX; p++) {
+    out[p] = ((((faded[p] >>> 1) & 0x7f7f7f7f) + ((fog[p] >>> 1) & 0x7f7f7f7f)) | 0xff000000) >>> 0;
+  }
+  return out;
+}
+
+/** Every tile on: the report shows the whole sheet. */
+const ALL_TILES = new Uint8Array(NTILES).fill(1);
+
+/** True on the end cards, where the sheet becomes the expedition report. */
+function isReport(state: GameState): boolean {
+  return state.phase === 'gameover' || state.phase === 'victory';
+}
+
+/** The collapse ink and the dimmed sheet clear away over this long once the report is up. */
+const REPORT_CLEAR_MS = 700;
+
 // ---------------------------------------------------------------------------
 // Fog compositor: survey reveal with dithered, animated edges
 // ---------------------------------------------------------------------------
@@ -1487,6 +1513,8 @@ class SurveyCompositor {
   private readonly dirty = new Uint8Array(NTILES);
   private dirtyList: number[] = [];
   private layers: SheetLayers | null = null;
+  /** Replaces the faded layer while set: the report's look for ground never surveyed. */
+  private unseen: Uint32Array | null = null;
   private readonly rimColor = packHex(FOG_RIM_HEX);
 
   constructor(private readonly edge: FogEdgeField) {
@@ -1498,6 +1526,7 @@ class SurveyCompositor {
   /** Full rebuild for a new map: current survey state appears instantly. */
   reset(layers: SheetLayers, state: GameState): void {
     this.layers = layers;
+    this.unseen = null;
     this.revCopy.set(state.revealed);
     this.visCopy.set(state.visible);
     for (let i = 0; i < NTILES; i++) {
@@ -1512,9 +1541,22 @@ class SurveyCompositor {
     this.surface.ctx.putImageData(this.img, 0, 0);
   }
 
-  update(state: GameState, now: number): void {
-    const rev = state.revealed;
-    const vis = state.visible;
+  /**
+   * Swap the layer drawn where a tile is surveyed but not in sight (null = the ordinary faded
+   * ink). Every tile is recomposited on a change.
+   */
+  setUnseen(layer: Uint32Array | null): void {
+    if (layer === this.unseen) return;
+    this.unseen = layer;
+    for (let i = 0; i < NTILES; i++) this.markDirty(i);
+  }
+
+  /**
+   * Diff the shown survey (`rev`, drawn at all) and sight (`vis`, drawn crisp) against the last
+   * frame and recomposite what changed. During play they are state.revealed / state.visible; the
+   * report passes the whole sheet and the survey, so surveyed ground is crisp and the rest unseen.
+   */
+  update(state: GameState, now: number, rev: Uint8Array = state.revealed, vis: Uint8Array = state.visible): void {
     const fresh: number[] = [];
     for (let i = 0; i < NTILES; i++) {
       const r = rev[i] ? 1 : 0;
@@ -1630,7 +1672,8 @@ class SurveyCompositor {
   private compositeTile(tx: number, ty: number): void {
     const layers = this.layers;
     if (!layers) return;
-    const { base, faded, fog } = layers;
+    const { base, fog } = layers;
+    const faded = this.unseen ?? layers.faded;
     const thr = this.edge.threshold;
     const billow = this.edge.billow;
     const R = this.revAmt;
@@ -1739,6 +1782,20 @@ function drawRouteSegment(
     if ((dashStart + i) % DASH_PERIOD < DASH_ON) ctx.fillRect(ox + x - 1, oy + y - 1, 2, 2);
   });
   return len;
+}
+
+/** One report route step at the map origin: 2 px dashes (cost 1), a 2 px line (3) or a 4 px line (8). */
+function drawCostSegment(ctx: CanvasRenderingContext2D, a: Point, b: Point, dashStart: number, cost: number): number {
+  const x0 = a.x * TILE + TILE / 2;
+  const y0 = a.y * TILE + TILE / 2;
+  const x1 = b.x * TILE + TILE / 2;
+  const y1 = b.y * TILE + TILE / 2;
+  plotLine(x0, y0, x1, y1, (x, y, i) => {
+    if (i === 0) return;
+    if (cost >= COST_STEEP) ctx.fillRect(MX0 + x - 2, MY0 + y - 2, 4, 4);
+    else if (cost >= COST_GENTLE || (dashStart + i) % DASH_PERIOD < DASH_ON) ctx.fillRect(MX0 + x - 1, MY0 + y - 1, 2, 2);
+  });
+  return Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0));
 }
 
 function drawTurnDot(ctx: CanvasRenderingContext2D, p: Point, ox: number, oy: number): void {
@@ -2450,6 +2507,8 @@ export class Renderer {
   private chrome: Surface | null = null;
   private creases: Surface | null = null;
   private ink: InkBleed | null = null;
+  /** The report's never-surveyed layer for the current sheet, built the first time a report shows. */
+  private hindsight: Uint32Array | null = null;
   /** Per fog glyph: when it started fading out (Infinity = still shown, -Infinity = gone). */
   private glyphFade = new Float64Array(0);
   /** Per cache: sighting as last seen here, and when it was newly sighted (-Infinity = never on this sheet). */
@@ -2491,7 +2550,16 @@ export class Renderer {
     const creases = this.creases;
     if (!layers || !chrome || !creases) return;
 
-    this.compositor.update(state, now);
+    // On the end cards the sheet is the expedition report: all of it on show, the surveyed ground
+    // crisp and the rest seen through the fog. Only the drawing changes; the game state does not.
+    if (isReport(state)) {
+      this.hindsight ??= buildHindsight(layers.faded, layers.fog);
+      this.compositor.setUnseen(this.hindsight);
+      this.compositor.update(state, now, ALL_TILES, state.revealed);
+    } else {
+      this.compositor.setUnseen(null);
+      this.compositor.update(state, now);
+    }
     this.route.sync(state.trail);
 
     ctx.save();
@@ -2544,6 +2612,7 @@ export class Renderer {
     this.chrome = buildChrome(this.desk, map, this.patterns, this.sprites);
     this.creases = buildCreases(map.seed);
     this.compositor.reset(this.layers, state);
+    this.hindsight = null;
     this.glyphFade = Float64Array.from(this.layers.fogGlyphs, (g) =>
       g.tiles.some((i) => state.revealed[i]) ? -Infinity : Infinity,
     );
@@ -2678,8 +2747,27 @@ export class Renderer {
     const camp = this.sprites.camp;
     const start = trail[0];
     ctx.drawImage(camp.canvas, MX0 + start.x * TILE + TILE / 2 - 4, MY0 + start.y * TILE + TILE / 2 - 4);
+    if (isReport(state)) {
+      this.drawCostRoute(state);
+      return;
+    }
     const progress = clamp01((now - state.player.moveStart) / Math.max(1, MOVE_ANIM_MS));
     this.route.draw(ctx, trail, progress);
+  }
+
+  /**
+   * The report's route, inked by what each step cost: dashed for 1 (flat), solid for 3 (gentle
+   * uphill), heavy for 8 (steep), so the stretches that emptied the pack stand out on the terrain.
+   */
+  private drawCostRoute(state: GameState): void {
+    const ctx = this.ctx;
+    const { trail, stepCosts } = state;
+    ctx.fillStyle = PALETTE.redInk;
+    let dash = 0;
+    for (let k = 0; k + 1 < trail.length; k++) {
+      dash += drawCostSegment(ctx, trail[k], trail[k + 1], dash, stepCosts[k] ?? COST_FLAT);
+      if (k >= 1 && isTurn(trail[k - 1], trail[k], trail[k + 1])) drawTurnDot(ctx, trail[k], MX0, MY0);
+    }
   }
 
   /** Caches and the Trig Pillar; `moveT` is the player's step progress (for the summit shuffle). */
@@ -2687,6 +2775,7 @@ export class Renderer {
     const ctx = this.ctx;
     const map = state.map;
     const flagFrame = Math.floor(now / 420) % 2;
+    const report = isReport(state);
     map.caches.forEach((cache, i) => {
       const tile = tileIndex(cache.x, cache.y);
       const collected = state.cacheCollected[i] === true;
@@ -2702,9 +2791,14 @@ export class Renderer {
       let sprite: Sprite;
       if (cache.kind === 'saddle') sprite = collected ? this.sprites.tentOpen : this.sprites.tent[frame];
       else sprite = collected ? this.sprites.crateOpen : this.sprites.crate[frame];
+      // On the report a camp the expedition never sighted is a ghost with a query mark.
+      const ghost = report && !state.cacheSighted[i];
       if (!collected) this.drawCacheBeacon(x + TILE / 2, y + TILE - 6, now - this.cacheSightedAt[i]);
+      if (ghost) ctx.globalAlpha = REPORT_GHOST_ALPHA;
       this.drawGroundShadow(x + TILE / 2, y + TILE - 1, 5);
       ctx.drawImage(sprite.canvas, x + Math.floor((TILE - sprite.w) / 2), y + TILE - sprite.h);
+      ctx.globalAlpha = 1;
+      if (ghost) drawText(ctx, '?', x + TILE - 2, y - 6, { color: PALETTE.inkSoft, shadow: PALETTE.parchment });
       if (collected) ctx.drawImage(this.sprites.tick.canvas, x + 5, y - 3);
     });
 
@@ -2806,8 +2900,8 @@ export class Renderer {
     const x = pos.x + this.summitOffset(state, pos.t);
 
     if (phase === 'collapsing' || phase === 'gameover') {
-      const p = phase === 'gameover' ? 1 : clamp01((now - state.phaseStart) / COLLAPSE_ANIM_MS);
-      if (p >= FALLEN_GONE_AT) return; // swallowed by the ink
+      // Swallowed by the ink while it spreads; on the report the fallen surveyor marks where it ended.
+      if (phase === 'collapsing' && clamp01((now - state.phaseStart) / COLLAPSE_ANIM_MS) >= FALLEN_GONE_AT) return;
       const f = surveyor.fallen;
       this.drawGroundShadow(x, pos.y + 5, 7);
       // Halo sprites: the art sits 1 px inside the canvas.
@@ -3035,7 +3129,13 @@ export class Renderer {
       const key = `${state.map.seed}:${state.player.x}:${state.player.y}`;
       if (!this.ink || this.ink.key !== key) this.ink = new InkBleed(state.map, state.player.x, state.player.y);
       this.ink.advance(p);
-      this.ctx.drawImage(this.ink.surface.canvas, MX0, MY0);
+      // The spill lifts off in steps once the report is up, so the ground it covered can be read.
+      const lift = phase === 'gameover' ? 1 - clamp01((now - state.phaseStart) / REPORT_CLEAR_MS) : 1;
+      if (lift > 0) {
+        this.ctx.globalAlpha = Math.ceil(lift * 4) / 4;
+        this.ctx.drawImage(this.ink.surface.canvas, MX0, MY0);
+        this.ctx.globalAlpha = 1;
+      }
       if (phase === 'collapsing' && p < FALLEN_GONE_AT) {
         // The fallen surveyor stays readable on top of the fresh ink, then fades in steps.
         const fade = (FALLEN_GONE_AT - p) / (FALLEN_GONE_AT - FALLEN_SOLID_UNTIL);
@@ -3096,11 +3196,12 @@ export class Renderer {
     }
   }
 
-  /** The sheet darkens (stepped multiply tint) while the ink spreads, and stays dim on game over. */
+  /** The sheet darkens (stepped multiply tint) while the ink spreads, and clears for the report. */
   private drawSheetDim(state: GameState, now: number): void {
     const phase = state.phase;
     if (phase !== 'collapsing' && phase !== 'gameover') return;
-    const p = phase === 'gameover' ? 1 : clamp01((now - state.phaseStart) / COLLAPSE_ANIM_MS);
+    const since = now - state.phaseStart;
+    const p = phase === 'gameover' ? 1 - clamp01(since / REPORT_CLEAR_MS) : clamp01(since / COLLAPSE_ANIM_MS);
     const level = Math.round(p * DIM_STEPS.length - 0.5);
     if (level <= 0) return;
     const ctx = this.ctx;
