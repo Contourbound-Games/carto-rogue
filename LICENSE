@@ -1,0 +1,51 @@
+The Carto-Rogue: 등고선 탐사대
+
+Copyright © 2026 Contourbound Games. All rights reserved.
+
+This repository is public so that its source code can be viewed, studied, and
+discussed, and so that development happens in the open. Public availability
+does not make this project open source. No open-source license is granted,
+and nothing in this repository should be read as one.
+
+1. Permitted use
+
+   You may view and read the source code in this repository, and study it for
+   personal learning and discussion. Forking on GitHub is permitted only to the
+   extent required by GitHub's Terms of Service; it grants no further rights.
+
+2. Restrictions
+
+   Except with the prior written permission of Contourbound Games, you may not,
+   in whole or in substantial part:
+
+   - copy or reproduce the source code or game content;
+   - modify it or create derivative works based on it;
+   - distribute, publish, or host it, in source or compiled form;
+   - sell, resell, license, or sublicense it; or
+   - use it in, or incorporate it into, any other product or service.
+
+3. Name and identity
+
+   The name "The Carto-Rogue", the title "등고선 탐사대", and the game's
+   branding, artwork, hand-drawn glyphs, visual identity, and other original
+   creative content are the property of Contourbound Games and may not be used
+   without prior written permission.
+
+4. Third-party components
+
+   Third-party libraries, fonts, and other components included in or used by
+   this project remain subject to their own licenses, which take precedence
+   over this notice for those components. This includes, without limitation:
+
+   - Galmuri9 by Lee Minseo (quiple), under the SIL Open Font License 1.1,
+     including the glyph data derived from it in src/galmuri9-glyphs.ts
+     (see public/THIRD_PARTY_NOTICES.md); and
+   - simplex-noise by Jonas Wagner, under the MIT License.
+
+5. No warranty
+
+   The source code is provided "as is", without warranty of any kind, express
+   or implied. In no event shall Contourbound Games be liable for any claim,
+   damages, or other liability arising from the use of this repository.
+
+For permission requests beyond the terms above, contact Contourbound Games.
