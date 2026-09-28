@@ -1,0 +1,12 @@
+/*
+ * Galmuri9 (SIL OFL 1.1, by quiple), bundled with the game so that it needs no network: Vite copies
+ * the unmodified woff2 from the `galmuri` package into the build. The game draws its Korean text from
+ * the extracted bitmap glyphs; this web font covers the seed dialog and any character outside them.
+ */
+@font-face {
+  font-family: Galmuri9;
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../node_modules/galmuri/dist/Galmuri9.woff2') format('woff2');
+}

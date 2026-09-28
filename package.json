@@ -3,7 +3,10 @@
   "private": true,
   "version": "1.0.0",
   "description": "The Carto-Rogue: 등고선 탐사대 — a procedural contour-map survey roguelite",
+  "author": "Contourbound Games",
+  "license": "UNLICENSED",
   "type": "module",
+  "main": "desktop/main.js",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
@@ -11,13 +14,19 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
-    "gen:glyphs": "node scripts/gen-galmuri.mjs"
+    "gen:glyphs": "node scripts/gen-galmuri.mjs",
+    "gen:icon": "node scripts/gen-icon.mjs",
+    "desktop:start": "npm run build && node scripts/desktop-start.mjs",
+    "desktop:pack": "npm run build && electron-builder --config desktop/electron-builder.yml --dir",
+    "desktop:zip": "npm run build && electron-builder --config desktop/electron-builder.yml"
   },
   "dependencies": {
     "simplex-noise": "^4.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "electron": "^44.4.5",
+    "electron-builder": "^26.15.3",
     "eslint": "^10.11.0",
     "galmuri": "^2.40.3",
     "globals": "^17.12.0",

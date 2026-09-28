@@ -1,0 +1,44 @@
+# electron-builder config for the Windows desktop build.
+#   npm run desktop:pack  -> release/win-unpacked/ (runnable folder, also the future Steam depot content)
+#   npm run desktop:zip   -> release/CartoRogue-<version>-win-x64.zip (submission / download build)
+#
+# appId, productName and executableName are the app's identity: saved data lives in
+# %APPDATA%\games.contourbound.cartorogue (see desktop/app-protocol.js). Do not change them in updates.
+appId: games.contourbound.cartorogue
+productName: The Carto-Rogue
+executableName: CartoRogue
+copyright: Copyright © 2026 Contourbound Games. All rights reserved.
+directories:
+  output: release
+  buildResources: build
+# Only the web build and the shell; the game's npm dependencies are already bundled into dist/.
+files:
+  - dist/**/*
+  - desktop/main.js
+  - desktop/app-protocol.js
+  - package.json
+  - "!node_modules/**/*"
+asar: true
+npmRebuild: false
+publish: null
+electronLanguages:
+  - ko
+  - en-US
+extraFiles:
+  - from: public/THIRD_PARTY_NOTICES.md
+    to: THIRD_PARTY_NOTICES.md
+  - from: desktop/README-Windows.txt
+    to: README.txt
+electronFuses:
+  runAsNode: false
+  enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
+  onlyLoadAppFromAsar: true
+  grantFileProtocolExtraPrivileges: false
+win:
+  target:
+    - target: zip
+      arch:
+        - x64
+  icon: build/icon.png
+  artifactName: CartoRogue-${version}-win-${arch}.${ext}

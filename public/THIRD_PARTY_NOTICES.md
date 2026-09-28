@@ -1,6 +1,6 @@
 # Third-party notices
 
-The Carto-Rogue: 등고선 탐사대 draws its Korean text with glyphs from **Galmuri9** by Lee Minseo (quiple), <https://github.com/quiple/galmuri>. The bitmap glyphs used by the game are extracted from the font's BDF file into `src/galmuri9-glyphs.ts`, and the full web font is loaded from jsDelivr as a fallback. Galmuri is distributed under the SIL Open Font License 1.1, reproduced below.
+The Carto-Rogue: 등고선 탐사대 draws its Korean text with glyphs from **Galmuri9** by Lee Minseo (quiple), <https://github.com/quiple/galmuri>. The bitmap glyphs used by the game are extracted from the font's BDF file into `src/galmuri9-glyphs.ts`, and the unmodified `Galmuri9.woff2` web font is bundled with the game as a fallback. Galmuri is distributed under the SIL Open Font License 1.1, reproduced below.
 
 ---
 
@@ -129,3 +129,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+---
+
+## Electron (Windows desktop build)
+
+The Windows desktop build runs the game in **Electron** 44, <https://www.electronjs.org>, which is distributed under the MIT License and includes Chromium and other components under their own licenses. The desktop build ships these license texts unchanged next to the executable: `LICENSE.electron.txt` (Electron) and `LICENSES.chromium.html` (Chromium and its components). The web build does not include Electron.
