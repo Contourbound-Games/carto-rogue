@@ -699,6 +699,20 @@ function drawCartouche(ctx: Ctx): void {
   rivet(ctx, x + w - 4, y + h - 4);
 }
 
+/** Explorer only: a small red-ink label pinned over the cartouche's lower band. */
+function drawModeTag(ctx: Ctx, state: GameState): void {
+  if (state.mode !== 'explorer') return;
+  const b = SECTIONS.cart;
+  const text = t('modeExplorer');
+  const w = measureText(text, 1) + 12;
+  const h = 13;
+  const x = b.x + Math.floor((b.w - w) / 2);
+  const y = b.y + b.h - 8;
+  fill(ctx, x, y, w, h, PALETTE.redInk);
+  fill(ctx, x + 1, y + 1, w - 2, h - 2, PALETTE.parchment);
+  drawText(ctx, text, x + Math.floor(w / 2), y + 3, { color: PALETTE.redInk, align: 'center' });
+}
+
 function drawAltimeterStatic(ctx: Ctx): void {
   const b = SECTIONS.alti;
   plate(ctx, b, 'dark', true, 31);
@@ -1526,6 +1540,7 @@ export function drawHud(ctx: CanvasRenderingContext2D, state: GameState, now: nu
   drawSurvey(ctx, state);
   drawStats(ctx, state, now);
   drawLog(ctx, state, now);
+  drawModeTag(ctx, state);
   drawSpeaker(ctx, state.muted, now);
   drawLangButton(ctx);
   drawFullscreenButton(ctx);
@@ -2029,10 +2044,14 @@ function drawTitle(ctx: Ctx, state: GameState, now: number): void {
       shadowOffset: 2,
     });
   }
-  drawTitleButtons(ctx, mid, y + 576);
+  drawTitleButtons(ctx, state, mid, y + 576);
   drawSheetNo(ctx, state, x + TITLE_W - 36, y + TITLE_H - 42);
   drawText(ctx, t('contourInterval', { m: CONTOUR_M }), x + 36, y + TITLE_H - 42, { color: PALETTE.inkFaded });
-  drawText(ctx, t('archivesHint'), mid, y + TITLE_H - 42, { color: PALETTE.inkFaded, align: 'center' });
+  if (state.mode === 'explorer') {
+    drawText(ctx, t('explorerNote'), mid, y + TITLE_H - 42, { color: PALETTE.redInk, align: 'center' });
+  } else {
+    drawText(ctx, t('archivesHint'), mid, y + TITLE_H - 42, { color: PALETTE.inkFaded, align: 'center' });
+  }
   ctx.globalAlpha = prev;
 }
 
@@ -2693,9 +2712,23 @@ function langToggleSpec(): ButtonSpec {
   };
 }
 
-function drawTitleButtons(ctx: Ctx, cx: number, y: number): void {
+/** STANDARD / EXPLORER, the chosen mode inked red (title card only). */
+function modeToggleSpec(state: GameState): ButtonSpec {
+  const explorer = state.mode === 'explorer';
+  return {
+    id: 'mode',
+    runs: [
+      [t('modeStandard'), explorer ? PALETTE.inkPale : PALETTE.redInk],
+      [' / ', PALETTE.inkFaded],
+      [t('modeExplorer'), explorer ? PALETTE.redInk : PALETTE.inkPale],
+    ],
+  };
+}
+
+function drawTitleButtons(ctx: Ctx, state: GameState, cx: number, y: number): void {
   buttonRow(ctx, [
     langToggleSpec(),
+    modeToggleSpec(state),
     { id: 'copySeed', runs: [[t('copySeed'), PALETTE.ink]], icon: 'pin' },
     { id: 'seedEntry', runs: [[t('enterSeed'), PALETTE.inkSoft]], icon: 'keypad' },
     { id: 'archives', runs: [[t('archives'), PALETTE.ink]], icon: 'seal' },

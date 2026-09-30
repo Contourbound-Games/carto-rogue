@@ -1,0 +1,4806 @@
+{
+ "commit": "774ec5d",
+ "seeds": 200,
+ "entries": [
+  {
+   "seed": 1,
+   "map": "6d78747866c9a76708ee392fe3a7e99512a97d82ae7ced26cb4b38c38810dd7c",
+   "runs": {
+    "walk": {
+     "hash": "44f4bb6acc93ab7a79adb9524cad04d873dceffeac66e7efec0f39a9e8622569",
+     "outcome": "defeat",
+     "turns": 71,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "283e2c694214e7b98921a3953dafe9a310b34041501a419da2bebb49a7a88227",
+     "outcome": "victory",
+     "turns": 61,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "3cdcc402ab5462561eebda10c47da31e77953b2948718956de47a9546415351f",
+     "outcome": "victory",
+     "turns": 89,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 4294967295,
+   "map": "4fc63cb899b99938f3cdeb2ff1bd8395b465b69fe84b63b228ae70fbd0880795",
+   "runs": {
+    "walk": {
+     "hash": "6ddd01c4b0f9f2936bc3c23bcc935d0b5478a2d85283d7b28babad5357cb1caf",
+     "outcome": "defeat",
+     "turns": 52,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "6cbc9ead19e623a0f71de7f43a67f499aaff3bcb06deabeb8fdcf7fea6f21422",
+     "outcome": "victory",
+     "turns": 59,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "c7e36b4e7e4bc967a8bd0cf24285a2d6a2d5b8237dc1c0205bcacd2768d3f1dd",
+     "outcome": "victory",
+     "turns": 65,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 17,
+   "map": "11d0713ec2a03220a89d912668acaf50432c4231a1f375adfcf765b204d6f90d",
+   "runs": {
+    "walk": {
+     "hash": "cfb1618c45d23f3d48d2bb6fa9cf5473acc8ae60b157307588c3656b6ca8aacc",
+     "outcome": "defeat",
+     "turns": 76,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "25b40a46c00fcdc38c2e733786267c9f842a87b91c002fe05590c2817d5d6b34",
+     "outcome": "victory",
+     "turns": 44,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "ac60fe21bbd74d8ddd8408092a1b2b54090cea027ca366824655187b53a192e8",
+     "outcome": "victory",
+     "turns": 64,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 104746,
+   "map": "1704a06aed0df2b58c464ed8c1cb17ed0daf9a30573ffa36d895969eb64b4f4b",
+   "runs": {
+    "walk": {
+     "hash": "3ac5c27663022416428f246de6bb25b6d61e5f29165aa63ceeba4190315db621",
+     "outcome": "defeat",
+     "turns": 59,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "65884f352eb4946e9b23cb35123c86ac9acd308c7ecc71b6b3a2a9860dd84df5",
+     "outcome": "victory",
+     "turns": 49,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "ded4af456f2ccdbd0d084f5806483a5cc245b4bb98981986541e9d6f9af4cafc",
+     "outcome": "victory",
+     "turns": 49,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 209475,
+   "map": "b5fc29fb93e66983dd72ba1d543631c9ad30f89c8d6b4f9bc8b70360ef9285fc",
+   "runs": {
+    "walk": {
+     "hash": "a7e9bac26eb7d3b16df241d885dcd6cb48601c509821140bc7bedf877f0903bd",
+     "outcome": "defeat",
+     "turns": 60,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "fdf794e1de9c567769fb8910beaf3858e65a0f62c231ec984fd51ee07a92a988",
+     "outcome": "defeat",
+     "turns": 67,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "c5166ed2dbcc61558494a6c07dbb58ed0510768f0ccc6ce6c2b1ff68356409f0",
+     "outcome": "victory",
+     "turns": 72,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 314204,
+   "map": "c8e8988cdd4086c903e10fc78380e2337206a104a30a531d723fe544e17d037c",
+   "runs": {
+    "walk": {
+     "hash": "cabdb3140a701cece9d02275c34cb9f07d850b0f153c3a57edc16963bcf99a10",
+     "outcome": "defeat",
+     "turns": 76,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "63813c4fe030aae6aad44dad8c6e50b6567e25a8191ead5416b51c774ad4307f",
+     "outcome": "victory",
+     "turns": 65,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "c4b6edf5c25386c27b57027a3594bfeda55fb83c38845287cb1f5e0a73080310",
+     "outcome": "victory",
+     "turns": 65,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 418933,
+   "map": "1992d0f3fc6ca211bdacbf07a6769d809a2db425976ede6a7157c0f2f9e994ac",
+   "runs": {
+    "walk": {
+     "hash": "e68ac87409a50b357c88a645913de6ae7af9afa536ed1887e8c2b534589ddc69",
+     "outcome": "defeat",
+     "turns": 64,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "17304a69859107dd2cc26ddd52f14d2ca1b5a387d66a75e53258ab9c01e0d840",
+     "outcome": "victory",
+     "turns": 49,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "335c6168d55a861f7080ecf4c07470f7fbc237543e440d1358c814c244c86c54",
+     "outcome": "victory",
+     "turns": 49,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 523662,
+   "map": "95a82733a6211ef36b43940702b073db4dec983752c622a894abe989b2fbd32b",
+   "runs": {
+    "walk": {
+     "hash": "82637beadf5939ac1def284cde2bff33b5f643b41ebe77a55058937b2e293ed0",
+     "outcome": "defeat",
+     "turns": 61,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "ed269446861c7736ef30d01ba195b9f9195f4d539a24973fbf4b70498359ab56",
+     "outcome": "defeat",
+     "turns": 53,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "ff16ea9c3722b63243956d9a2dd5a357b1e1df266cce8525ddaca980581c267b",
+     "outcome": "victory",
+     "turns": 64,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 628391,
+   "map": "6714c138783cde7908e8ff8ea4a48856b2a784cbe8e700f4d695964ae5553fa6",
+   "runs": {
+    "walk": {
+     "hash": "49c4ce6c967e2c5d99adb05e341cf1383553147bdaeabbe35de20c3bf0544b17",
+     "outcome": "defeat",
+     "turns": 49,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "ab4b03bc0ba4ff8359c2d5bb9ac01654066d03fd09d725e3b494cac53b74782f",
+     "outcome": "victory",
+     "turns": 48,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "25ff12f9d8dbcf5cc78f1a13e0847ab108e48c23584cecea0285eab19451b348",
+     "outcome": "victory",
+     "turns": 62,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 733120,
+   "map": "20d3ed26f2d81629f7e91eee6d91faabcd92ecc6de9621317ab9c26c71d2ca56",
+   "runs": {
+    "walk": {
+     "hash": "a9ac3554e01a73deee5f66850fc0ad763fae2d933382ae0d8042526c1366e52c",
+     "outcome": "defeat",
+     "turns": 79,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "622cd75b426a4b2b4fea30f110c2a926085b8d78a05f54ef0b8065c0bcf2febd",
+     "outcome": "victory",
+     "turns": 44,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "025c1ea840e0d91d12bd84a1d66af7827906a4fe32c05842b5bfb006a4b0dd54",
+     "outcome": "victory",
+     "turns": 44,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 837849,
+   "map": "ea1889576d65918c61f1b04cc04500d1240023181b28ffcb2c61a87d8788c45a",
+   "runs": {
+    "walk": {
+     "hash": "3ddc440fefefe5c3897ac404164973f26e21163a8f3250c6922b46ae08bcf57d",
+     "outcome": "defeat",
+     "turns": 60,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "965cd4612e6a59c4c16491e5fbcca13056d29330eb138911dbb9065334c1a294",
+     "outcome": "victory",
+     "turns": 65,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "b10e0224b6c040f711b3c4337c30a9f91a6d5d7defa8b2c57a6818ab3de29d05",
+     "outcome": "victory",
+     "turns": 65,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 942578,
+   "map": "39ff2aaf12fb1869f49ea1fd3c42d1de00c0fe70509ac6494816fa907b489211",
+   "runs": {
+    "walk": {
+     "hash": "8c57300fae5040b995236da6f013cc42191cbb48e9dd6db0cb2b440594c969dd",
+     "outcome": "defeat",
+     "turns": 72,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "213908f1fa7ea36df622bdfd3926388ec06e222603dad7533111f22d3ab16eb8",
+     "outcome": "victory",
+     "turns": 44,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "d8f534c9673cadb0c74ccdb12c280266e720a2b1c9688ad4d3c223aa9fb166f3",
+     "outcome": "victory",
+     "turns": 44,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 47324,
+   "map": "7158c16a17727a54f24bf7b48e630bd3b3cd9e5345a38e2055ed89526c2a07f6",
+   "runs": {
+    "walk": {
+     "hash": "252a04a6369d48b8f3cdce42d263cfcfffd9d3d9499f38dec40d9a1bdc01f13b",
+     "outcome": "defeat",
+     "turns": 67,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "2e65beb081dc2ca82f9816d50fee1b4e8248d5c4f42e60e0758739eda292e933",
+     "outcome": "victory",
+     "turns": 66,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "739e10c3cdfe64ada209125f09262ea25b6eef357d65e33b2f4374e12e754818",
+     "outcome": "victory",
+     "turns": 84,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 152053,
+   "map": "9067273f00aceb090f575aa16b2873f1c0e15081d7ad1587a83cb0d2d4cf3538",
+   "runs": {
+    "walk": {
+     "hash": "5d0fd62028fe57054405f360d41a4d0eb2589b1468e81fa9c200f4110489852b",
+     "outcome": "defeat",
+     "turns": 74,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "af509acb5fc0a9dd9f92422d3469d71da2a7a3482fa9497b1fb021614ad0397f",
+     "outcome": "defeat",
+     "turns": 79,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "72e2de2f0594bc1b84f2f407b2b9d2d5a40d93bfe739fd179c3b909755e335ca",
+     "outcome": "victory",
+     "turns": 72,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 256782,
+   "map": "3ec141cb900b23f176fe006d34446cfcc447e5ef821b965b909c99fffdde291c",
+   "runs": {
+    "walk": {
+     "hash": "a04aeaad7606c4139581183cd8b5ae9cb1991f3470f985c600423bcc3cc0c50c",
+     "outcome": "defeat",
+     "turns": 56,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "e453d41f7464c9d48cfa4d36e19fbc80455a0fad51a0ca3e8c609aecd3d3e5c9",
+     "outcome": "victory",
+     "turns": 40,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "af360a1e5e88bb3e3c022e1cae86957adc0508b9c78350c9148bcb440da93aa8",
+     "outcome": "victory",
+     "turns": 60,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 361511,
+   "map": "c8ae84cb74f8b18636b510ba915b9a6f538443696edc40661b3e6d71bfc0481e",
+   "runs": {
+    "walk": {
+     "hash": "d573f73ede9037dda6678e76d8a95a4f6abe099f4f821b7b5333ae3e0acf7e64",
+     "outcome": "defeat",
+     "turns": 48,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "c8df879f1c33dcfd4db0f4ee08902f4fe52aa4351dd9588240abc22502a6af9e",
+     "outcome": "victory",
+     "turns": 53,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "3bb59b89ddfe2761106cea1aa6f009fc00b1fdad3af5a61459dde7350a00b880",
+     "outcome": "victory",
+     "turns": 71,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 466240,
+   "map": "92d490af4ab4f7726537e0b1cc96a79bde6d8b736e5b5573f4b97e088f74ddb4",
+   "runs": {
+    "walk": {
+     "hash": "07180ac143142168e92b95f7d3b103d29521034c369ec004a9d83957276226af",
+     "outcome": "defeat",
+     "turns": 61,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "a6e8a6f53ac8dede83385834e47e037c74c2e88354e73aa4a2a89fdce48d4229",
+     "outcome": "victory",
+     "turns": 47,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "7bff5d34d26a8a0184669b5d1272dc502c1adeb9030cf4759753dc0e482a56de",
+     "outcome": "victory",
+     "turns": 55,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 570969,
+   "map": "1c7054d033fad0c10dec325abab14f20cc7b85673431102fa0e13455b2abed9a",
+   "runs": {
+    "walk": {
+     "hash": "579bec991a3746b252df428e9439060dd68863784232d021b49b55b167e5f014",
+     "outcome": "defeat",
+     "turns": 32,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "c4db767feb99d9dad56641730b745d50e6202cc629afdbf32e042f130e420281",
+     "outcome": "victory",
+     "turns": 48,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "c39f8af6f18d5492b4beee7730b02bb6a236291374ede29bf2bbf1e382e27af0",
+     "outcome": "victory",
+     "turns": 48,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 675698,
+   "map": "624764a82a881e1b335552f5ef80e8e210f525d854d71a93152873204855efd9",
+   "runs": {
+    "walk": {
+     "hash": "cb8d8a4810f6acb00997af8b40d9cff1e535e46c68e6916ebb1250774b298f17",
+     "outcome": "defeat",
+     "turns": 76,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "5fab2a54609c0bd377f9f931e0ed043d9b996b74b3268af42853d5145e3d8478",
+     "outcome": "defeat",
+     "turns": 54,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "f0bd46119b5645fee064f56c5b20305d34206983e76a9078acf9bfc0c143cae9",
+     "outcome": "victory",
+     "turns": 72,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 780427,
+   "map": "b005d43e456be020a85ee70b0b70f19ab93d98321ceedddf2e23d740acbe777f",
+   "runs": {
+    "walk": {
+     "hash": "e8aa6ea84276bbb882e2fc10ed493ea0ef9008311308d2fdeafd09d979127b6e",
+     "outcome": "defeat",
+     "turns": 49,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "e2e2d2e30a6ed90cb7b63ee3c98de8b15f19e347902f7ff8c348b4482c2e38cd",
+     "outcome": "victory",
+     "turns": 49,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "64996692eb0a271c8b435be4474a1fb546e23d3e6161f5858dd1a350a832a922",
+     "outcome": "victory",
+     "turns": 97,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 885156,
+   "map": "a754efa793a46883a563d89d020a5a53b9e27ec91a57f8535d9fe8ecd512a466",
+   "runs": {
+    "walk": {
+     "hash": "3b93c95b779b983653d230aa009cd1fd63d67ae4e5e43b21c750ca1261585628",
+     "outcome": "defeat",
+     "turns": 45,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "676babcb34434e0f47147ece7feaf73274f56318f88020df6049f5215eded908",
+     "outcome": "victory",
+     "turns": 57,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "0f537a593956220c6354dcfc6e13a87c681926ab408405746e2d6cbd80b7f344",
+     "outcome": "victory",
+     "turns": 65,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 989885,
+   "map": "600b0f76a515c4b4842d0784ae87f5accc611f6cec20dc9be778d9c2600c6ef1",
+   "runs": {
+    "walk": {
+     "hash": "cebe207471d9feda3ffcc4dd3ae44590790371c0606d7b8a615e3264a3d76693",
+     "outcome": "defeat",
+     "turns": 62,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "68e3431fbcb19dba87c02da64ab0320582d5cc005c20801c161f47b89439ba22",
+     "outcome": "victory",
+     "turns": 66,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "e22a4716d6cf60b954ab9fe85b0deff3cdc4aafe5ba9830a93a9b16793d5b548",
+     "outcome": "victory",
+     "turns": 66,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 94631,
+   "map": "1e7f7c31ca5dc44fae44b02501e3f8718059da330efee39f86fc0acb19d14562",
+   "runs": {
+    "walk": {
+     "hash": "7ed8f0a6220facf2d6e37543e71e2a5181c31b821d48d172c026c87d43791fd6",
+     "outcome": "defeat",
+     "turns": 66,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "6a995da7a98dffb858a0799c563b57bfaa0f69e9cc64abfdc448eab3d829c7f8",
+     "outcome": "victory",
+     "turns": 63,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "245c9e5428edae29854849e300ac80fed14efc31be6832013472d6fbe2846b5b",
+     "outcome": "victory",
+     "turns": 63,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 199360,
+   "map": "96168bd1b68a1a53d3ed77003fc6d2f39faab578423891e19dc89d958fdc26a8",
+   "runs": {
+    "walk": {
+     "hash": "6a3adb6c512d308512d096ce1bbebd6506eedc9f004c65465c4e2a946a7b7e8e",
+     "outcome": "defeat",
+     "turns": 77,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "a53faf088ed93eed54b86176b6a6b0c3c22318863494f07b3aa723ae1a8febec",
+     "outcome": "victory",
+     "turns": 53,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "7838425aae54822ad12b6d2aa74bc294dc50eb06e5e25eba2f856cb9db8151aa",
+     "outcome": "victory",
+     "turns": 53,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 304089,
+   "map": "347185633d217a3a0fbc5d15769815696364989e9f5adae3aa6a2ab076cd55a4",
+   "runs": {
+    "walk": {
+     "hash": "8dfeea7e44e7b359d46814fbbdd29bd022b221ff488d19377dadff665039ad3f",
+     "outcome": "defeat",
+     "turns": 63,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "735ea30543b78ae8ce5496e9acfa85896074e2b8a6ccf57a76c1c88bf63aecff",
+     "outcome": "defeat",
+     "turns": 39,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "bc29f656c2dc7183d8c33cc5fb8f00776d1fcab2e9676a943bad0f34ce96d432",
+     "outcome": "victory",
+     "turns": 44,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 408818,
+   "map": "bacb38d14e8126f5b2b18b032bfad6eda62271c2c40038d23b4c88fc5bad37c0",
+   "runs": {
+    "walk": {
+     "hash": "57e70ad284859e6d7f6f4088ff239db37ece897b78dd25a51ccf96d33199a975",
+     "outcome": "defeat",
+     "turns": 58,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "22f016d066dfbee643ce10d84fd903117bee8329b7c111bb90dfc9551e715b4f",
+     "outcome": "victory",
+     "turns": 60,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "4dc5df6ed10214976b641ff0cf444dbabbd00928ce3e455b6a8c8ffd1fe61c96",
+     "outcome": "victory",
+     "turns": 62,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 513547,
+   "map": "a03bea38929713f408a6b01f1f2a5a74e369212668a3f4935c1a975b7e29a719",
+   "runs": {
+    "walk": {
+     "hash": "c9153c7de70f54d9ab9132b8ea6703939ea704a95e605998c5738dbb37a50f60",
+     "outcome": "defeat",
+     "turns": 82,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "dd9b86c7c56511fdb520c47cc05ca89e756fec9333b1ed684344300a7f89e151",
+     "outcome": "victory",
+     "turns": 51,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "45c24c7d06d47246a413144625db53b67ae1d0305a4203ee8c1a300617731478",
+     "outcome": "victory",
+     "turns": 51,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 618276,
+   "map": "b3f5f650d256e8221c96ad6a1381a1dfbb5bf21918ee4fbd7e5b3042a66f2301",
+   "runs": {
+    "walk": {
+     "hash": "e39f38e6fa241862a23d596fbe7bfaeb4a56c21a3b56f677437140249b566c59",
+     "outcome": "defeat",
+     "turns": 57,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "cbc8538387012e12a4c9a284007e9c5c4886ca4ca4e48b0c7c8d433f8fbc0132",
+     "outcome": "defeat",
+     "turns": 53,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "f7d28638168408a835e3befa5609de14d51b036b36248b7fbb84614d2c97430d",
+     "outcome": "victory",
+     "turns": 82,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 723005,
+   "map": "e5982eadb1f7552ab6c71a79dee29ac562ea93a9e0942e4ff88cd088812843ee",
+   "runs": {
+    "walk": {
+     "hash": "909a1a5519bd93b84af7c21677417c943838b44ccec83d593e7975b233cf73e8",
+     "outcome": "defeat",
+     "turns": 50,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "dcd84272857efdde66e329143ef0a80d00356a85286763e785121f8dfeada163",
+     "outcome": "victory",
+     "turns": 48,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "da5c1a01ea0745acf72c480aa884b87d9d777db1810f5bba87917ed99945bfd9",
+     "outcome": "victory",
+     "turns": 48,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 827734,
+   "map": "c73f72042e29303aa5138c38a349b3b787a8bc3c12bbed652e97cfcb6a68de65",
+   "runs": {
+    "walk": {
+     "hash": "9de1a74ceabb946f7a1fae282c39b0a9a3ce858cdb7577267a190f7993fda843",
+     "outcome": "defeat",
+     "turns": 44,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "b1eefb3f4ec8dbff9c78b37b7404c2ba44b667650f6fd1445be180b05c2a8a7f",
+     "outcome": "victory",
+     "turns": 53,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "e651d18345b4e8f595d781258685b7550ce998970c1849312a1145af417e7f00",
+     "outcome": "victory",
+     "turns": 53,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 932463,
+   "map": "eb876d6279687ac0e083d81bc1b01bccc62575eb8df45b83d714dad43e90c7d0",
+   "runs": {
+    "walk": {
+     "hash": "8dc9761db47fb5a62088c87e0345f05e24fbb17c0627d65380b5a4b5fcfdaaf4",
+     "outcome": "defeat",
+     "turns": 64,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "d5f126c1c1a3c0ea7f92ca3aaa398bdc5df9e2266bbf8df36427f4f217b6d779",
+     "outcome": "victory",
+     "turns": 51,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "cd02cb706f559141fc2f8656607e76b72eefd713b13ae513dbd9aeb90d42b924",
+     "outcome": "victory",
+     "turns": 51,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 37209,
+   "map": "879690a7899c5ad0e3c288be311c934cf44f6aeb83976dd5eb437b926e96d0e7",
+   "runs": {
+    "walk": {
+     "hash": "9cca4dae621fee08bee74c9d92a0a2491d518b1229fca68a09021932aae3290b",
+     "outcome": "defeat",
+     "turns": 55,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "0438ac137376b7d9f1106677fc085923a0237f7ffb752cb8a0b7873178db5557",
+     "outcome": "victory",
+     "turns": 54,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "d91c7a1270919ed44c7c5a666134ae7fe30112b732ebec635f63f79f0982456a",
+     "outcome": "victory",
+     "turns": 48,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 141938,
+   "map": "5c605a07944a8b90abe33ab631345a1bab9d7415d68ed14a3df69ee29c8339f9",
+   "runs": {
+    "walk": {
+     "hash": "470f8638d7740f90bf129dbaf6c8aa8ca743b05ff1ddaf843d744870f15a1fea",
+     "outcome": "defeat",
+     "turns": 70,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "8ff8900c5f82882b3117adf7c29cd57ef0932f505a1c772023860ef0fb4dfa98",
+     "outcome": "victory",
+     "turns": 41,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "2044780b1242391947a41a637bc93000103305e4793cb663a4f0c68f4e32bae6",
+     "outcome": "victory",
+     "turns": 41,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 246667,
+   "map": "3a0b6aa25dbb4b5c5478ee49678d832321d638861abf3281dae4bc7db9d8c832",
+   "runs": {
+    "walk": {
+     "hash": "9f18d72f445d88e469861e5aba58195040d25b00d3f929576220a063a2bbe3c7",
+     "outcome": "defeat",
+     "turns": 65,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "f0fcb390cc88a172fa9383c5254d978c18f4ed83c571fa7917e2db66ed81d5c6",
+     "outcome": "victory",
+     "turns": 46,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "7466deecc22f835946d1ddaebd7db1df9b11dea109a0ae76aed4765d6d56e6a6",
+     "outcome": "victory",
+     "turns": 46,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 351396,
+   "map": "a3f8be0459d59eb9ddf035f511f08371937db682b9dd121624bf5568b9cbd10d",
+   "runs": {
+    "walk": {
+     "hash": "6383b140dff65e330b0478e2aa446b4215fa930889004c930a655e747eccf4fc",
+     "outcome": "defeat",
+     "turns": 56,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "3fd13b10149253c6ece93158ab15ff3e4977ffc79a376c819afd82b60e4baaba",
+     "outcome": "victory",
+     "turns": 58,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "5cb9736f047e3cb47587fd0cc140b7bee67c2ad1bd0303ec16b51c21fd849701",
+     "outcome": "victory",
+     "turns": 58,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 456125,
+   "map": "484f58caf622e1b238544df6097451cd935d454bba4386de62f24d8fe481e14c",
+   "runs": {
+    "walk": {
+     "hash": "aa444af3831fd08849e6b69a3494c941e6fc0172635efaef2613bbd8ff8c70a0",
+     "outcome": "defeat",
+     "turns": 53,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "9632c88628a9d6519604a3d0016d3db631348e45ef87a0e62809914fb546c7bf",
+     "outcome": "victory",
+     "turns": 57,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "c2493123e487d6c5535921b00896223142f66be4760fd4af5f86580a077c5c77",
+     "outcome": "victory",
+     "turns": 81,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 560854,
+   "map": "599fd890b0c6858cc2cc191d9d0f9dd2bf19b9c5ce416135012b6b528a15160d",
+   "runs": {
+    "walk": {
+     "hash": "4c5c572846fd99cf953e431c7ccd9489c5f8c7258f6f3969683e8f20dd842439",
+     "outcome": "defeat",
+     "turns": 50,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "3addf4d26b6cd5e6b68a884bbbeecdc0849968832cf1f8507b7fb8844cc414e5",
+     "outcome": "victory",
+     "turns": 56,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "255ab2e55b9ef7a4b4bdfce35961c3f9b76866b687e15bb51dba5d240488e196",
+     "outcome": "victory",
+     "turns": 56,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 665583,
+   "map": "73ddb4394b587f04ddcf6f12ab17b8f4b34b7410f64388bf89e18ea31262231c",
+   "runs": {
+    "walk": {
+     "hash": "cc592bbddf1e62ef5d250d06d13edeedbe314aedc832d07d066c6bc7ce0b2a2b",
+     "outcome": "defeat",
+     "turns": 52,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "677422a676b6ab9621dd7287d162ae3eaf25d4a413a83a3bc93f569b378c1055",
+     "outcome": "victory",
+     "turns": 48,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "3969619d59e3ff13afc0467f5e47cfbf64d1ce10133f8c39a318c57a641491b4",
+     "outcome": "victory",
+     "turns": 48,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 770312,
+   "map": "cb28e1aa3461b43065cc3e62fd4bac191f5b3fb86fb1c13ed894151a3e3f060a",
+   "runs": {
+    "walk": {
+     "hash": "1d06b98f630e57751c583c8e099d37e9dbfd07069910e360e661be3ec6bdea45",
+     "outcome": "defeat",
+     "turns": 45,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "4bc4e72be32b88b186635035665deac4fb018d4fa287a954cc00f1950c611472",
+     "outcome": "victory",
+     "turns": 57,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "8b5dd852817dea4ff2e2ec25a5968d8a259e99227db38a77dc16d8c12b98fbb3",
+     "outcome": "victory",
+     "turns": 57,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 875041,
+   "map": "112fd05fc0cb4d3e87cb6a89f2e3203f96a0ef42b1d45dc496ce00e422b20403",
+   "runs": {
+    "walk": {
+     "hash": "a0f6463077b6959b6dabbe0e0c100ed4bb2e2b35cb7c27d2e58b6f71f39542d2",
+     "outcome": "defeat",
+     "turns": 35,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "743f5a103a5b48b57254d0f88e77a6933230275bd106ce0a80ecbe7f26ef3171",
+     "outcome": "victory",
+     "turns": 45,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "de963c4060becf1015b624bb55508170b7a729e3f4597d73f502c5b3499a3543",
+     "outcome": "victory",
+     "turns": 83,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 979770,
+   "map": "0071e4ba925bef796c60c5ff5917f9cf6738edff31fda93f017926ae9e8ea183",
+   "runs": {
+    "walk": {
+     "hash": "47dde37223dd64a052bc80faf44ae8ed9ae327c3d43a3f000b9eb1e071c9a43a",
+     "outcome": "defeat",
+     "turns": 62,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "fa6822873beb01547efdcc3caedb294b5d25b790f6b2bff67188dbdd30b30472",
+     "outcome": "victory",
+     "turns": 48,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "87ebb8fbfbd69cfed5be3000a4807b9d78a2456cd3315959a6bc3ec9413937be",
+     "outcome": "victory",
+     "turns": 48,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 84516,
+   "map": "aceda213ffdc838774edcdd3e8e4f8be456dd5ab3cd3e4fd9bb62f22aba5ef95",
+   "runs": {
+    "walk": {
+     "hash": "a4ef313f9c88aabb78c39aa1ea534bb343ddea8f11837a9c054dc2d9cc05664d",
+     "outcome": "defeat",
+     "turns": 70,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "b33f77e054f9c7b931e242f35500f52844a1a99e95d11c6c1259ef53508a4919",
+     "outcome": "victory",
+     "turns": 46,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "925be90a066f2d6f4483a9fbca992130a8905d8aedf0a93c4e9ee00b5c3b2f93",
+     "outcome": "victory",
+     "turns": 46,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 189245,
+   "map": "43ad3fc2919ef85c5926044f3f84af96eab6487855ee7e85257fdb7368dc4e52",
+   "runs": {
+    "walk": {
+     "hash": "f532ae2eb408fb1ba05b946e57d8eb1fce52cde82dae45cdb235a8661732c3ef",
+     "outcome": "defeat",
+     "turns": 44,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "249a690b78514c7406901ccb973738acd4eaa7cdb8c182b89cce5dc391554b0d",
+     "outcome": "victory",
+     "turns": 52,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "6df8aeb165f5ff9c0c35eb933681b11059ec2d96d8e51ac52fc553680963cd33",
+     "outcome": "victory",
+     "turns": 54,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 293974,
+   "map": "c3ddafe3999fd8b04dd146952c266e09c592e579e05a545ebf96956b2c841b7b",
+   "runs": {
+    "walk": {
+     "hash": "550cb46275548aa72f5c59ee84762262a98fa06b21ee8c3de6fc534515af0c1b",
+     "outcome": "defeat",
+     "turns": 90,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "1706648443706d75b0c3ce3ea0967b22a7fd5f00c9e72f31d118ae9f03dad536",
+     "outcome": "defeat",
+     "turns": 57,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "908e6b7895767e627b62c4957c885e3b75a79ebbf130c409a34904eb0a43a6d0",
+     "outcome": "victory",
+     "turns": 55,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 398703,
+   "map": "a721693df4fa3d9a391871c701f041937ab7bacdc1345a5619f1be40b2d21c13",
+   "runs": {
+    "walk": {
+     "hash": "a9f156a32d4ec635e7b1aee5c36ffcde8fa43cc6da7a800164cda72b4cce435b",
+     "outcome": "defeat",
+     "turns": 85,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "683a5afa77724f366b81fbb025a32afd3c4ada83689569aa3970be4af1f9ded3",
+     "outcome": "victory",
+     "turns": 48,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "b2637c2f103d0fe65051a8282a9eb09fa3493f4a8ecc4a90a1ffd2f798e4aac6",
+     "outcome": "victory",
+     "turns": 48,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 503432,
+   "map": "2cbb36eb1850f863ceb0476d2fc11a7ba1fb8be685edbdb0894076f04a2e2499",
+   "runs": {
+    "walk": {
+     "hash": "e84ee4e980f997ed9ecb509cb9ddd250de547df385f5f4ef0fedadfbfeb99590",
+     "outcome": "defeat",
+     "turns": 43,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "ab739705cfc111ef320c4d40531eb4b9b300f813aec18b0f73b29a5dd6966ae0",
+     "outcome": "victory",
+     "turns": 48,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "d3a6420cd94c15066c346b2b707c0c545af1c82150353f14c367a021b1f26a04",
+     "outcome": "victory",
+     "turns": 48,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 608161,
+   "map": "e2b110c735b33140df199c3ab854298cee0ca5df5befb65861cd36ab1f210929",
+   "runs": {
+    "walk": {
+     "hash": "45d0f0bbcfb8ee7c412dc24f9325faa7dab97caef9640448b65dee04f51af554",
+     "outcome": "defeat",
+     "turns": 64,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "def63fe362e2411b8c6a90347e1cfff45195df3148937315d3c199ad7125e578",
+     "outcome": "victory",
+     "turns": 59,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "39b23d933250577e774078f94a08f0d32d71af792d5f98615b4c1928af86d4e2",
+     "outcome": "victory",
+     "turns": 67,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 712890,
+   "map": "d6349d99d15a164ff8adb7932b2ebc9e5acf1a2aa306acb0a3eef6ba3dcd5830",
+   "runs": {
+    "walk": {
+     "hash": "8b23e681dd591dc300afb62919fae919494f4868fa007d91b4ac6ffdd844384d",
+     "outcome": "defeat",
+     "turns": 55,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "4ec9a23644b561667178eb5f2eef31ccf23413e4545ac104cee947342c702246",
+     "outcome": "defeat",
+     "turns": 57,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "227ddcb7b75fc0c03f3d5f50754b512561e61062f749300596859ea49e6e120b",
+     "outcome": "victory",
+     "turns": 58,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 817619,
+   "map": "7c5fba9c19d298f78e3c9bc305f13902a9ff55dfd7be1e04664d204847ce5054",
+   "runs": {
+    "walk": {
+     "hash": "e24c1c905cffd0534b79b02f5c6d111475d2807fdae0c3746330dce72dbcb2f9",
+     "outcome": "defeat",
+     "turns": 82,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "82a591117da31345daa9cce4159f704ceedb80ce94d6b3def1ee69f4004c5c7c",
+     "outcome": "victory",
+     "turns": 47,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "972eee6dbda236b7cc97831e5e7a86a5c0a00f6f306d79691446f6d523e1007c",
+     "outcome": "victory",
+     "turns": 47,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 922348,
+   "map": "cfd03afeec9558c31510927947efea182dd1b8449ee7d3cc9470ce6aa8d6192f",
+   "runs": {
+    "walk": {
+     "hash": "1ee812b4e13a2a1814e355bdddd4966919f48312395f101d88c0b3059be43758",
+     "outcome": "defeat",
+     "turns": 57,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "7fec92f9209d540882e05beba47c0f833844d56b938bf68cc1f8fccc6f6b5749",
+     "outcome": "defeat",
+     "turns": 58,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "26d30bd36d2c5b116c863b0eeba8588f04f1bff70bf0f31f5d6765726a0b8857",
+     "outcome": "victory",
+     "turns": 65,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 27094,
+   "map": "df1e9cacd76fe7bb04bb45c3fdaa9dcb0a2faba004a545fa5b4ab207db5fdbf1",
+   "runs": {
+    "walk": {
+     "hash": "213a8d50a038714fb44bba61d65b5034821db94a5c9727f16a2bde0dd9d1aab9",
+     "outcome": "defeat",
+     "turns": 55,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "fe39fc669e482cbad86e009d27fae508152a910ee2f3f01d746f2587a70b3290",
+     "outcome": "victory",
+     "turns": 47,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "c0f4a33b56e157cd75de3a7c8a6e607508acb1e47640578db644b29c3719abc1",
+     "outcome": "victory",
+     "turns": 59,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 131823,
+   "map": "93caaf0915202b724d8d47742f5359acf3b92c798ed48205cf68f2c4133ccd13",
+   "runs": {
+    "walk": {
+     "hash": "0ba2030862a7c0b050fbe3df8f53126af131948f6b1bcb92b8245b7b70a2329a",
+     "outcome": "defeat",
+     "turns": 72,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "54c23b7a2fd1399fa59122ba180888468d517be1ea156f87667428239b0f42c3",
+     "outcome": "victory",
+     "turns": 48,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "071ca99b5f6352c96943eba8c270a9892eef64de97ea4802258b7abd9b14ecbf",
+     "outcome": "victory",
+     "turns": 48,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 236552,
+   "map": "068fac1a201960f78faaecafe250d44cf203d1d77cfecd58f694f0fc2d74344f",
+   "runs": {
+    "walk": {
+     "hash": "de773eff5292ec804e043850de4a56f99d44077913e0762f9d4ec9250805e807",
+     "outcome": "defeat",
+     "turns": 73,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "4b44e1a1673c4b63908320a77339061be91b60d9b68437c8ff2a7674cce130ca",
+     "outcome": "victory",
+     "turns": 51,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "b3ca59939708dda8c54c825b3a2d1cbc20e5d28529c6c238eeaf0db25b31871c",
+     "outcome": "victory",
+     "turns": 51,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 341281,
+   "map": "95a4d04b74a9f00a538ecea75374bf9d5807fe65a9c08a921d7b0b8da697b8d6",
+   "runs": {
+    "walk": {
+     "hash": "8cf37819274093e130554e233e516f0ce98bdbc751c573e7e2b26207e736d459",
+     "outcome": "defeat",
+     "turns": 56,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "81d9af8c4eb7fa27469dc98dc639fa6479bb92c439d8b804f584e32ec3ae9caa",
+     "outcome": "victory",
+     "turns": 49,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "92858179031429cf6f1b454c77dc6dc3c8d09c70ced10805528dc99b2132958d",
+     "outcome": "victory",
+     "turns": 49,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 446010,
+   "map": "0d02faeb72829ff757b71fec33094c99d3ec1d4221c236b690e8b0dd2621aa63",
+   "runs": {
+    "walk": {
+     "hash": "c365315d3f3b6da250cb49f78dd71584501fe21291dfad01f4b697f9edd638c6",
+     "outcome": "defeat",
+     "turns": 56,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "d38ab564f79c412c0919f8d7887296d43d4b0c06ece89d832a31719de9508df3",
+     "outcome": "defeat",
+     "turns": 58,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "64b6f1dc80d289112db18c411888ca3360aa0ac60ef984565284959eb56c245c",
+     "outcome": "victory",
+     "turns": 67,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 550739,
+   "map": "845a411d17f18c9e0ab198888f7bfc8a81d5652ac7c1f51a378dd93f1b080d92",
+   "runs": {
+    "walk": {
+     "hash": "32beb687b01bc3936bb279a6a83e721b6cefd4bb260a28a08256b1d09e4bc491",
+     "outcome": "defeat",
+     "turns": 63,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "299c3939bd8b12df3b81790be436954616e34420e6501ad69fd9afa773a9fb99",
+     "outcome": "victory",
+     "turns": 64,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "147371a0ba3ac6b1c8836b0c0572b806a3ed740b67b8de6e8f46c8df629cf35c",
+     "outcome": "victory",
+     "turns": 96,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 655468,
+   "map": "26b41f16904b7544ce04daf17a9035352b6f70ed565eda5b3c6d1201a13586c8",
+   "runs": {
+    "walk": {
+     "hash": "583ecc5d27bb50141f6f200a98e4061d771f7181faf1cc5388b33f0637b7b021",
+     "outcome": "defeat",
+     "turns": 66,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "cb2014082db6f685406b321d7d33e72c3c93ed423efc28be6023663078b0478b",
+     "outcome": "victory",
+     "turns": 50,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "13495cbc390915bfe4d2658c60a82f411e414aabf336580b1d815a98f532aa5d",
+     "outcome": "victory",
+     "turns": 50,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 760197,
+   "map": "87cd6cf1df3fe0513fc70fbb8532c3ae4b0a55d50887e98d0056db6ee4d43a4d",
+   "runs": {
+    "walk": {
+     "hash": "80b76e92d55d78a7dbb5dae98af4578380463f2e4919412e136d6c6fcfaed74e",
+     "outcome": "defeat",
+     "turns": 66,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "49ad6f0f7996eafbba8ce3c13b943b774608a6183194290a0fab1ca7b35dfaba",
+     "outcome": "defeat",
+     "turns": 51,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "8e65d3fe2df8cdefa76b47d5eff1bac3e0add658cdb54f759f0a69d39c19679e",
+     "outcome": "victory",
+     "turns": 64,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 864926,
+   "map": "73a94cfe675a88762e6f02405a4b0c20684af2ff7103d824e7e20ca4bd70f1f4",
+   "runs": {
+    "walk": {
+     "hash": "462270645a76f308ce6eb1b637cf0dee027c9aab91c87935b41e1d188c3d9d69",
+     "outcome": "defeat",
+     "turns": 88,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "df12284cbf72c23617bf742a835c430e974fc1d97a4b3e1127832d2f2696e206",
+     "outcome": "victory",
+     "turns": 46,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "0905fed89fb8dad08533b3044ee9de8368e2236e30a7ced735664ab572e38c4b",
+     "outcome": "victory",
+     "turns": 46,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 969655,
+   "map": "001551059559c90e4e073a251199b58999d0c894f14cc88567be0d4bbbe36a3c",
+   "runs": {
+    "walk": {
+     "hash": "9d3c6cb176fc3919acf887f6d6332acdd6e981d6705bae6cfb0d519a80c7d76d",
+     "outcome": "defeat",
+     "turns": 70,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "6062d001d7ec91c5b99961169c09a7883569fcffe554c7a8884014b51f927eda",
+     "outcome": "victory",
+     "turns": 42,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "147e1fb9b81bf2448a45d40a10d4f3c970ac4e3f822e60a0b0b2dd9f5a65f75d",
+     "outcome": "victory",
+     "turns": 42,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 74401,
+   "map": "f326530aedc5ae289ed72b24026d185dcd024e99c725662dc7fbf7cef0f48744",
+   "runs": {
+    "walk": {
+     "hash": "df0e8b16e4cf1cb15f7b582ab97f1e7f921b8f9a896969e21b6b1e1aa75b2f90",
+     "outcome": "defeat",
+     "turns": 68,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "25659f7de3b1dd84126e302717043e3381c93f089d7cf4356b1373accebcbcd6",
+     "outcome": "victory",
+     "turns": 60,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "f91b372d486a94f7377c368f8250334d58c95e192cee6e3b26cf25cc5f6cd989",
+     "outcome": "victory",
+     "turns": 82,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 179130,
+   "map": "4c49193319be8b9eaaf01faed602f9bc3d91ffbdd0de33ad614cd71e2372314c",
+   "runs": {
+    "walk": {
+     "hash": "85e8db427a2315c1215b9adf70c96b766c0e0611a69c2e9c2d81def5ea5d287a",
+     "outcome": "defeat",
+     "turns": 37,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "916393b718539c3a399e3b53a22ae823d5166243783117d434c664d91685693e",
+     "outcome": "victory",
+     "turns": 46,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "6903dd58dba6321768675623dcd80fec7e221a6d0e454f72094e3a00f84a782d",
+     "outcome": "victory",
+     "turns": 46,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 283859,
+   "map": "77159604908d43cc54c918bb6e1b42b2cc7e35c7b69470504ffb2e8ca1231d08",
+   "runs": {
+    "walk": {
+     "hash": "70693b97889988928953ee4335718d7ed9685166cdfe9a106145700781aeed78",
+     "outcome": "defeat",
+     "turns": 40,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "b2ea9929e8b2136194862f24043b9e5885cb2b77114fdb9660ece8d796d447ee",
+     "outcome": "defeat",
+     "turns": 60,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "d63f21199ca8fa011d537fc2d7381aa10c69b57cdad9d9d9b49fe3a3aeed94f2",
+     "outcome": "victory",
+     "turns": 62,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 388588,
+   "map": "cbd5ad4df8099004607c8214f9ad2b2ef0408d18410938657b9be33a4fc07d0f",
+   "runs": {
+    "walk": {
+     "hash": "0b6e92496946e08eb641ebed2656b8a82838f055ec5fdb96d3b81c8a434f84d2",
+     "outcome": "defeat",
+     "turns": 100,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "d1854c0b2080f8bf3a98fa7ec70783dacb8318197a58442acf46af6613f7b455",
+     "outcome": "victory",
+     "turns": 46,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "bfbcbbe40120b4a6ac674d877221b95b3da7bd0bd20ae3ebbca0d454773d46e0",
+     "outcome": "victory",
+     "turns": 46,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 493317,
+   "map": "bdca021757b1d1527a89f0c1594125525cb129ebd87f4bef0098705b8d9308bf",
+   "runs": {
+    "walk": {
+     "hash": "961fdae8766b7ddb62871867524e9f204fd4589878e228b47139c3ac70caa111",
+     "outcome": "defeat",
+     "turns": 46,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "d15ea307810b8fa4d7436fe41104a50b59b929b8e2932a9f13dca06e27f2c00a",
+     "outcome": "victory",
+     "turns": 54,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "30d6b66c8e64338140c8713fec9985fb1d2095a957c4a151bd53cab68a9f95f3",
+     "outcome": "victory",
+     "turns": 54,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 598046,
+   "map": "2502f192c3971f44a559e2a2f85de5774935727fb838cda934a546e0f43cccaf",
+   "runs": {
+    "walk": {
+     "hash": "9bcc714c4957b4cda3e306054bdb84dec162ea676e5eaf8e9fd2c6c47724f956",
+     "outcome": "defeat",
+     "turns": 57,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "c4ce1054305a9e0a42c8de2563752f04b30100f4fb5a021b5159bbbcfc2aa87a",
+     "outcome": "victory",
+     "turns": 48,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "95cf8a841c2c3d0668c1d1f1a372f99a3c5a7e0f2e261d0fcb11d14ef8a31f40",
+     "outcome": "victory",
+     "turns": 48,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 702775,
+   "map": "992508b571471fd33cd61e215cc4e3bee54f1268b1d84625402248c8809504e0",
+   "runs": {
+    "walk": {
+     "hash": "32e9d4938518cb6914e448f5c0a09579ee31c1205e609e1edcb760f2005b01f9",
+     "outcome": "defeat",
+     "turns": 49,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "6944604eab5112b112186a9681b9042a537b6a54db8ecbd6d087c38a89ef9f56",
+     "outcome": "victory",
+     "turns": 48,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "62a25d7e562846360d0de232511c9b59fc98cd1b03b3654a537a31d20c6bd7d9",
+     "outcome": "victory",
+     "turns": 48,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 807504,
+   "map": "4d4438284ab48b340a12aba1ebda25290cfe65d2b563411148e057238aa55a06",
+   "runs": {
+    "walk": {
+     "hash": "a17bbe004c7d216948b64cf36ad5e39d2f6c853fc47fc2eaef1b356a155e3d3d",
+     "outcome": "defeat",
+     "turns": 63,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "6b2c7ea7d4be4fab40a825dce924cae861e559535cf6cee547ebea52b15f19e2",
+     "outcome": "victory",
+     "turns": 44,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "ae0e4b1054d1c5aede7b376f1efb489279698fdee32396b5ab01b4b138feab14",
+     "outcome": "victory",
+     "turns": 44,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 912233,
+   "map": "e5ca7b4c5c81a6b19833cf30be6dfc5566bb251d40ad687eff1bb96368f915b8",
+   "runs": {
+    "walk": {
+     "hash": "e57cdcb7bba8de6ab4da2d90c88d6008e900ed10a9f70d3f87b35f35b4d12909",
+     "outcome": "defeat",
+     "turns": 59,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "7eb61ddbbcbf58d6243c2df0fbbca18ccb1ea25cfcfb021fa0ca3102d02f3729",
+     "outcome": "victory",
+     "turns": 46,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "f947c1a4d6d246b769682a7855379fa661462ff03f95b5e1347849c8f73fd5ba",
+     "outcome": "victory",
+     "turns": 46,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 16979,
+   "map": "cf925131d90c70c94da0cd8afb30e39e38a66272fa9a5fa30ca9f1599e0bfa35",
+   "runs": {
+    "walk": {
+     "hash": "21a88a10f5ae67631b876db2f27fe49cdf523d4699b05cf605651d2b875e0bf1",
+     "outcome": "defeat",
+     "turns": 28,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "e14c8f3344bd91bbb33eacb77e4082543a0c20ce88fc76537ca7e36034ce4159",
+     "outcome": "victory",
+     "turns": 54,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "d7c54bd63255a9b1a23856f6d8a14ac0776217167e07cd8de846476611a55c64",
+     "outcome": "victory",
+     "turns": 54,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 121708,
+   "map": "49691c37a0b59df6be6d405691a8070ce12e555fa5f74ed471c3337e101e89c7",
+   "runs": {
+    "walk": {
+     "hash": "37492e5255f704ac61aba0996f70f2ad399c9f3e17c4effae999fb9b0b826e6a",
+     "outcome": "defeat",
+     "turns": 52,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "d268de47c4016c7020c3bd85ab114af98a0b504580a126fc658aed9c00155098",
+     "outcome": "victory",
+     "turns": 40,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "df7f5ad813f43fac87e44f442ea9800ff5098e051462c89704b80f6d18e91300",
+     "outcome": "victory",
+     "turns": 40,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 226437,
+   "map": "49b28227816b043a3de1d6ecac98302fa65558b628a04de206a13889e5245049",
+   "runs": {
+    "walk": {
+     "hash": "dc48b2863c89dba5cbe444dd4ba998aa7b68034818f2c356c8fc0f1abc770e7b",
+     "outcome": "defeat",
+     "turns": 79,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "839f67e4407d2898b4cdd47e4c9412a5c3f258a1af87fae756f58eaf784c573c",
+     "outcome": "victory",
+     "turns": 40,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "dfd95ec4672aa5560775f3e0fa3bdd189e3336166e848b6e4fc1b652a8700f5f",
+     "outcome": "victory",
+     "turns": 40,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 331166,
+   "map": "73a9873427394c13f5236b42c4ed790078e5ce0f3cc36d5b0f329c859c8c0966",
+   "runs": {
+    "walk": {
+     "hash": "7c2f85f04c0dbeeafb595cfbfd974089264e48bad401b67e779d1294c0c71f88",
+     "outcome": "defeat",
+     "turns": 72,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "4ff30ec245eb2f476fe638821385ad49eaf02f46e927f3dc8139611f167c2725",
+     "outcome": "victory",
+     "turns": 50,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "77293e11430d225aa1b74d7f9a33f84cba8ae8dea70cd879a54586d512925423",
+     "outcome": "victory",
+     "turns": 70,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 435895,
+   "map": "ca298e0a83a9b373c93f8fbb6674dff8a4bf213cc4cd1edf1f7ea108dcf3fd88",
+   "runs": {
+    "walk": {
+     "hash": "43e6a65ba7f94138453362946697e9d3559e3a9a047992e00c799b482b76c4c5",
+     "outcome": "defeat",
+     "turns": 48,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "251a92bf09142c62c24e0e05959f953605bd0abd0d6f897b4726e00dcaf4d17a",
+     "outcome": "defeat",
+     "turns": 63,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "7f40be61fbac4968f656c05b21b0ba2847051848d4abbe26e2f23677e284849e",
+     "outcome": "victory",
+     "turns": 76,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 540624,
+   "map": "e4e2a8c2f4f8349a080549523d6f2c9ce676a20076d060aba5cd62e495b8f382",
+   "runs": {
+    "walk": {
+     "hash": "265202d87e395ca1e36482f1eb28cb9c1225f77593e229c26a65d8925fca80c6",
+     "outcome": "defeat",
+     "turns": 37,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "82185bd7ba1951b9e0676576d1fa204309b417411e9c5fc2d8b181439cfbf732",
+     "outcome": "defeat",
+     "turns": 67,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "c2706f9f7ada0ce6310f6d72ff3121985b2fc15d6470c3b9a9ef2b3819a1b719",
+     "outcome": "victory",
+     "turns": 73,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 645353,
+   "map": "ef52530e6d1d6d69ec79c9a173aad091ed458ac887cf781b9c6c1256abbc7025",
+   "runs": {
+    "walk": {
+     "hash": "430912ec28b21f32e0040a9d61acfdaedcd4632344716d6cd4c152d974335f6a",
+     "outcome": "defeat",
+     "turns": 47,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "ee99645dfc2e3a6b5fc4c6c686c6e5ced13109be03d01f2a21d0e6b5690829fe",
+     "outcome": "victory",
+     "turns": 45,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "bfbc1cd6e9bc23d349c9841e657e14525dcf6b95e0186b44225aee90a927cf12",
+     "outcome": "victory",
+     "turns": 45,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 750082,
+   "map": "c96d83131b1e2dacb8a2f5847bf922d50715508524890e1b27524c699540e44c",
+   "runs": {
+    "walk": {
+     "hash": "a014240e747bab66f6e14399204c26df6a581779924ca32d296ba742a567760e",
+     "outcome": "defeat",
+     "turns": 46,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "0d0b5abb0e1535d238b5324b350639c6a11daa6c3ac40edca2f42bb690c60654",
+     "outcome": "victory",
+     "turns": 60,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "0a057771777368a0bbae7aa2e1cefe03682bbbe1f433fb2ab3731836f6cc0378",
+     "outcome": "victory",
+     "turns": 60,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 854811,
+   "map": "512318d7226c5729cf997ea618388f06b18f9993a3aa12d7ef89eb45adc4a961",
+   "runs": {
+    "walk": {
+     "hash": "b7cbc196d3b56fe6556f9eff73c569b0ad043ab6358a979a4bc1227b4a802f24",
+     "outcome": "defeat",
+     "turns": 74,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "9d30901aba9f4c631c02e2286bce1ffaf25e28d4c0717fa8fdd949b0998ff389",
+     "outcome": "victory",
+     "turns": 44,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "81680e9ff2371c173ecfd758158952acaec1f6f86322dbde65120207c789ea59",
+     "outcome": "victory",
+     "turns": 44,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 959540,
+   "map": "8236edc9fc6ab3e0e61763f666d0bf7d07775fcbfeb65087def3b64b8e28a8eb",
+   "runs": {
+    "walk": {
+     "hash": "426794e487382af8e71b8876abc723bd1e23ebb3195c730576bd5ae853173b38",
+     "outcome": "defeat",
+     "turns": 59,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "0238649c67f1a1c3ca22c7b82923c289818ab02188b3f9d848bd7dc68090c012",
+     "outcome": "victory",
+     "turns": 42,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "b3792adbe8813fb3a4d932d48f6b126ef25393a0fee6d86ff1a1b49bb46eff1f",
+     "outcome": "victory",
+     "turns": 42,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 64286,
+   "map": "a4a065e49cf177b6edf74faf5d6ef2290c0c98b7db26536025291dece2623859",
+   "runs": {
+    "walk": {
+     "hash": "0ad20a52183f7a2f28bb343f918d8fea3218b6472b560068ba05ab2dc027cddb",
+     "outcome": "defeat",
+     "turns": 59,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "2965a1936c1ada6c0ee929755e81de9df9679b3de1a6a58f388c8c9dacd79594",
+     "outcome": "defeat",
+     "turns": 63,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "1dd611c43711374a2efdba65a0a39201b301544231b0ea108a4526fd1419f47d",
+     "outcome": "victory",
+     "turns": 68,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 169015,
+   "map": "ec28a4bf416de0cc6f98cd27c58c9dc61367b10982d2d1499b6caae2013440ec",
+   "runs": {
+    "walk": {
+     "hash": "6abf992ecd225d22ddbe3f9024b7c12fc74ff7c3a4fee657848c78b1748a96ce",
+     "outcome": "defeat",
+     "turns": 66,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "c2781ecaa13ad84d31a74985aae1fcc6ac401ae3108618433420eb02b80478c0",
+     "outcome": "defeat",
+     "turns": 60,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "0368aa954fccaf740a46d67c531976d7c7e49b5d9b8878c3763b55ac6e22a0d6",
+     "outcome": "victory",
+     "turns": 71,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 273744,
+   "map": "e5080ab55da7880bc08f8e94dea153907f10322b1e4ba7010c2df3277a13601f",
+   "runs": {
+    "walk": {
+     "hash": "58ec1a4a99f4df2441de41b66e6ea096eff629319484a237efabe4323fbef2e9",
+     "outcome": "defeat",
+     "turns": 56,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "4dcf6400d468532ebdbc2d475005d6f67004a797224a302e27fdeefb9501777f",
+     "outcome": "defeat",
+     "turns": 62,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "9d0ad3524966f88bf5d6e84c1cd24d53a0a1c34fe69dc0049e2d62d94b80e974",
+     "outcome": "victory",
+     "turns": 66,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 378473,
+   "map": "6db3fa45fb4145fa6f55509e2b8dbced567193a3e7cf5b36bbc0cab62b5fa866",
+   "runs": {
+    "walk": {
+     "hash": "eb4ac6a55e1a59d907aa01ad397653cf4b64cfdf97c191e3119ab3009b9d9282",
+     "outcome": "defeat",
+     "turns": 49,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "d186a4fd4e57c8ca732483ea201c9435b13249cf3ffadfc5f894dfcdf6622df0",
+     "outcome": "victory",
+     "turns": 62,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "32b8f3be831da3fbd860dd8e56ddff3d804e33f5bbf88f448803e96b269aca0b",
+     "outcome": "victory",
+     "turns": 62,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 483202,
+   "map": "9eeeefd049dbcfd45abb5417129ab20dc73f704c82304d0ba113c48b760077c4",
+   "runs": {
+    "walk": {
+     "hash": "cf0d280c486111fb611825d1ace3070e7bac3007b5798af0a6a9a6cb3e84601a",
+     "outcome": "defeat",
+     "turns": 68,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "205ecf6c7c840a044cbd4b478b154ccff2371ee942ca7342730bd76b10086ab8",
+     "outcome": "defeat",
+     "turns": 61,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "127d0635f2a97884c56c07c7cd9176fce0ca8e3e8bece3e67ed44634c8e94e6e",
+     "outcome": "victory",
+     "turns": 74,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 587931,
+   "map": "bf1bfbdb46a1ae70d3b73d59fd276b95612a4b5ca722c68d9583adea34f2b56e",
+   "runs": {
+    "walk": {
+     "hash": "47ba2a4f35c74d25cbfc1ae5ca2fc70eb347f402d947870372aa21b494d88963",
+     "outcome": "defeat",
+     "turns": 40,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "e1f50eeb8748764a56df23c6cc4314bf9742d8a6d9caca6001ea71b25771738d",
+     "outcome": "victory",
+     "turns": 52,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "115bc97bf876343c3bb276a7c1f5a992586758de66d8dffb0216f3dfadcfc1d6",
+     "outcome": "victory",
+     "turns": 52,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 692660,
+   "map": "a6b44d46c57e88ba790c9bac9115eeda9e13599a76ec125ed69a8877cbb593be",
+   "runs": {
+    "walk": {
+     "hash": "7c00a3746d7a2d8832cd281aac40c2480d853bca3b155d3b602ec6217e8afbcb",
+     "outcome": "defeat",
+     "turns": 66,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "814e2197bda748e2b0ce5c9fd812a11c10e26671c3d6fe8e1aca3ea48c1551ae",
+     "outcome": "victory",
+     "turns": 47,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "2054934620463d35ee9d83142ee400673fc63bb2f312d5050e44a9cbe7477703",
+     "outcome": "victory",
+     "turns": 47,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 797389,
+   "map": "7990204dd1f80a157e91d5b440eee27221958d368cf269c0dfb9868cabce91ab",
+   "runs": {
+    "walk": {
+     "hash": "522b1b7f11c4749e54acecdd4472468e497e7cb41ea238917df84f9c3aeabdd4",
+     "outcome": "defeat",
+     "turns": 49,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "bb3e2cd87625634529dc0ad4af0f9b820cd0d87a9e8ab281d9c4f73102d68ce6",
+     "outcome": "victory",
+     "turns": 52,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "9660efbd69eeb5e9e09011a8e85fcd507ce982af108afb6a2f76ace631693086",
+     "outcome": "victory",
+     "turns": 68,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 902118,
+   "map": "6a116dda850aa8880ec667ef146b20406bc980657f440f10ca962b3a65a0efad",
+   "runs": {
+    "walk": {
+     "hash": "50bcbad5ccb9e00b7bebcc2788ad821c9089496d87e45f427fe4f92423e120d8",
+     "outcome": "defeat",
+     "turns": 62,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "7ce7ab3b6929cf2424710aca5e741cd04cb29ae9a09d4528042b57a2f60cefca",
+     "outcome": "victory",
+     "turns": 40,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "18f5390502a07f71e7cdec442d78a7664082cd97f0aca53f74a17ad252e22c80",
+     "outcome": "victory",
+     "turns": 40,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 6864,
+   "map": "b08451bb334305c8e39e4ffe27b0e0008c649e62a6870864037dd24e39d8b349",
+   "runs": {
+    "walk": {
+     "hash": "67907f883e3f56250e033bc37f425371796cd2c969b0e9c371bd98e7f821d9d3",
+     "outcome": "defeat",
+     "turns": 77,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "f714c52703d515ddf50579c995fef86225b585c14cb71c27959a715a4b189d2b",
+     "outcome": "victory",
+     "turns": 49,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "80b95011fbcf5f9866e370820951a00caf3bfc1235953daad681c526a3da942d",
+     "outcome": "victory",
+     "turns": 49,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 111593,
+   "map": "9fb37ff4ec155440bca6534cefe99b3409e777e0d1bf8fa3725b5c667b7c8da8",
+   "runs": {
+    "walk": {
+     "hash": "21df2aaba09b8afa2f8a6a7031fa3c49dd81b4c42addb51da4e4e8c1de109722",
+     "outcome": "defeat",
+     "turns": 60,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "c91750e379a7a7f688465c28985a12036a27ba77d8ea21ebe4544b752a12b5c5",
+     "outcome": "victory",
+     "turns": 41,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "e48e1e54067466519d524ee66a6f2f6c26612c4489ab241da78461dd68b2878f",
+     "outcome": "victory",
+     "turns": 41,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 216322,
+   "map": "df07baf47c8d93ae7bee252ddfb513f24bd68328142680b8585ba475bc55f505",
+   "runs": {
+    "walk": {
+     "hash": "70c2a0d435720dcfeb7350b2a26884b847195d76cba9bd07a77e0c0b6f4f6122",
+     "outcome": "defeat",
+     "turns": 55,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "542c16f77996992b982fcfb2bfb28d1633f8e5f58a74b28c281a182fce775554",
+     "outcome": "victory",
+     "turns": 50,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "cfb61c0aef7cbf21bce5b18760b2e39a79e919b7d6aa84678a05b3aa33cc5b34",
+     "outcome": "victory",
+     "turns": 54,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 321051,
+   "map": "47dfdb58b2e4c6994f7b991470cbd5ecb2fa08e0f26528b4681a858ad836b466",
+   "runs": {
+    "walk": {
+     "hash": "bd80b45c23c6204b329a47061662b24921e2468d7be77d88767c00b197c1d46c",
+     "outcome": "defeat",
+     "turns": 65,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "70db8d9763583d44ecfa7b4893e83a53c148ece16d3929bcd09100b1a37caaec",
+     "outcome": "victory",
+     "turns": 56,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "9586399d46e3ef29e79f002a9bac914849026a9b1b470ac5ec99b4e88b222c4e",
+     "outcome": "victory",
+     "turns": 56,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 425780,
+   "map": "590c65be73ea730d9ec02aee596f4fa23e2a4e9c91f4d0cb400b3067e9282923",
+   "runs": {
+    "walk": {
+     "hash": "fd1927c9d466239ce3ce960f8cc4fbff8226436844caa71939ff1815f2eff02f",
+     "outcome": "defeat",
+     "turns": 92,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "a59df5971005cf3fd199b946f4dfa55665c6f186439bb6f087960ddd5713717b",
+     "outcome": "victory",
+     "turns": 37,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "012ac38adedff4dee046b51a5f88f7d148f60262bef7e0e86003992fe5a23374",
+     "outcome": "victory",
+     "turns": 37,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 530509,
+   "map": "354410aefa28b74ee8329b00ca41dbb88717a7d4fa6af55532b91a96efee6e1a",
+   "runs": {
+    "walk": {
+     "hash": "5eb8afa83f774348ce086cff15c8ea707a96243a3c3780b97aaeea3e3165294b",
+     "outcome": "defeat",
+     "turns": 74,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "d5461580bcf62ef93991e592ad0799be7323b4f66c07c718206ec6dc0827a632",
+     "outcome": "victory",
+     "turns": 54,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "e00fd89307d4a385600a2bd4a21bfc57825bf3fd5b360726382418055f9663ad",
+     "outcome": "victory",
+     "turns": 54,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 635238,
+   "map": "a19cf29b072187e6e81e15c534a663195f14a050463a721e1eba3a23156b5b37",
+   "runs": {
+    "walk": {
+     "hash": "0c7605942173e5dc481bcaec0b8704ef2020dcc3959b5d27839395ffb2357879",
+     "outcome": "defeat",
+     "turns": 51,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "82faf3916f5fbb86834f4b9d5c1a911bf1c8d7162c14800df429075197d441fd",
+     "outcome": "victory",
+     "turns": 62,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "4d996fe952976839347ee6a4ea69a053deb05487e001fd5e011d584677e6a632",
+     "outcome": "victory",
+     "turns": 88,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 739967,
+   "map": "3dfdc62b51deb2afde764381090b1854c6f22efd227892aacf7165fe60f5cb1b",
+   "runs": {
+    "walk": {
+     "hash": "de4c68169a865edaadaef2fbbd9e35c6468c113f7fa41264d8d4a37343132b51",
+     "outcome": "defeat",
+     "turns": 61,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "466f6481d0d3114a62a551431210c61a93541cf55d601a5147955f429de4f819",
+     "outcome": "victory",
+     "turns": 51,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "99892c032ee38ee5675ba71c10fbac13aecd7512421fe775fa8b468022a4f1bd",
+     "outcome": "victory",
+     "turns": 51,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 844696,
+   "map": "781a8cd94d0affd8c9ad10b25935d8dc2a4a7e69fd98ca6f3f769b83c9ea409a",
+   "runs": {
+    "walk": {
+     "hash": "2d8450bcd632ea9a867bcf3649c046a2dcc444450dbcf52e57250dd0ee553883",
+     "outcome": "defeat",
+     "turns": 53,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "cb3f8c2d34d4b7434bae00f50123fb7bcd3b91e8d754f2fc2d4872df13376beb",
+     "outcome": "victory",
+     "turns": 39,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "d263dd16ad3f5050b9b706953c4293d5a4f8464db261dea9bee0cb52fdca7219",
+     "outcome": "victory",
+     "turns": 39,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 949425,
+   "map": "9ef13de02fc326b9ca84eca971f34df2e0d11e0d8d8904502df984f1955f31cf",
+   "runs": {
+    "walk": {
+     "hash": "00d644b7d26f52127b51e7ab05036a41a6c683b2a0595a74afb6520981235143",
+     "outcome": "defeat",
+     "turns": 38,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "8768391b313d3ab176552f7879233c039db5fb16824c9a1bcb63fb85e3b97f24",
+     "outcome": "defeat",
+     "turns": 65,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "072fbfa2741c15fc0c3a0b63c43093c017579733c5f260a640b7c80735a9733b",
+     "outcome": "victory",
+     "turns": 70,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 54171,
+   "map": "c9ade80409e9c4f21235f0d08eeea55c9cadd0b65e84b240fa9796f57c3a4b35",
+   "runs": {
+    "walk": {
+     "hash": "77c340619274fa0186e7c95e3966743b192cdf8d1a641eac798f062993cb8687",
+     "outcome": "defeat",
+     "turns": 36,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "000fab4fbb864ee393590203852ed39ffcfbc0fd6ee14103c545861b6070f49b",
+     "outcome": "defeat",
+     "turns": 54,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "608e1c59b1cb874bfabbcf68679b4df3db86ec03340deebc0869af123a86bc55",
+     "outcome": "victory",
+     "turns": 64,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 158900,
+   "map": "4411d98de08eb69fc9723bba2e87aa9670514c4759df1a2423d3a605edc864f8",
+   "runs": {
+    "walk": {
+     "hash": "407c4571f0aec2e5c7d821e9f1779e85917532408edecac010bc43dc8cc21891",
+     "outcome": "defeat",
+     "turns": 52,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "94b78dffcefe0a134a351fe94089340ecebfea4fa747e1072fcd5d078caa5763",
+     "outcome": "victory",
+     "turns": 50,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "f9ba5d1a1878c170d4dc1bf6bb9ef5ce65f875405da6245e441ba531e8a47bc2",
+     "outcome": "victory",
+     "turns": 50,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 263629,
+   "map": "4bc46d5784950739436fdadb7807d76312755432e47282fd4dcb494124997b0c",
+   "runs": {
+    "walk": {
+     "hash": "50c558d716d3aebda8e0423957ebf6674e538ffdc3514ad605edc1af4bd89f3c",
+     "outcome": "defeat",
+     "turns": 47,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "944d43ac0ff500020454744d268cc57d2452dc72fdbda7858ed50ccdc0e2163b",
+     "outcome": "victory",
+     "turns": 41,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "2373a1752464e6dd699317fa8574bcc41b131e345df4fe28f92dd4366222e977",
+     "outcome": "victory",
+     "turns": 41,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 368358,
+   "map": "219750a4b1fcd252c00e299a7ff1b39f6aef5f9a6c3bf11d2c71fb797cb9cc37",
+   "runs": {
+    "walk": {
+     "hash": "452732eb01e8c56eb3119cba52aa0791434e760c3320a23c92f8fbe0f8179a18",
+     "outcome": "defeat",
+     "turns": 41,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "9f68a7fda7849c94570898f884ced00a71e0ae9802163642176f8338fec3f943",
+     "outcome": "victory",
+     "turns": 59,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "f6b8001fd45d6dc5abce173d4ff24ad343ff75782e0535eb7b278dcb9bf66e91",
+     "outcome": "victory",
+     "turns": 59,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 473087,
+   "map": "f6e73127655b79036561e7e5f25592948c62403b0d9985526af0a2988531bec1",
+   "runs": {
+    "walk": {
+     "hash": "e74c5cfc1a5baefdcc43ad67c6bffe96f5586f2a5304afed03ede49598e8f402",
+     "outcome": "defeat",
+     "turns": 36,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "7f622d9ddbfed739e59a951490fbe25a0134332fe9d7a9b753d11301f8a18202",
+     "outcome": "victory",
+     "turns": 45,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "9e0d9a6f1892f23224883a2c728f27128725e44509f8a0331872d77e317a2ab7",
+     "outcome": "victory",
+     "turns": 45,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 577816,
+   "map": "460e87098992984907bd3641ce44ef0d084bccdd15153ae5c49b0e1caa6fa34f",
+   "runs": {
+    "walk": {
+     "hash": "833c350d7f0414a9c793daca7ff9549d72fba78bffe4c9e6bb604e9c8f0c058d",
+     "outcome": "defeat",
+     "turns": 59,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "0d4e1661b1c60be86d18a85fd0fcdd116ed42c6f9f9d110c23326f710329ecc1",
+     "outcome": "victory",
+     "turns": 51,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "7079d4a240fb4b32911852cace08ef4aae74cc9b30a0e1eabc941f4b86611c80",
+     "outcome": "victory",
+     "turns": 51,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 682545,
+   "map": "168ffb99e7f8ef982787fcd8cc96739f199618dd970252477284abec10d6f0b2",
+   "runs": {
+    "walk": {
+     "hash": "94f01afe873b6fa6d7fc834d070486729ec184959f6316fdaf5bb1842683446d",
+     "outcome": "defeat",
+     "turns": 82,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "f7d115addb1d6fbfc96b6d4f895c309cebcd046f5e4dbf74be876eab6f24e494",
+     "outcome": "victory",
+     "turns": 50,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "79a897d30f663b817b97d20aabc355f23b1ad42c3d4b6437546a2500f0e128b4",
+     "outcome": "victory",
+     "turns": 50,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 787274,
+   "map": "9a5465479dd45ca4fdffa1026f76d7c25b8227780b37f3fe40c9c157a8ac3bc1",
+   "runs": {
+    "walk": {
+     "hash": "0de4d716b33967bb2a737d64f20ed542cc66c61bda57ab4cf6ead507d9670185",
+     "outcome": "defeat",
+     "turns": 38,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "ff832560238caeff13bc6ce1fa1e363bdb1eac34f9931db59d684b8e4ae6a587",
+     "outcome": "victory",
+     "turns": 54,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "17313071507534a0483e6f43ffd554f521277555887f44cf9b51f5976f563016",
+     "outcome": "victory",
+     "turns": 54,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 892003,
+   "map": "48ca36f72279745646e7a315044e814f803c863323bc524e3e1e4a4e1cd4f5a7",
+   "runs": {
+    "walk": {
+     "hash": "8be90869f4f5069ece9f27cc9980dd7c3e36803a0a5ef15e4db44a354eae10d0",
+     "outcome": "defeat",
+     "turns": 63,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "bf9d1a35f22477a3d70d1885c2981c23a7ee5bb715bd20accf8f27b84fe7a051",
+     "outcome": "victory",
+     "turns": 52,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "000b362a9e21bb52a7833f076f21b35e3c2ee16b9e923bd1e07e106039865b67",
+     "outcome": "victory",
+     "turns": 52,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 996732,
+   "map": "4373fb1e40872ff02a7175c5b1a172011f4246202739db007fd7d8ee1807baf0",
+   "runs": {
+    "walk": {
+     "hash": "6f7a76fc64a3347243955456ecfd4ea3ce370c70f87b5d04f776c8f08253e222",
+     "outcome": "defeat",
+     "turns": 65,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "384b3d3d142a5eaf8ba3ccbee02d3a1aa3e63de9276b43192d690fbc2ff23005",
+     "outcome": "victory",
+     "turns": 50,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "515cfc3f530b60f82f645b5e107a6d41b386249bb0281dd62660973db30b11ef",
+     "outcome": "victory",
+     "turns": 50,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 101478,
+   "map": "a0111882e7e1956157ab90ca361ad1e80ac546b88d9417a193765434947bb47c",
+   "runs": {
+    "walk": {
+     "hash": "83d1fd260f4b780e4e87bd5c5f187d0312aad607bb3e4c628d2eb0fb2ae2d81d",
+     "outcome": "defeat",
+     "turns": 53,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "875b71af37b44258c5f5a8363bceadb74231fb1bcc9b6e9e93f98f7c141edc45",
+     "outcome": "defeat",
+     "turns": 61,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "2925d0c377034ac1a01b1a4606980f769c350fc7d54041da17955c624704fc40",
+     "outcome": "victory",
+     "turns": 67,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 206207,
+   "map": "2677db6573fe0cfa9cfcdb7702df3f4b2ce15f581829568590241ecde2ce4a8f",
+   "runs": {
+    "walk": {
+     "hash": "00403aa4d8b263a443f5bc2e12cfe6a2c1bf09cf6a7511d3c78b27f47d7e9381",
+     "outcome": "defeat",
+     "turns": 72,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "be3ecd49ac1320cecea389e98019aaea6274b1e6ced37953e471732cf103ca28",
+     "outcome": "victory",
+     "turns": 55,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "66f6fb7069b9584d4a31afeae31bd17de319de8ee11f58d7ec0daee45a201216",
+     "outcome": "victory",
+     "turns": 55,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 310936,
+   "map": "ed3d5bbbc550688f4fc09b3ef1755201ce9279e4bbce374d420a2c655b9710cd",
+   "runs": {
+    "walk": {
+     "hash": "460a6801258a131085517ae1be2bbd173464f2b313332d7f18b386c1f4fca6be",
+     "outcome": "defeat",
+     "turns": 55,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "2c611c3900a713ef57287d85fea66139aacdad81cd3d03b09a9001b5ee193904",
+     "outcome": "victory",
+     "turns": 65,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "5b76e5ecf129521734409002881f50b0a71ecc9a4d90b1bd0ee5348953f5e315",
+     "outcome": "victory",
+     "turns": 65,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 415665,
+   "map": "f287979b0a5f4e8113b39c75bc57a03d24ff0584098a65c58a2db99ac3b9d29b",
+   "runs": {
+    "walk": {
+     "hash": "84b6d7fa90381f640c2c3eb2b92f39cbdd64b8fb280ff0cf003a85e9c8182368",
+     "outcome": "defeat",
+     "turns": 81,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "05943708148df9a0117407deb8a517edc5f32feedacefc14e8b55271e60f60a8",
+     "outcome": "victory",
+     "turns": 53,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "6971704ba825c61e58a34863279592a1f622b6f9f7cf3c4169a2c2eca7fa58cd",
+     "outcome": "victory",
+     "turns": 53,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 520394,
+   "map": "b492d849ecc0cd1d6cc024c8986fb7c4f4a15b0d9e4f62c438ed01da3ea0c66d",
+   "runs": {
+    "walk": {
+     "hash": "58ff391091841a3167b787ced1ee22672aa7d3733ba54727d5c394d57e87948d",
+     "outcome": "defeat",
+     "turns": 64,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "2308eb46ebeea33510f50ef49e338692bd839ed53da577d3c2877e6f6d16279c",
+     "outcome": "defeat",
+     "turns": 69,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "48e6ac31c79797a1ffc531e45fbdf02609bbf7cbca37bf2a0c4b0721fda6a33a",
+     "outcome": "victory",
+     "turns": 72,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 625123,
+   "map": "3844f7f457348f222b640f3dcadce0074a0c9012b4270372be1b564fdd3456b2",
+   "runs": {
+    "walk": {
+     "hash": "76d6dde46aee283cddb772aa08db9a7b21c1b0b21cc5eda5711fca53524cf236",
+     "outcome": "defeat",
+     "turns": 82,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "c84fc415b6665cf553df16f0ea4fd10b87d84a8f194e379f9148095920b2d1ae",
+     "outcome": "victory",
+     "turns": 38,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "56c5426009efa42349676823efcf017997ef024427243642448f872de0296f6f",
+     "outcome": "victory",
+     "turns": 38,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 729852,
+   "map": "ede3fe9a12fe9f147e292e9dfe640f71ad98653e34da155b2d135c03b495d677",
+   "runs": {
+    "walk": {
+     "hash": "21dadd778a6c9453bf6c9dad70015e6fe083c4e70064dffa2ca2b942892a2b54",
+     "outcome": "defeat",
+     "turns": 79,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "9962f9fdb83212bac6b3b65948bef02db24dd11ff5357883b7b8fc56a0dd7413",
+     "outcome": "victory",
+     "turns": 56,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "c991973dafd34831c81f35ec6adf00541da637e43998aba3707b2760cd03611d",
+     "outcome": "victory",
+     "turns": 56,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 834581,
+   "map": "ff445b60ab9c0ff4ae4268b3c1d87ff856cb4834a1b423661a62a8b9be535078",
+   "runs": {
+    "walk": {
+     "hash": "feb485c88eedf013bf55cf65ec84fd91eea6d0392f26590f1249b979b30e914a",
+     "outcome": "defeat",
+     "turns": 46,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "98edeccb370d79e947adad5308c398795995c928270a0b62ceb6ab1a22629565",
+     "outcome": "victory",
+     "turns": 51,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "10e598c5c846a347fcb653eefa8285277b63f7a242e054a498df571821b3b357",
+     "outcome": "victory",
+     "turns": 59,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 939310,
+   "map": "e6674f60a380768936a18621d60a5425a2cd36542c2b7a027db1d2d2965f2eba",
+   "runs": {
+    "walk": {
+     "hash": "566b8fb12cc96e2af56cf49450d89920a68ac8a1d83cd1096da5af24271305f9",
+     "outcome": "defeat",
+     "turns": 47,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "0dda82c72c225fd09aa4cfdf6d0911566c62a3747ce1b84d543e24b9f94b3356",
+     "outcome": "victory",
+     "turns": 37,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "dd4959344c692982ab2a1cfe939afd135071d288af0c7f647e63ce9d906d3fac",
+     "outcome": "victory",
+     "turns": 37,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 44056,
+   "map": "96d95608f2036fb3eb4ae70cefb6dd28ee966f9de40a60400e3ee7da65984678",
+   "runs": {
+    "walk": {
+     "hash": "381cd4b1595fb5ce36a07e1f7b95d7fddc696b164008397680f44576191c6f95",
+     "outcome": "defeat",
+     "turns": 70,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "06737c457555a034c294874b35c9d977a57df5e56938f3032efdba7fc3d7f54b",
+     "outcome": "victory",
+     "turns": 52,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "9e42d5879387841f5a543bfd7074257ce464b837681406e842c64f4dec259c9f",
+     "outcome": "victory",
+     "turns": 52,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 148785,
+   "map": "862fbdeab4a98ef002fd3acc16b6c209bbbcd5710e27c492c3a8555c80d79ed8",
+   "runs": {
+    "walk": {
+     "hash": "4384e9368014ddc4e89398b47ab996b4657daad5b962586da98e8b92fbd7d96c",
+     "outcome": "defeat",
+     "turns": 83,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "986da6456bd7208e6c7cdd87880d7e74da79e3e908e6bdeff3e5a09562a225e8",
+     "outcome": "victory",
+     "turns": 57,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "ce50a4fcf5ce93d4b6c8671acd7d6b9efd904cfab6380245fb982d18777fe6b8",
+     "outcome": "victory",
+     "turns": 63,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 253514,
+   "map": "4c2e7a860aa75c1af32442309e77adfb613ef31cac6f6200ef539f7da8137d12",
+   "runs": {
+    "walk": {
+     "hash": "dc2fd06d6c74908ef4b1f880df4d95484c05121d50447dc53e86c86638e4ee9e",
+     "outcome": "defeat",
+     "turns": 60,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "a580145428edeec30c2bbce70901cb566697e35819101b2944c91d6d8b741822",
+     "outcome": "victory",
+     "turns": 50,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "0168d93b9c6128910090fdd89f42d7671b9222fa22c0fcb9b19a6796ee7e4d45",
+     "outcome": "victory",
+     "turns": 52,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 358243,
+   "map": "a537730153d963276a8b5c052c3d61e658ee1821e8ef47404e04ab9b10f24b71",
+   "runs": {
+    "walk": {
+     "hash": "a92b35066b07f4b685e9c8f4b864af92ab1d88be60ea3cb84c478a2e8a7d2317",
+     "outcome": "defeat",
+     "turns": 70,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "0a251294ed46a370dcfacd79f771914e97b6d076219eff87de90c29e38e5dda4",
+     "outcome": "victory",
+     "turns": 57,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "7be92c2767e3164b54973a308b236fa5edf8da1dc224e04f2e869eee3016038f",
+     "outcome": "victory",
+     "turns": 57,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 462972,
+   "map": "0ea4c669d9729de18a89670f4db4088c12e168bc77fe817b157d51de6d06a337",
+   "runs": {
+    "walk": {
+     "hash": "56e7c95b99c5eb72018434ffcf0462d85d559d30f230a3f158301946b2843f8b",
+     "outcome": "defeat",
+     "turns": 61,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "e17890d4bf2823b95613c66bb343c96427bf3f5b582adc540aac1c3577828d8e",
+     "outcome": "defeat",
+     "turns": 63,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "42b5439ef8e0a0226a08f7c13d3a14f83318c1f21c274dbde0714d8068b9012e",
+     "outcome": "victory",
+     "turns": 119,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 567701,
+   "map": "17bc422c960e60e6b4339512fcdf209588fb5d0b7355fc36ab464afb8ac2c31d",
+   "runs": {
+    "walk": {
+     "hash": "bef974aac75f078f7e12ce9c432dc6570ad9f5520ec7e86d91ccfad9d7f5c300",
+     "outcome": "defeat",
+     "turns": 74,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "bc36ab968cd8149cd349eda415be035026a83695d5cebf371d4349790c942d5d",
+     "outcome": "victory",
+     "turns": 38,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "30f8225dbf6d1a37e158248baeaa31e1226f889802b12137de1c3d76f70dcfef",
+     "outcome": "victory",
+     "turns": 38,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 672430,
+   "map": "80242eded4883ea540589f503466fcbb9cf34605f8408377b9001b0b03453efe",
+   "runs": {
+    "walk": {
+     "hash": "ab90c92924601c9f3a3420e9580c2c808e0be1ad33005ecac3d2ec4f3d33a78b",
+     "outcome": "defeat",
+     "turns": 59,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "48e34181fdf43416784657c6782f2f11a10bc0ff92fc66ef52344c2de0d3e71f",
+     "outcome": "defeat",
+     "turns": 56,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "8c1b86f69d0743c988c0a22d102c897264eeb52467d623b91fc88ca6d3614cc5",
+     "outcome": "victory",
+     "turns": 80,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 777159,
+   "map": "3a4b55642e713116327100c5766c4ab8ca726b97bf7aa14c97d659a54e9d378a",
+   "runs": {
+    "walk": {
+     "hash": "ef962c8935191ff37230a045519faca35a530d08a0407252f234c127210f4143",
+     "outcome": "defeat",
+     "turns": 76,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "289c27123397d0ae7827343c21d59c2ffffbec988f3d06c11e08338a471ce101",
+     "outcome": "defeat",
+     "turns": 65,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "e64a3790fd90425b09692593c41a440277602afb208a29fe87034b73c94ab7c2",
+     "outcome": "victory",
+     "turns": 106,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 881888,
+   "map": "c14f7e7bd96904a06b73f13229b682dcc61c79a08bb32be50764f493dce97b65",
+   "runs": {
+    "walk": {
+     "hash": "3f0a1df09ba71ea60d70dd23d36ef72ed00f86937341651d2d6e6de26094bcb4",
+     "outcome": "defeat",
+     "turns": 83,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "83282f96358f2b48a6f335d7fe8444770e550a77f0bc7b65d55cedef15316f0c",
+     "outcome": "victory",
+     "turns": 48,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "0a1f885ae0594636debd1b40495a7b03ff97cd90ea5d059ba17bfad02cf1c66d",
+     "outcome": "victory",
+     "turns": 48,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 986617,
+   "map": "d2145b90c84768a07a70401670b45576af9e0e66ae58cca3fa958a68958ad275",
+   "runs": {
+    "walk": {
+     "hash": "8ae44f2ba777fa29ea632e78b0bda72596ce5bf4c3d296b392c9d59d8428b046",
+     "outcome": "defeat",
+     "turns": 66,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "34bb2253b0f09823347ce286165f4388139602f811fbe7d0182738f0f9f0f0f8",
+     "outcome": "victory",
+     "turns": 57,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "e33609d941a5bb913f7bb0b7d1e18036c5e42c532ebb38248027081e2e55c5ef",
+     "outcome": "victory",
+     "turns": 57,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 91363,
+   "map": "f912471d331ad3178b00fdc246ea72cfa1b5bd177ffffd2b44106999e4d8389a",
+   "runs": {
+    "walk": {
+     "hash": "fcdef777324516e6932ca21dc6460a83a1926988ffa742f383e6fc7841f4181d",
+     "outcome": "defeat",
+     "turns": 56,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "0a2ff8b3f49fbceff941b5cdc6e6593dbe8c09991f9a9d37ec278b019a095f38",
+     "outcome": "victory",
+     "turns": 56,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "e626c844f30d8a5315657b56dc16fc19115650f78d5d0c2a0992cb4f2cb8f2b6",
+     "outcome": "victory",
+     "turns": 56,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 196092,
+   "map": "7e1ab5d62690787de5ea5e6e2e50fc3611bf58d3e74d563db06a25af8ecaa2fd",
+   "runs": {
+    "walk": {
+     "hash": "a1df40096ce00600e9935e621c6dae06d5b041b5a6cfefb87f27e93fcc141df1",
+     "outcome": "defeat",
+     "turns": 74,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "c3aea0cdf0ca8668916f5cf89b3b9e96e7ca444a10cdb60a8adae9f0ad9325f5",
+     "outcome": "victory",
+     "turns": 40,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "8cd8380a85247961aabc8c162ef73e6a70724f8274c498fa02688005cf195746",
+     "outcome": "victory",
+     "turns": 40,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 300821,
+   "map": "d3644ac545b29f8957c60261aaa8b2d96b9e20f753e629801cb084381732ea92",
+   "runs": {
+    "walk": {
+     "hash": "5ffa7198242e5ea489e29e759f8a906c5afddf42b634174746f0a56c54ecdfd5",
+     "outcome": "defeat",
+     "turns": 56,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "252c7b0c216cc50ac21c87cbe2711b69c7b41870058179eeb3e594f7b48af63f",
+     "outcome": "defeat",
+     "turns": 70,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "8fef3630d3c11946946b3c10d78cc434fc862fde740124f6b7a42958150e2aa8",
+     "outcome": "victory",
+     "turns": 81,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 405550,
+   "map": "bd5bb992c985ed86bd0c2e831380e220a282d071145205a3c7f47c49210388f2",
+   "runs": {
+    "walk": {
+     "hash": "f3c9c6327d36595a09fa302bc9c9e1bdf2ffc8d160ff2a1bb49e80bd45a8455b",
+     "outcome": "defeat",
+     "turns": 44,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "25e2ec4bbd5d95714658f19509548c70ea171ffe380ea6b6e958e1781b346554",
+     "outcome": "defeat",
+     "turns": 67,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "f1a689224fce8649cd4e337686646897b3bd1931742db75e6a614d71b757354b",
+     "outcome": "victory",
+     "turns": 75,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 510279,
+   "map": "9dfdbcda3dcffad6ea73ebd34f01b16060496145c3d6961215fd60bf1b9365ef",
+   "runs": {
+    "walk": {
+     "hash": "9b7cfb6193f44165fea548f53e521293395f11de3a8a324e54c6501a49b5c1de",
+     "outcome": "defeat",
+     "turns": 41,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "94a902e7759f75b138a9886581d0da0f35ee25f14e457b1abe3b05853d6e9e75",
+     "outcome": "victory",
+     "turns": 58,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "6659c8ec6e9695d4996e3924956319b02e9a6def1470463cccce490cb5a9eb05",
+     "outcome": "victory",
+     "turns": 58,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 615008,
+   "map": "45465e5ccd6245a84b2dbb8a28af8acedad5e1e2281c3fb083a488776d1a2045",
+   "runs": {
+    "walk": {
+     "hash": "c7144dcf3809a2bbb3e2dc9173ecd953c1dbfcf017a8d7115b94ba6a1dfb8070",
+     "outcome": "defeat",
+     "turns": 61,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "8f533b9acae3822af486020422337117fb987ee6ac70d52e125414a167edc9bd",
+     "outcome": "victory",
+     "turns": 55,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "1e44f89d3a1c242fccac9c66e18a83baf56af66dce763e8c31dd5c3e37a6f5be",
+     "outcome": "victory",
+     "turns": 55,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 719737,
+   "map": "529d1b8fc7339a8b8f49001c1806229a0f78a3d1f831f8a512c0e7500c6636a6",
+   "runs": {
+    "walk": {
+     "hash": "62474b7d0eeda787ac29c87bdfb37e5520fed784258253b93d7df14d19f98aa0",
+     "outcome": "defeat",
+     "turns": 48,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "8d45b8477c0a7074a9c2d27e2c8aa69bb5ee8b2e297c0521d1f8c14eb84ab5c7",
+     "outcome": "victory",
+     "turns": 62,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "969d0ef23aeca4bdf4df1555faffbccf4b687d01119658dac52fac3549169ec6",
+     "outcome": "victory",
+     "turns": 62,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 824466,
+   "map": "e9a7bbd54e77a4cbe67a3ba10fcc0204bc3b9e8c85bb033b055d6c9c0a836fda",
+   "runs": {
+    "walk": {
+     "hash": "7bb2d40ccf36f5dc2aadc483e940071da0f8c01fd7012f4dea096b5d26a984c2",
+     "outcome": "defeat",
+     "turns": 63,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "3a4ccf5ddc13b7f28003e49f93cdeaa200bd08f0efba74ff43fef9caf34f34ac",
+     "outcome": "victory",
+     "turns": 62,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "7720fbfd747124b08a05c699bfffd8df3c42f79c110eb833b63d13a16dc836f5",
+     "outcome": "victory",
+     "turns": 80,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 929195,
+   "map": "2ae146e3db0e78d02dee6dd65f73ac3f5117e7d359203e6d4483ce1d0d73b4cd",
+   "runs": {
+    "walk": {
+     "hash": "75e69996b628e0205ca8472e17b48b03bc6853d8095b043866835642d2343d7a",
+     "outcome": "defeat",
+     "turns": 76,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "a98f1ebd14ea797486e296f0d436d6413d5edabda467243b1f2e6ef2c4bef8e4",
+     "outcome": "victory",
+     "turns": 47,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "7bf5bac26a28feeefe44dec8d40b4ff66c46b3b876d65b5ecee53a044269dfc7",
+     "outcome": "victory",
+     "turns": 47,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 33941,
+   "map": "6d0c1b9bf4247c13c0f10b521a336b2b4eaf1f9ea595f3db1bae8936e719dd2c",
+   "runs": {
+    "walk": {
+     "hash": "4a54c4744ca63236e1c6215a1ebf560e39c3d995394b89236053959e5f0caa99",
+     "outcome": "defeat",
+     "turns": 71,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "0b1007a9a9ca49145d196c8d825b566c7e32a1b4df8471c3222eeac286f8e605",
+     "outcome": "victory",
+     "turns": 45,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "521418b8f8c0eb308f412ff0aba4d96edc1f01765f13e4d3ade0c417dc1d5adb",
+     "outcome": "victory",
+     "turns": 45,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 138670,
+   "map": "7f7c1ffffcc19d9a5ee210bd1275fead858fa2ef673440bead87e390dbbc419a",
+   "runs": {
+    "walk": {
+     "hash": "0a6e9d4f73e63d783c52956ade66ad4bd1b2e6bdb51375f951ff448ffff8c3eb",
+     "outcome": "defeat",
+     "turns": 36,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "b8ffcc93e5f8c53cec6293e2fbb507f3235b8a7d097ba663ee5265ba011ff1ed",
+     "outcome": "victory",
+     "turns": 54,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "43d2e291f36e8f3784e1009d2e831ccd0b5b908aa4d07e16e951453ebd239e1d",
+     "outcome": "victory",
+     "turns": 58,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 243399,
+   "map": "d219d6385ac06909cd4680d842d302c9e7d13297364ac23b7e112a2b033d842e",
+   "runs": {
+    "walk": {
+     "hash": "866bf848456c6bf4fa2c7e6159fcd5f89ed138cf3f33282fbb8a0af2ba823ef2",
+     "outcome": "defeat",
+     "turns": 42,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "a6e9a047d3dd55020d9f48e1a480efa9894d766b642286169e4f3d064e945b0a",
+     "outcome": "defeat",
+     "turns": 53,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "92d8b2512e413c2687a0edec926177db42af353c6c9ef1b6e83eefc474e2ce3d",
+     "outcome": "victory",
+     "turns": 135,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 348128,
+   "map": "cfff923f4e32748d722a72011026c3bacfe8e6139cb1acff574ec2a5b8fd662f",
+   "runs": {
+    "walk": {
+     "hash": "3e4fb5c977c6c9c8e9851c0966a73fa004cbff1c7f242770c0dbc2e474a37ae9",
+     "outcome": "defeat",
+     "turns": 71,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "a7c06de49c582fb3c3c65ab419768be389e54bbe1c670d9aa34ff30c723f187f",
+     "outcome": "victory",
+     "turns": 47,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "a9e58b5bf2bad76ed3fef32f9ffb96f3da3ab1810c51aeb0f22ec45175272377",
+     "outcome": "victory",
+     "turns": 47,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 452857,
+   "map": "7f0f0549ccd9265741a95eb42e42c855ebfc25cd114fa1fc056dff309ed643ad",
+   "runs": {
+    "walk": {
+     "hash": "81f8d817c3f842ca4a1d8e09aff86af9c218e7ac650a296604aa93c236fe1e0f",
+     "outcome": "defeat",
+     "turns": 55,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "fc968eecf55aa5720e403ae31a15ca52f50bd45a344e78d1bbb3879b051b84fb",
+     "outcome": "defeat",
+     "turns": 55,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "87d577005d8369bd2228d3de47d817472b688d1c9b91d5173aaf1f77ad265c3f",
+     "outcome": "victory",
+     "turns": 70,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 557586,
+   "map": "7afb421ac5c8a419f1887e842ec5fdf1f61b8c497d242adac11434777d1120a4",
+   "runs": {
+    "walk": {
+     "hash": "e7ad7c0190671a9e9dafb0d6d49f17c86c98bc7c531463144371807700021208",
+     "outcome": "defeat",
+     "turns": 66,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "05e4d2378f7006b998bca8a55a2aa2d7730a18268379830b641c14cbfa7eb622",
+     "outcome": "defeat",
+     "turns": 55,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "990c9924bd3fa64cc30ab1be2dd7270e27f19946a10cbec318b9674435f8cbae",
+     "outcome": "victory",
+     "turns": 75,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 662315,
+   "map": "3435b838e6e61bd4f63a6f440df501981592d2c3cd9bed6d03e6ba92b77d0ff7",
+   "runs": {
+    "walk": {
+     "hash": "d80d6ed7cb18d69a3c0c048fb9a2a8e908d67fcfec0bc99912873dfbee937131",
+     "outcome": "defeat",
+     "turns": 54,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "120c74dbd66b449bdcfef1bab8d76b2b097963dd7601a6565ee657ef7ac49fd7",
+     "outcome": "victory",
+     "turns": 47,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "24f1986a1a8d6076908ec9ea19c986352ef32f2b57fb975e06ae901ae2ff3220",
+     "outcome": "victory",
+     "turns": 47,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 767044,
+   "map": "067586debfe147e4cc4105340c7c55b1fe9f84bdb502f4ec89c6125f38b890be",
+   "runs": {
+    "walk": {
+     "hash": "cc6eed1fcb076309475941f23df137c76118476ada84de28c1b1cc2ffc69f414",
+     "outcome": "defeat",
+     "turns": 63,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "0d3112e903f29653da7f35f9e34fd1ca92aaffcc20f3463481424e86268f5fce",
+     "outcome": "victory",
+     "turns": 53,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "10c5ebc10e420693a61a5b1709994b730faf0844a42aab83473a9e2d1d854a9c",
+     "outcome": "victory",
+     "turns": 53,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 871773,
+   "map": "fd01f5cf3c3ff561b7be06e07daec4561552a6eeee8bedc961526ec0cff9f052",
+   "runs": {
+    "walk": {
+     "hash": "80d130db96cbc2830d18376edb9748d0fbca7abf7188dbbd8fb1171516177ce6",
+     "outcome": "defeat",
+     "turns": 55,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "d1f85d928009f8ce40b5d03bc569a0ece0fae339b0a89094099a122eb458a260",
+     "outcome": "defeat",
+     "turns": 56,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "ecfde18502d05800502061254be5bfc6eab11d67dc73de0ce99716c89ba0f271",
+     "outcome": "victory",
+     "turns": 83,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 976502,
+   "map": "80a0f8dd93b1fafaafd4d9307fd72d575efe59b725c9dd2efeee525a141213db",
+   "runs": {
+    "walk": {
+     "hash": "e2968437d82d828e1e86ee2a31ae6569a04b5352bac68cfd93518196eee93180",
+     "outcome": "defeat",
+     "turns": 64,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "5d918036a2c95c3513962d88df2ad3ac299e663f9bdd55a37713d4f3c24f0f87",
+     "outcome": "defeat",
+     "turns": 59,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "6de20f3cbb4650a2017255f8d35d3a9a007e84fac82a3b51cfc0347e4343ea35",
+     "outcome": "victory",
+     "turns": 81,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 81248,
+   "map": "4fe944d443dabeeb5308f5e149a427aeee60f4ccd1d86b08dbbc995b9c14c8b8",
+   "runs": {
+    "walk": {
+     "hash": "e8fcac19b751d5f16d74439a14511831be032540c7a302482af0d7857e762e1b",
+     "outcome": "defeat",
+     "turns": 45,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "627dad46af0061701bf8add29d0e96c4888abc631deab7c29ebffc00819df63b",
+     "outcome": "defeat",
+     "turns": 59,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "097d480f77e8d6606130c62a63c6c9f074cf1096ee25dd50feba7ee56a051dfc",
+     "outcome": "victory",
+     "turns": 78,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 185977,
+   "map": "195b4cd2c4af7c388187ba7af4f6ad63696217b26cae0c47480ac527756b9301",
+   "runs": {
+    "walk": {
+     "hash": "b1fad350dc09ce405c9ed4d5bbf255e5710ab5fb21b824d1c4128a19611aceeb",
+     "outcome": "defeat",
+     "turns": 68,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "b135c85d2f3b8c473c83f5c3f075c01ca3cfc08d72105d70a7fa22921374f97d",
+     "outcome": "victory",
+     "turns": 66,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "374c2d1425d5a9f19fe8dd34345c250c132cebf9b4c1a8b0fbf09a400bea9859",
+     "outcome": "victory",
+     "turns": 66,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 290706,
+   "map": "ac2b351504228c225846fd7e6616fafdc62e0bcf2f1d5094041cfca7a631394d",
+   "runs": {
+    "walk": {
+     "hash": "f79f97575b17a95ee1efe7d584d259ffc5787c4f2c97cd97882cfe7e725d6887",
+     "outcome": "defeat",
+     "turns": 35,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "89b0c0751a22eea0eaf6a57d450e38c3a638bd567def7a357d4c4fc33084a25c",
+     "outcome": "defeat",
+     "turns": 45,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "51b77e95ce4a66f39073e7fc80426cf7c2ad7ab17ac144ac93faafe0aee01735",
+     "outcome": "victory",
+     "turns": 52,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 395435,
+   "map": "f680924a436d7283c47be9309e6f5f47b6e49d1389f27bb8fee6b9e47ea21cd8",
+   "runs": {
+    "walk": {
+     "hash": "11573ca1d3fdd7982fc191b84ce9383ec63a953abb1b10faf06ca3aafab3b3af",
+     "outcome": "defeat",
+     "turns": 56,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "1a4d0617671f60ea51b6cc1360e7938a08c7a1cbc18a704c6254b63628d253d2",
+     "outcome": "victory",
+     "turns": 44,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "d42ae8ce4ce090e778fdac0be345040db48df6470645638ef4364e2f9d362586",
+     "outcome": "victory",
+     "turns": 46,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 500164,
+   "map": "627f40b922c9a7ee15fb7e194646768d49397e0766aab8ec935fe93356cdf927",
+   "runs": {
+    "walk": {
+     "hash": "eee5ff71c876ec42ab465cf2bd0f64020581f7429897cec746e8933eb5bc8aee",
+     "outcome": "defeat",
+     "turns": 33,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "68bf6e6fb7b85fe070e5f8e58f5f07dd5f911e93fd218297b52b9b43bc2d659f",
+     "outcome": "victory",
+     "turns": 49,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "6775070e886816124a8b33690be25b36db05f5602826420992cc842a0ffd50d9",
+     "outcome": "victory",
+     "turns": 49,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 604893,
+   "map": "953ebbefb0617c66d9ff1c6cafa2cf8afd5f4d2e1e61383f79860505c81926be",
+   "runs": {
+    "walk": {
+     "hash": "f68aad32a93ab665836816599e6992d0b8773a58c02df416a082b88f3de9a1c1",
+     "outcome": "defeat",
+     "turns": 35,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "3e17048ee915afeca0b18076fd9ba63c3d172e38924c89b6a77eba6abf9e8ced",
+     "outcome": "victory",
+     "turns": 25,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "534eee035659f128c6fd2524cf478fdc499e37d6e90060c705c4d8eed0c62049",
+     "outcome": "victory",
+     "turns": 25,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 709622,
+   "map": "5eec4662a89999bfcbb1191986bf9e21b3e6cadfeb3dc0e1c3ad2cc8892a075e",
+   "runs": {
+    "walk": {
+     "hash": "9005b08a5a7bba27689d607e7c345c768154dcb5ac2d678c37a5aa6b9c5d1a37",
+     "outcome": "defeat",
+     "turns": 61,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "18619714ae5b2849a0b203e0388d9b1161131433ac89026d74b5cf909f04018c",
+     "outcome": "victory",
+     "turns": 65,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "0c64349426e219dc7d8975c287b01efbd403c42f3c866f33c8f7cdebe91a86dc",
+     "outcome": "victory",
+     "turns": 65,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 814351,
+   "map": "99b3ca2add3c159ce5ed2d6f61f46867200e7194a4c0a6baa714e3cf5ff799a7",
+   "runs": {
+    "walk": {
+     "hash": "4398998df6903063d151660b32f808026705e3da71cf8f55f90ab4cee0d5338f",
+     "outcome": "defeat",
+     "turns": 51,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "d38c072206cd685938bfe585d14fc0307f740cfbd6e75ddb619ec7229fd911d9",
+     "outcome": "defeat",
+     "turns": 54,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "e7d84b941e40eba5dd4dc57bef697b0c5322afa91b4a3fde3f7db02a89feb2dc",
+     "outcome": "victory",
+     "turns": 61,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 919080,
+   "map": "1bda7545c74af3d3a0871be28c8b819870be424cacc186be6ff09d1d7f3aa74f",
+   "runs": {
+    "walk": {
+     "hash": "6780c3170d3a0f4f34e18a7ef4b43654c1e8d7eb3b17b330521ea85c2d4e1f30",
+     "outcome": "defeat",
+     "turns": 42,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "2004591b045cda5d04b9d3592261be60017135d445e6eff367d95bb40bc1f34a",
+     "outcome": "victory",
+     "turns": 33,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "2004591b045cda5d04b9d3592261be60017135d445e6eff367d95bb40bc1f34a",
+     "outcome": "victory",
+     "turns": 33,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 23826,
+   "map": "4ec6127b97c50b94bbd6b5169d382672da881e2dc2a842491a069ea12da5ba0d",
+   "runs": {
+    "walk": {
+     "hash": "b9ae0086380110dcde89e475494e7eec69a6dd6c41202cb694de2e11ade40220",
+     "outcome": "defeat",
+     "turns": 56,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "44359a1d3eb40468601d062e09ccf52357a47bac2bdedae5f21af7d96c8323e4",
+     "outcome": "victory",
+     "turns": 43,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "d992e3191054263e77245abc90cb166db6df461952f6a04015decc255772732d",
+     "outcome": "victory",
+     "turns": 43,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 128555,
+   "map": "240ae18c571d401305d1f67e02231a947ae9e517260da84ff43402990b655ba7",
+   "runs": {
+    "walk": {
+     "hash": "1015073365379a7b61da35d80d76867de67ad7eee920ee289318fe2f84a04410",
+     "outcome": "defeat",
+     "turns": 67,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "092382fb4a1a6094dafa8cf2dde74f23c84751862d9573a989423d407388fb66",
+     "outcome": "defeat",
+     "turns": 43,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "139bc9234d56fda030b9259c2efed7f056fe8c7c85fe6e21ce54be51c7fff4b0",
+     "outcome": "victory",
+     "turns": 57,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 233284,
+   "map": "dee5d2db121903b6f0551e618bec7cd2f84f96d0c1ace01040ebd6f53f626728",
+   "runs": {
+    "walk": {
+     "hash": "a06cd7799a7534666c01b607bc3e4306d47220d8302d43e226795642e1ddfe62",
+     "outcome": "defeat",
+     "turns": 56,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "83aebe8392d17131d3b64466c026b5b543388e2c090ff424f38853543b565978",
+     "outcome": "victory",
+     "turns": 49,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "942c50f736d28ee6ad1dd2201980f61ae125d2943c61f1f5d4802fca042de397",
+     "outcome": "victory",
+     "turns": 49,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 338013,
+   "map": "ca55935e93b087f993bd2e7026dd0cadfc3a4eea2a222b220020f100690d828f",
+   "runs": {
+    "walk": {
+     "hash": "3ed34c254ab35417b9472ebcb9773e3be136cff64421d86a53b861e48b0c5d1a",
+     "outcome": "defeat",
+     "turns": 67,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "8f9c590a62965fe2ad7c765e41a99596bea6a4706a1dec7d42b0283f7748e36d",
+     "outcome": "victory",
+     "turns": 39,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "888311af43b4765978a99646e3bb6866aac09623af1605670932aeb09370e097",
+     "outcome": "victory",
+     "turns": 39,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 442742,
+   "map": "a405d3a053197e7077979685e004199f1830047ee138a2810c35b50fdef8c04c",
+   "runs": {
+    "walk": {
+     "hash": "310d95f3c2dfed8ae0212dc1ff38fa9f8ef3a9e0629a41aa10834d7cbb548ad3",
+     "outcome": "defeat",
+     "turns": 41,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "e8c4d55110c469b348c6da62692b4ecb30272175ab962e962e33cb596e0eb8be",
+     "outcome": "victory",
+     "turns": 44,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "85f123b14a247e4994523209dbe6a7e8d837115736c2ea405307dd65adcc4a5c",
+     "outcome": "victory",
+     "turns": 44,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 547471,
+   "map": "fcdbb7f31a04d7071a080e913943727aa344439a0bbd9cd5f51d3f6c12492744",
+   "runs": {
+    "walk": {
+     "hash": "2f1f8a1e3d6bacf4ccc3071ee8a87acecafbfc694d61fd66066f422bbecac9ce",
+     "outcome": "defeat",
+     "turns": 56,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "d841d308f6e8dde9a5316351abe3ae3e407eef9e3b29b253fca1f5ffafca2020",
+     "outcome": "victory",
+     "turns": 41,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "93df8b5b5fa8aa9f6fb7333c1641f0ff016526ba2e1c134aa1e69fb6cc55192c",
+     "outcome": "victory",
+     "turns": 41,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 652200,
+   "map": "44bc0a629ec5dd1f00c6252ac229b31eef12cd405957905f81185aa95a0691ae",
+   "runs": {
+    "walk": {
+     "hash": "49142d2bc65f65085a46113bb1898100a7a87d272cc6cb911c87a154a015c0f1",
+     "outcome": "defeat",
+     "turns": 31,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "d027b7ca0388f2b59988e224435ab70f7e106f0572be483dfee0f134a722dad4",
+     "outcome": "victory",
+     "turns": 51,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "9e640b0c9fe01068f74fe35dec7043d7a1ef5cc86ffe075647457cc81021d083",
+     "outcome": "victory",
+     "turns": 51,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 756929,
+   "map": "a244bdd6e2589db5d5cac5723968f9f71290db993c3d0ffcfdb6ba94002117cf",
+   "runs": {
+    "walk": {
+     "hash": "55f8cd67001e6c60da6e0dba850c34c6378792f216b82de59478d6c672bf7d86",
+     "outcome": "defeat",
+     "turns": 88,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "e13b107d7a712463d787b1ac42c9e058fe9c9835b20266670b97a3547e0c7a27",
+     "outcome": "victory",
+     "turns": 72,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "4831b8289c61c3ac31202df36e4fb20bf92d2a14ae6c46f1510d78724d53c13f",
+     "outcome": "victory",
+     "turns": 72,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 861658,
+   "map": "b02cc6d2b00391c31d8cb734f341d03cd93f2d948ddded9c53ac6d223b0761c4",
+   "runs": {
+    "walk": {
+     "hash": "f143b18adcc3030590dfcefd52e5a4377e5c35fc31b61314ac3e75857c89e81c",
+     "outcome": "defeat",
+     "turns": 42,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "1cfecb41d97f69faf8907139cc4368c521be42173d5d2ce46352e25c9b8d90e4",
+     "outcome": "defeat",
+     "turns": 65,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "819927bda396e3e0aac1cdbb7a6953ab9915e6c0c49eae191f7ddf0eb8d8091f",
+     "outcome": "victory",
+     "turns": 75,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 966387,
+   "map": "16bb05f83c725d3b3d0b436abf3ed044f84bbab64e80190bc485dbc0d341dbb5",
+   "runs": {
+    "walk": {
+     "hash": "04c28d9b59840e02a5c6f8d1de96edd01f7e9e97066e66eae2922ee0939ed6a7",
+     "outcome": "defeat",
+     "turns": 43,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "eef7dd3c94e38c1dcc02c2b51012f43ef43053310606ebcc60e76bc48d7220a1",
+     "outcome": "victory",
+     "turns": 60,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "050d6b48950e6cb865a4ed07a806791673ed53f0794363abc6ad989eb10a675d",
+     "outcome": "victory",
+     "turns": 60,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 71133,
+   "map": "2f7521668389e05a9d920e39634ec8cbb00c2844e1b7460885550f90e1fd8e80",
+   "runs": {
+    "walk": {
+     "hash": "1810865999dfb323ffdd551c419c41f65d96108d5cabfc9776b506dabfeae6c7",
+     "outcome": "defeat",
+     "turns": 51,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "69f5c28c79606658f14b9cd27c7f109d1a308e24dfea962dbe48f47a8e4fecb5",
+     "outcome": "defeat",
+     "turns": 61,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "3a928c195b38ea9d40eb7f600f778a626790c3d6b82e1a9833b306f8d81c098b",
+     "outcome": "victory",
+     "turns": 66,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 175862,
+   "map": "6f572e157f3983386250485fe4e97437b6379af5bf9c462d9b016cb372cd0396",
+   "runs": {
+    "walk": {
+     "hash": "97d3455247129cb7f3f3a999f7c4a3d14a1b6eac2abfe4dd27545de4ca622879",
+     "outcome": "defeat",
+     "turns": 46,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "e7cc75446d3f018b544c4244c1589341966529c4ac0b8c02002ad0a7998aaf8e",
+     "outcome": "victory",
+     "turns": 53,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "6721bf2925b1f8e555c2be24e8938a8b5ed1cb1b7241403316ef132a5c24f568",
+     "outcome": "victory",
+     "turns": 53,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 280591,
+   "map": "8a37f25276f94ded5bb56a888bbc22316e86736686f5c2f5945fc2be5a30c6a5",
+   "runs": {
+    "walk": {
+     "hash": "bd29306ab1f3c98ef8907f29924685321bf199664227c191848ce6b51c3b5edc",
+     "outcome": "defeat",
+     "turns": 80,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "3b9cc1aff0a080fa0a70098f43f31e2e1d1aa602862aa58fb13d6789f6abefa4",
+     "outcome": "victory",
+     "turns": 47,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "02d1f894d23af9cc79d37545d6e11506f175661ee0485fb6c0492ee03146ae21",
+     "outcome": "victory",
+     "turns": 47,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 385320,
+   "map": "8e54423cb8676eaa6b4041c3f0b3908ee698e848c276733e84e15abb3696ccb7",
+   "runs": {
+    "walk": {
+     "hash": "92cf5b1c699c285477e8e19307df2fdd72cf249c0a709d1abf9dfbabb959279e",
+     "outcome": "defeat",
+     "turns": 69,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "8a505b0d261b01ecbc45c8eb709834656b9d39b4b991ea81a9bc2de0e863ebe5",
+     "outcome": "victory",
+     "turns": 46,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "cce44b72b1ff6d7e1a6d5ef5988ec97904a25d639382e694df7163ee25258918",
+     "outcome": "victory",
+     "turns": 46,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 490049,
+   "map": "c00ee273f708bf5918b8f12a4849519ad425e4787179e9c1a2e734b9fd0125e6",
+   "runs": {
+    "walk": {
+     "hash": "4ce8505ecca02d5b2c45f750a8c2d9e48c8041d892eef344b2f351c7c00714cd",
+     "outcome": "defeat",
+     "turns": 64,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "d6385c4c274b0cceb73ca6ede9a93df9c31f64fa3118c235788c6d69255603f5",
+     "outcome": "defeat",
+     "turns": 64,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "192ef5f9a2d29aae35604be57e4209478cb0c137e64b462c5b7a32a2260165c4",
+     "outcome": "victory",
+     "turns": 83,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 594778,
+   "map": "1201398acd51243b1497fc0d837b75aa18bcd8caae9476d1823d1bc6bcb82c86",
+   "runs": {
+    "walk": {
+     "hash": "e07c7aca477633f637863e75ef5e27819fae4515807d288a48e8553d480d719b",
+     "outcome": "defeat",
+     "turns": 83,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "03a5c4059188f020a54bc3d49b134a665dcd39246837ce52c9cf670d4582f32b",
+     "outcome": "defeat",
+     "turns": 57,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "f1553359cdfe81564e7bdf0af990a0d2537a04ddf34c0139d95764d10db322ef",
+     "outcome": "victory",
+     "turns": 100,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 699507,
+   "map": "1fe2beffcbc4b245e5d2fe4251f4d2b546c047039f03d6dbe8ca6410325cb803",
+   "runs": {
+    "walk": {
+     "hash": "b8a0c42faf3277804824349b5637c29aa46d1b4f85a6437c9e0e21dfa4810b74",
+     "outcome": "defeat",
+     "turns": 61,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "e7e7775579a1985d4119e677561c26b9a0e8fe3bc9871bfe19072765d996d11b",
+     "outcome": "victory",
+     "turns": 51,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "f3c2d781f712a53b371b257008cd783d784dbc2b49856263987a81aa15d3db3f",
+     "outcome": "victory",
+     "turns": 51,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 804236,
+   "map": "7c1b54533072f6840355d70eb8f6c1e89bedd1b651f268526673a3d8dbcb0781",
+   "runs": {
+    "walk": {
+     "hash": "462cab50521e10a169e0cdba8fcbf4c166531bcc0d03b3a21984cd401200713c",
+     "outcome": "defeat",
+     "turns": 48,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "b5f19d6a8189c1f3a1a036a998a302d2a3e8ae486213785f150356365beada12",
+     "outcome": "victory",
+     "turns": 53,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "50b77f9bff8d0a847ced786825615bb93caccb2c61c51783802c75a081754e42",
+     "outcome": "victory",
+     "turns": 53,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 908965,
+   "map": "23db5e47087a9be7b3c3c7b50221e5d8272a34e3535275f6e1aa2235612b1193",
+   "runs": {
+    "walk": {
+     "hash": "7e5d99b5a1fa38839b97d1cdf10ee6df1256bca36b8efca33288a309628f1e0a",
+     "outcome": "defeat",
+     "turns": 76,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "b9a11e9200710b29cb711bfc9b153431153f60ceb2b2d9852902e6fae806ac78",
+     "outcome": "victory",
+     "turns": 46,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "8d37a70efc6778d1d1351ef5b063931943d0e31e063bcf98edd70a5b4518b94d",
+     "outcome": "victory",
+     "turns": 46,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 13711,
+   "map": "b12c2b48de670f779e5deea3e28b9e49c026ef7249b34c6e3a95f4272bb15435",
+   "runs": {
+    "walk": {
+     "hash": "2d9974b8ee3471f0db4113d76cfb97826287f3e6931affb7d1eb9e59c94147e7",
+     "outcome": "defeat",
+     "turns": 40,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "ee37c0a0f5c3384675ea1c3851004e417fc0e0ec106c7e99831f00cdf9f182f7",
+     "outcome": "victory",
+     "turns": 42,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "630b4d08f692a7ee750e8c581962a69c4a818a8dcbfe7585b8bfb04688a7d426",
+     "outcome": "victory",
+     "turns": 42,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 118440,
+   "map": "12b3b89ef7e1b604f8d8a2a0508c9b6572fea9dd3a5f58a1dd8cd8e5f04e1aa1",
+   "runs": {
+    "walk": {
+     "hash": "acc9f2bf51b3a0fb5c0da02a2e8e8554d2f764f96a478a6761e0db654766629b",
+     "outcome": "defeat",
+     "turns": 87,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "13dc70b6f170da5da744ff6a0766ba36eb4fa42e3d8ee5a3c060ecffbc5bfef3",
+     "outcome": "defeat",
+     "turns": 51,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "6ca1f94c4fd02b969a9466b241755d0c47773806c111d559ef9856dbadee2746",
+     "outcome": "victory",
+     "turns": 74,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 223169,
+   "map": "158691206f1351005d688176aba11df652503cc34a34ff90540b033b8540200f",
+   "runs": {
+    "walk": {
+     "hash": "bbfbf8ef67b208f258883ead19627beea225c8040418fb93858038234dfa886c",
+     "outcome": "defeat",
+     "turns": 44,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "390c2c3eae5048c133370ca7a4c146f020901f271cbfefde81e024d2e8ab7760",
+     "outcome": "victory",
+     "turns": 48,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "df105282daee73d13bc6b9d3b2697d1aba4f5f2cfc7bf44822c84d03d2276874",
+     "outcome": "victory",
+     "turns": 58,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 327898,
+   "map": "08de0a5c1c21e66e6fce45e1ffaa344fd0e6654cf2eca5e283867e3f69fce3d5",
+   "runs": {
+    "walk": {
+     "hash": "99ee0fdce499841918b17552bf3e9dcf003aedc900f1c5b9d3870b281d3da662",
+     "outcome": "defeat",
+     "turns": 78,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "b7c4e238714372155e5ac320c0eca5435a35f2c8be3d4993f1d0561c8a574e47",
+     "outcome": "victory",
+     "turns": 49,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "9c3c40dc820b51043ba22a13d50717781b0a368991415af1de5f0c28891ff488",
+     "outcome": "victory",
+     "turns": 49,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 432627,
+   "map": "d3026a766789e2adac38f9d84dc31cb1f912441ac71eccb943e0f4aea4a29dab",
+   "runs": {
+    "walk": {
+     "hash": "56afc8dc7995e7342b9bae26215c6c0dcc2a1d5cb881515121b3695c5c0af01c",
+     "outcome": "defeat",
+     "turns": 44,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "7821f60005f21454f59ac1444c89b9e2318be2d357c5252581d8db619686e479",
+     "outcome": "defeat",
+     "turns": 54,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "48c9061bd8d7618f74dc5b73d99442e19c7dd791e1d12a8b9c5e98be4865c6b4",
+     "outcome": "victory",
+     "turns": 63,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 537356,
+   "map": "943d5329df58211bf7518b74a546ff7818643d6fd76eda35ddf9f60a62f04278",
+   "runs": {
+    "walk": {
+     "hash": "b22143f7921182fd794755e1d1bc0dbe2a101ac45b35994111ceadf1092feedb",
+     "outcome": "defeat",
+     "turns": 59,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "e2af7babfd28afe61e2d5b7dbbc5e45f3eca0a25e031823c5e9146f1eb861da1",
+     "outcome": "victory",
+     "turns": 45,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "f69f5058c5186fab0b333af173c363a3bab3f22c1f893256920d3361f6e356fc",
+     "outcome": "victory",
+     "turns": 45,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 642085,
+   "map": "130379faacaaee9ce0edec0e8ea0d16524f7f5edcbbaf25135351e8529cb3099",
+   "runs": {
+    "walk": {
+     "hash": "d9b5055254a1ebec7bed5a8b8266c5bd9e0b2ddd5dfa3023f6bb7b200bc44203",
+     "outcome": "defeat",
+     "turns": 59,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "dc5eb688c4d78134f150506b0959d31a47bd9143e417800243768d49b78fd43b",
+     "outcome": "victory",
+     "turns": 45,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "fbfb66b2bbbb9fe2ac40e841a55feab9829fe1af22e6b1e62c3c6faf0e92f618",
+     "outcome": "victory",
+     "turns": 45,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 746814,
+   "map": "62767d8ff3875c8d6535a066dd00ccb1a2119463f421a0f952bb600438848ae8",
+   "runs": {
+    "walk": {
+     "hash": "b9711aa479502024dba6c586d30a878597e9f45b755dd22283323e75ae20d80d",
+     "outcome": "defeat",
+     "turns": 47,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "079bfe37389e34714f65cce70c7522a56269ee94cffcc8ad4ab54085b2db30a4",
+     "outcome": "victory",
+     "turns": 50,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "7a27f7326f02b5526b79d9dcf2bed761c5e5b05e7dbb600dd6c230b8eacf071e",
+     "outcome": "victory",
+     "turns": 50,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 851543,
+   "map": "82f5f88a4be5646e423c338420b9771fb16679dccecca5a940d984b8ec1a41e8",
+   "runs": {
+    "walk": {
+     "hash": "9902674a254195640da546f76fdf56dc8cbfc98e11311fd0a2d49b0a3f1d9361",
+     "outcome": "defeat",
+     "turns": 43,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "4b2c36f2a0727ae8dcae4a3123b2161381eeaa50ffd424189110c6a7259b8467",
+     "outcome": "victory",
+     "turns": 52,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "33d85b8e8f191824872c2f6a0065474737ac798acdfad7a0b78b85472ec05653",
+     "outcome": "victory",
+     "turns": 52,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 956272,
+   "map": "4afdf0069e4a1f5645bc416b21f707fac0a077c8b7be2eb98641f93200c5f4f4",
+   "runs": {
+    "walk": {
+     "hash": "c3202a6193e522301b43e941b7384388a62e2a628a23d97a67bcb6b22dd0a497",
+     "outcome": "defeat",
+     "turns": 53,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "6fda98f96085c6b7bf829d2c9e31b48bc86ef366ad9886b9fde86a18a5cc4881",
+     "outcome": "victory",
+     "turns": 43,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "843a46e7912d23dc057ac5f436dba8732f0646ae666bb2bdb5bc4702a33639e4",
+     "outcome": "victory",
+     "turns": 43,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 61018,
+   "map": "e9f4511f3aaced40b3c7f12782d02759c40ebf4f830a4c2ee37d59c3ac137083",
+   "runs": {
+    "walk": {
+     "hash": "9d3665af54c356a04f0c0aa5f0b43712cd83716e1a76e5c8eba6c09a3b5b3609",
+     "outcome": "defeat",
+     "turns": 76,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "7e95329b4e0a3f36fface51bd924ad717e52bac873d1e9ad7a86d1c0913e9ee2",
+     "outcome": "defeat",
+     "turns": 60,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "d94366be273b6fb962fd4043e58a59a718431b1c0bcefca12353c1cec63cfbe2",
+     "outcome": "victory",
+     "turns": 66,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 165747,
+   "map": "be900673c685285b7198fdf0264ae18caaf721145edb459d88c66a4a5263377a",
+   "runs": {
+    "walk": {
+     "hash": "bd07a6670c4ca23c71891139ec4b013bdacc3b2e01c24059fe16750e2197375d",
+     "outcome": "defeat",
+     "turns": 82,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "f8900be00079d9f0ea81a0e99bf794549edbed8061138427df0d370e42d67e30",
+     "outcome": "defeat",
+     "turns": 62,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "91d3c2f5c798879d1738f5ff2a06318bc0472a6336da6caf81a935c44de3851e",
+     "outcome": "victory",
+     "turns": 81,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 270476,
+   "map": "37b106e42274e191e53da1eb055b7c2c2c1efe69ef2642660d8106150b1ba7bd",
+   "runs": {
+    "walk": {
+     "hash": "11f65b9b8e0a9838a5c090360081640154c902b5daf2e214f9a2f463247802eb",
+     "outcome": "defeat",
+     "turns": 45,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "e8d2b5a821eef3f06869417df6952327975121f80e8d55aeadf9d13ea74a7293",
+     "outcome": "victory",
+     "turns": 49,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "112c44a5c1859c31507036db6337a357fbf953a2d1405eb75a126c0223654589",
+     "outcome": "victory",
+     "turns": 49,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 375205,
+   "map": "70ec58321e25149ad038b43cac442bc0e63beff20b05d5c1bd6af34a43024fb6",
+   "runs": {
+    "walk": {
+     "hash": "a7178319fe32055b29e6c413705041bebf3b6f528eae113c1cb9a207f9b32168",
+     "outcome": "defeat",
+     "turns": 60,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "957db132166f1d251500aa9e924e4dacf9f407733da40751c69eb6a3477859e1",
+     "outcome": "defeat",
+     "turns": 55,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "e0daf16bb519b13268ff20f164e39fa36ae0617ebda285b842773bed2462c921",
+     "outcome": "victory",
+     "turns": 53,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 479934,
+   "map": "689d93e32302d1a31c06e9f2deb77bb86763725de74008999a5c802f9df23e11",
+   "runs": {
+    "walk": {
+     "hash": "81df3fe67e768f13e02bc109cb3a76b42f9081ce5f881a66182fee5e1867a1af",
+     "outcome": "defeat",
+     "turns": 57,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "862021d15289984bb2d081f16a06e520f5d71e38971dcb2e68f90a5887d5f23d",
+     "outcome": "victory",
+     "turns": 46,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "d0d37167af560a7d8b3f8676a7d8ae92c2e5cb498130d1cae3d89cedba2dc295",
+     "outcome": "victory",
+     "turns": 46,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 584663,
+   "map": "9f81e79f0b7f99d8a1e4de49b35748b0c1c716a7e8a4bf9e38bcabc7fb41d717",
+   "runs": {
+    "walk": {
+     "hash": "e597f3fcce7d85593b949e3498501fe98ed92b504f12fb40f1efd26b0a29b3d9",
+     "outcome": "defeat",
+     "turns": 55,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "b6cccd5ab5079544d2a6af157501ad3e3c0a5c5206cc85fdec08e79f4da42b50",
+     "outcome": "victory",
+     "turns": 68,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "256c0aed2ecea5712ee1c80aa5435c45c6efd45fbd816d0001996b5195b999d3",
+     "outcome": "victory",
+     "turns": 78,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 689392,
+   "map": "9275f48ff4e960b7afe20d865153a333667733ee0b22b2cba32a23819d18cc81",
+   "runs": {
+    "walk": {
+     "hash": "861e711085d0c285a837d830e9a12d9422313ca2e5c5693d74aa7048a9f5c107",
+     "outcome": "defeat",
+     "turns": 99,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "8c9ab162a55d52ce29f660d8e4e2ab296ae3a60e0ad4e36eecfc703202feffdc",
+     "outcome": "victory",
+     "turns": 49,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "66376be776bd7c982124aea585cfef7347bdd925a8314af0f5eaa2528913db61",
+     "outcome": "victory",
+     "turns": 49,
+     "grade": "S"
+    }
+   }
+  },
+  {
+   "seed": 794121,
+   "map": "dff733c6ac6685944c57dcff389dca5749a8cb20d315fa62555a968fb99b57b1",
+   "runs": {
+    "walk": {
+     "hash": "2c6648671ca1b21bca7e04916efce77106e3b830161916d8d8a288d6f5304457",
+     "outcome": "defeat",
+     "turns": 66,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "6660ec5d63f70254bfc83ffe3d2166281d6cfd8001cf7aff1d1afb46c55e88b7",
+     "outcome": "victory",
+     "turns": 50,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "74d9aa60e4185e295c50810b3f08976da5fc1f0dd21105385a861542c81caa71",
+     "outcome": "victory",
+     "turns": 50,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 898850,
+   "map": "49d0a192c26d7ad5b10e722ec22dad65b917193f994ff4b5d163bf57041e7730",
+   "runs": {
+    "walk": {
+     "hash": "b09597ebdc5b6d6571666e59be0588a9f6920f8bfe999ce45a48845dd1f8c30c",
+     "outcome": "defeat",
+     "turns": 65,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "b4fddaf4717ba7d15e0f9a2934da8bbe6663337fd5f013d286021281bc56945f",
+     "outcome": "defeat",
+     "turns": 67,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "8fa0c962cfb532f688fdec0793c5c537cb1979e8f21833da82b44bc666f0120a",
+     "outcome": "victory",
+     "turns": 94,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 3596,
+   "map": "3f5a4a42bb5093c4b83e96a991b969de03c89f421cd1bbbcb84000b0b02ba01b",
+   "runs": {
+    "walk": {
+     "hash": "2db31c4daa915ef742363a14703233913ebf4d433c4cbb23a4675c98aafab06e",
+     "outcome": "defeat",
+     "turns": 52,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "31caedee1b03a70c098880f0e3cec3e5c2ba2547b22657490b4c901b8cf22a38",
+     "outcome": "victory",
+     "turns": 56,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "dfafaba7021d1eb9891e778d45ce574bbca3670b943a6777275e9a740dfac770",
+     "outcome": "victory",
+     "turns": 56,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 108325,
+   "map": "8efde6e7d9b3382dc973d39355376520e94633862f3a3dedabf7285320908a3d",
+   "runs": {
+    "walk": {
+     "hash": "97ce13e18944dda56fccc42317fbf152bfc28c390ab7f2c0f7fa67b433b0b506",
+     "outcome": "defeat",
+     "turns": 46,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "09485bf55c9b15ab98f9053f27179a49d39be7a21a8f8bb3632571cb62e78087",
+     "outcome": "defeat",
+     "turns": 55,
+     "grade": "F"
+    },
+    "camps": {
+     "hash": "241cba1999fca9493d0920718a178b58993d97b363da9aa088dd428b59bff65c",
+     "outcome": "victory",
+     "turns": 66,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 213054,
+   "map": "6cf4d2c96e91b6b8aa7b0c453e53c167f0ea092a7c097eecab827c1aac6bdaa7",
+   "runs": {
+    "walk": {
+     "hash": "224639535f9c526e989623ea8fda810d6eb4658e4023ee1d05b28b21516dd80a",
+     "outcome": "defeat",
+     "turns": 78,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "ab9f114d24bdadf6798ece50a98ae5e12ecbdd2f73402bba00bea9946a61a4b2",
+     "outcome": "victory",
+     "turns": 47,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "cfc45a8c1538c20c70a01e80cf66f0ac677accc56172bf4ef78c1e6c660bda9c",
+     "outcome": "victory",
+     "turns": 47,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 317783,
+   "map": "bbbc172a8c2028b699ca9d42b8ad4ee990785b40f4f08413e6f40e246e6d3c51",
+   "runs": {
+    "walk": {
+     "hash": "b6d301a2e44d0ce683603cd56a94e1529aa1c8a648017bc6bb103af8d90a5f70",
+     "outcome": "defeat",
+     "turns": 48,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "e528bec06e3d22c840e4249d70f83f4fd087baf811c334fdb40e1e42002359a7",
+     "outcome": "victory",
+     "turns": 44,
+     "grade": "A"
+    },
+    "camps": {
+     "hash": "7dcbaf752a30c0111293b8ace13186399939e6377d229d1ddc559461780223d5",
+     "outcome": "victory",
+     "turns": 44,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 422512,
+   "map": "41ebdc2397766ad672523d31bc46e266b3d39920d873292c18cb66c4e0283f62",
+   "runs": {
+    "walk": {
+     "hash": "0e1fa1bdc686ad72f9f21666aab5ff843df4ace93f0d3c5435a88f3237950201",
+     "outcome": "defeat",
+     "turns": 57,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "fb11088fd66b4ebfa08fc8adfa6f8bc4a06acd49ab9015ba76c32272f645299f",
+     "outcome": "victory",
+     "turns": 45,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "fb0bb063ab0ea5ad15f4ea18ed075f6805da97ee47fa3a2148bd507d63b41e2a",
+     "outcome": "victory",
+     "turns": 65,
+     "grade": "A"
+    }
+   }
+  },
+  {
+   "seed": 527241,
+   "map": "9cd01e2fdc0e1046caea1ae3d982bd6d14bc804c10a1aaca52e6dcb5993578b1",
+   "runs": {
+    "walk": {
+     "hash": "31d7e7cb2b02b50a8be0d2107a8976bff3b60740eb60c204e55353b9e6780ee9",
+     "outcome": "defeat",
+     "turns": 58,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "0fa40534e45795f6f5f91b3d092e0e1ae502da7cca1053421cf7cc6841bdbf64",
+     "outcome": "victory",
+     "turns": 47,
+     "grade": "B"
+    },
+    "camps": {
+     "hash": "b7f3ab2fbca9b80b12b88ed2b2b49aac7ec24600e4e1e411303e808a05a4be67",
+     "outcome": "victory",
+     "turns": 47,
+     "grade": "B"
+    }
+   }
+  },
+  {
+   "seed": 631970,
+   "map": "8071a0994e136c43003bdb041ae2a91941b658d779576840c89b9e137efdfb17",
+   "runs": {
+    "walk": {
+     "hash": "66b13775878b7e2debbde13369b2d5245fe212f9cc15a9201887304d44ba2e61",
+     "outcome": "defeat",
+     "turns": 45,
+     "grade": "F"
+    },
+    "route": {
+     "hash": "9c9a52547c230cff9b4d4967dd6a0636224126baa288a9be9b7854e8d248caca",
+     "outcome": "victory",
+     "turns": 53,
+     "grade": "S"
+    },
+    "camps": {
+     "hash": "c2d79aaeb5d8ab0f86c830f80af88b863b41fe9fe92922188f40c23857550ca0",
+     "outcome": "victory",
+     "turns": 53,
+     "grade": "S"
+    }
+   }
+  }
+ ]
+}

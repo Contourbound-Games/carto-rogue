@@ -42,6 +42,8 @@ import { REPORT_GHOST_ALPHA, drawHud, drawOverlay, drawUi } from './hud';
 import { langVersion, t } from './i18n';
 import { TAP_RIPPLE_MS, ui } from './ui';
 import { hashSeed, mulberry32 } from './rng';
+import { stepEcho } from './echo';
+import type { StepEcho } from './echo';
 import { visionRadiusFor } from './game';
 import { tileIndex, toMeters } from './terrain';
 import { DIRS } from './types';
@@ -2577,11 +2579,15 @@ export class Renderer {
     this.drawSpotHeights(layers.spots, now);
     this.drawVisionRing(state, pos, now);
     this.drawRoute(state, now);
+    const echo = stepEcho(state, now);
+    if (echo) this.drawEchoStroke(echo);
     this.drawPhaseUnder(state, now);
     this.drawEffects(state, now, 'ground');
-    this.drawYouAreHere(state, pos.x, pos.y, now);
+    // An echo just drawn beside the surveyor already shows where he is; the ring would cover its figure.
+    if (!echo) this.drawYouAreHere(state, pos.x, pos.y, now);
     this.drawObjects(state, now, pos.t);
     this.drawEffects(state, now, 'label');
+    if (echo) this.drawEchoCost(echo);
     this.drawPlayer(state, pos, now);
     this.drawEffects(state, now, 'air');
     this.drawPhaseOver(state, pos, now);
@@ -2768,6 +2774,52 @@ export class Renderer {
       dash += drawCostSegment(ctx, trail[k], trail[k + 1], dash, stepCosts[k] ?? COST_FLAT);
       if (k >= 1 && isTurn(trail[k - 1], trail[k], trail[k + 1])) drawTurnDot(ctx, trail[k], MX0, MY0);
     }
+  }
+
+  /**
+   * Explorer Step Echo, the stroke: the step just taken re-inked as the report inks its route (solid
+   * for 3, heavy for 8) on a thin parchment halo, drawn out with the surveyor's tween and fading away.
+   */
+  private drawEchoStroke(echo: StepEcho): void {
+    const ctx = this.ctx;
+    const heavy = echo.cost >= COST_STEEP;
+    const w = heavy ? 4 : 2;
+    const x0 = echo.from.x * TILE + TILE / 2;
+    const y0 = echo.from.y * TILE + TILE / 2;
+    const x1 = echo.to.x * TILE + TILE / 2;
+    const y1 = echo.to.y * TILE + TILE / 2;
+    const limit = Math.round(Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)) * echo.progress);
+    const prev = ctx.globalAlpha;
+    ctx.globalAlpha = prev * echo.alpha;
+    for (const [color, size] of [
+      [PALETTE.parchment, w + 2],
+      [PALETTE.redInk, w],
+    ] as const) {
+      ctx.fillStyle = color;
+      const h = size / 2;
+      plotLine(x0, y0, x1, y1, (x, y, i) => {
+        if (i <= limit) ctx.fillRect(MX0 + x - h, MY0 + y - h, size, size);
+      });
+    }
+    ctx.globalAlpha = prev;
+  }
+
+  /**
+   * Explorer Step Echo, the figure: the stamina the step cost, small, in map ink beside the middle of
+   * the step (above a sideways step, right of an up-or-down one), once the surveyor has arrived.
+   */
+  private drawEchoCost(echo: StepEcho): void {
+    if (!echo.showCost) return;
+    const ctx = this.ctx;
+    const mx = MX0 + ((echo.from.x + echo.to.x) / 2) * TILE + TILE / 2;
+    const my = MY0 + ((echo.from.y + echo.to.y) / 2) * TILE + TILE / 2;
+    const sideways = echo.from.y === echo.to.y;
+    const prev = ctx.globalAlpha;
+    ctx.globalAlpha = prev * echo.alpha;
+    const text = `${echo.cost}`;
+    if (sideways) drawOutlinedText(ctx, text, Math.round(mx), Math.round(my) - 13, PALETTE.redInk, PALETTE.parchment, 'center');
+    else drawOutlinedText(ctx, text, Math.round(mx) + 8, Math.round(my) - 3, PALETTE.redInk, PALETTE.parchment, 'left');
+    ctx.globalAlpha = prev;
   }
 
   /** Caches and the Trig Pillar; `moveT` is the player's step progress (for the summit shuffle). */

@@ -2,7 +2,7 @@
 // The pure update function is separate from storage so it can be unit tested.
 
 import { MAP_H, MAP_W } from './config';
-import type { GameState } from './types';
+import type { ExpeditionMode, GameState } from './types';
 
 export const RECORDS_STORAGE_KEY = 'carto_rogue_records_v1';
 
@@ -33,6 +33,16 @@ export interface ExpeditionResult {
   turns: number;
   /** Null for abandoned expeditions (they are never graded). */
   grade: string | null;
+  mode: ExpeditionMode;
+}
+
+/**
+ * Whether a result belongs in these (Standard) archives. Explorer plays by the same rules but adds
+ * a learning aid (the Step Echo), so its expeditions are resolved like any other but kept out of the
+ * Standard records.
+ */
+export function countsTowardRecords(result: ExpeditionResult): boolean {
+  return result.mode === 'standard';
 }
 
 export function emptyRecords(): CareerRecords {
@@ -44,7 +54,7 @@ export function gradeRank(grade: string | null): number {
 }
 
 /** The records after one more expedition (pure; the input is not modified). */
-export function applyExpedition(rec: CareerRecords, result: ExpeditionResult): CareerRecords {
+export function applyExpedition(rec: CareerRecords, result: Omit<ExpeditionResult, 'mode'>): CareerRecords {
   const won = result.outcome === 'victory';
   const bestGrade = gradeRank(result.grade) > gradeRank(rec.bestGrade) ? result.grade : rec.bestGrade;
   return {
@@ -150,6 +160,7 @@ export class RecordKeeper {
       tilesMapped: state.revealedCount,
       turns: state.turns,
       grade,
+      mode: state.mode,
     });
   }
 }

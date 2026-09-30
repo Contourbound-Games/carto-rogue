@@ -22,5 +22,8 @@ desktop.ini
 # Local screenshot captures
 screenshots/
 
+# Explorer sweep output (tests/explorer-sweep.test.ts)
+.sweep/
+
 # Promotional media (large binaries) and its capture tooling
 promo/

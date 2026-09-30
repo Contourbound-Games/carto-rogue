@@ -7,7 +7,8 @@ import { Game } from './game';
 import { initLanguage, t, toggleLang } from './i18n';
 import { clientToVirtual, directionToward, keyToAction, keyToUiKey, parseSeed, swipeDirection } from './input';
 import { generateMap } from './map';
-import { applyExpedition, loadRecords, RecordKeeper, saveRecords } from './records';
+import { loadMode, saveMode } from './mode';
+import { applyExpedition, countsTowardRecords, loadRecords, RecordKeeper, saveRecords } from './records';
 import { Renderer } from './renderer';
 import type { PauseCommand, PauseItem } from './pause';
 import { SeedEntry } from './seed-entry';
@@ -159,8 +160,15 @@ function start(): void {
   const audio = new SynthAudio();
   const renderer = new Renderer(canvas);
   // A shared ?seed= link drops the player straight onto that sheet.
-  const game = new Game(audio, generateMap, { seed: urlSeed, now: performance.now(), startPlaying: urlSeed !== undefined });
+  const game = new Game(audio, generateMap, {
+    seed: urlSeed,
+    now: performance.now(),
+    startPlaying: urlSeed !== undefined,
+    mode: loadMode(),
+  });
   const records = new RecordKeeper(game.state, (result) => {
+    // Explorer expeditions are kept out of the Standard archives.
+    if (!countsTowardRecords(result)) return;
     ui.records = applyExpedition(ui.records, result);
     saveRecords(ui.records);
   });
@@ -220,7 +228,12 @@ function start(): void {
         return;
       case 'share': {
         const stats = game.state.finalStats;
-        if (stats) copyAndToast(shareText(game.state.seed, stats), 'toastResult');
+        if (stats) copyAndToast(shareText(game.state.seed, stats, undefined, game.state.mode), 'toastResult');
+        return;
+      }
+      case 'mode': {
+        const next = game.state.mode === 'standard' ? 'explorer' : 'standard';
+        if (game.setMode(next)) saveMode(next);
         return;
       }
       case 'archives':

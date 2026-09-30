@@ -15,6 +15,7 @@ export type ButtonId =
   | 'archives'
   | 'closeArchives'
   | 'seedEntry'
+  | 'mode'
   | 'pause'
   | 'pauseResume'
   | 'pauseToTitle'

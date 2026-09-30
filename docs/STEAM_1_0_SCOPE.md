@@ -27,6 +27,13 @@ Changing the feature lists means reopening the scope decision. Tuning within the
 - Same-seed Retry
 - Basic Records
 
+## Explorer
+
+- Explorer uses the same gameplay rules as Standard.
+- Costly completed steps (3 / 8) briefly echo on the map to connect movement cost with the terrain just crossed: kept after playtest.
+- It reveals no hidden terrain, routes, camps, or strategic information.
+- Explorer results are kept out of the Standard Records; shared results say Explorer.
+
 ## Steam Mastery Layer
 
 - Curated Survey Contracts
@@ -49,7 +56,6 @@ Changing the feature lists means reopening the scope decision. Tuning within the
 
 ## Not balance-locked yet
 
-- Exact Explorer information assists
 - Exact Expert rules and combinations
 - Number and conditions of Contracts
 - Achievement conditions

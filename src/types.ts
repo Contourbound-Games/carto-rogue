@@ -116,6 +116,14 @@ export type Phase = 'title' | 'playing' | 'collapsing' | 'gameover' | 'summiting
 
 export type Action = Dir | 'restart' | 'mute' | 'confirm';
 
+/**
+ * standard – the game as designed.
+ * explorer – the identical sheet and rules; only the presentation adds a reading aid after the fact
+ *            (a costly step just taken is briefly re-inked with its cost, see echo.ts). game.ts
+ *            never branches on it.
+ */
+export type ExpeditionMode = 'standard' | 'explorer';
+
 export interface PlayerState {
   x: number;
   y: number;
@@ -189,6 +197,8 @@ export interface GameState {
   phaseStart: number;
   map: MapData;
   seed: number;
+  /** Chosen before the expedition starts and fixed for it; read only by presentation and records. */
+  mode: ExpeditionMode;
   player: PlayerState;
   stamina: number;
   turns: number;

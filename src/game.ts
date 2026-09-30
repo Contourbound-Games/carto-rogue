@@ -32,6 +32,7 @@ import type {
   Dir,
   DiscoveryKind,
   EffectKind,
+  ExpeditionMode,
   ExpeditionStats,
   GameState,
   GradeBreakdown,
@@ -75,6 +76,8 @@ export interface GameOptions {
   now?: number;
   /** Skip the title card and begin the expedition at once (a shared ?seed= link). */
   startPlaying?: boolean;
+  /** Expedition mode (defaults to 'standard'); every later expedition keeps it until setMode. */
+  mode?: ExpeditionMode;
 }
 
 // ---------------------------------------------------------------------------
@@ -247,7 +250,7 @@ export function gradePoints(b: GradeBreakdown): GradePoints {
 }
 
 /** A complete, fresh GameState for `map` with the player standing on the spawn tile. */
-function createState(map: MapData, phase: Phase, now: number, muted: boolean): GameState {
+function createState(map: MapData, phase: Phase, now: number, muted: boolean, mode: ExpeditionMode): GameState {
   const tiles = MAP_W * MAP_H;
   const { x, y } = map.spawn;
   return {
@@ -255,6 +258,7 @@ function createState(map: MapData, phase: Phase, now: number, muted: boolean): G
     phaseStart: now,
     map,
     seed: map.seed,
+    mode,
     player: {
       x,
       y,
@@ -303,6 +307,8 @@ export class Game {
 
   private readonly audio: AudioEngine;
   private readonly mapFactory: (seed: number) => MapData;
+  /** Mode of the current and every following expedition (the rules never read it). */
+  private mode: ExpeditionMode;
 
   // Per-expedition bookkeeping that the renderer does not need.
   private lastMoveTime = -Infinity;
@@ -326,9 +332,10 @@ export class Game {
   constructor(audio: AudioEngine, mapFactory: (seed: number) => MapData, options: GameOptions = {}) {
     this.audio = audio;
     this.mapFactory = mapFactory;
+    this.mode = options.mode ?? 'standard';
     const now = options.now ?? 0;
     const map = mapFactory(options.seed ?? randomSeed());
-    this.state = createState(map, 'title', now, audio.muted);
+    this.state = createState(map, 'title', now, audio.muted, this.mode);
     this.primeSurroundings();
     if (options.startPlaying) this.beginFromTitle(now);
   }
@@ -436,8 +443,19 @@ export class Game {
     this.repeatHalted = false;
     this.lastPanoramaTurn = -Infinity;
     this.panoramaLine = null;
-    this.state = createState(map, phase, now, this.audio.muted);
+    this.state = createState(map, phase, now, this.audio.muted, this.mode);
     this.primeSurroundings();
+  }
+
+  /**
+   * Choose the mode on the title card (before the first step). The modes share every rule, so this
+   * only relabels the waiting sheet. Returns whether the mode was applied.
+   */
+  setMode(mode: ExpeditionMode): boolean {
+    if (this.state.phase !== 'title' || this.state.turns !== 0) return false;
+    this.mode = mode;
+    this.state.mode = mode;
+    return true;
   }
 
   // -------------------------------------------------------------------------

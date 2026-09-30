@@ -2,7 +2,7 @@
 // iframes where the async Clipboard API is blocked.
 import { t } from './i18n';
 import type { Lang } from './i18n';
-import type { ExpeditionStats } from './types';
+import type { ExpeditionMode, ExpeditionStats } from './types';
 
 export const GAME_TITLE = 'The Carto-Rogue: 등고선 탐사대';
 
@@ -17,8 +17,11 @@ export function seedText(seed: number): string {
   return `${GAME_TITLE} #${seed} | ${PUBLIC_GAME_URL}`;
 }
 
-/** "The Carto-Rogue: 등고선 탐사대 #721405 | Summit: Conquered | Turns: 67 | Explored: 15.5% | Grade: S | <public url>" */
-export function shareText(seed: number, stats: ExpeditionStats, lang?: Lang): string {
+/**
+ * "The Carto-Rogue: 등고선 탐사대 #721405 | Summit: Conquered | Turns: 67 | Explored: 15.5% | Grade: S | <public url>"
+ * An Explorer result says so before the grade ("... | Mode: EXPLORER | Grade: S | ..."); a Standard one is unchanged.
+ */
+export function shareText(seed: number, stats: ExpeditionStats, lang?: Lang, mode: ExpeditionMode = 'standard'): string {
   const summit = stats.outcome === 'victory' ? t('shareConquered', undefined, lang) : t('shareFailed', undefined, lang);
   const explored = `${(Math.round(Math.max(0, Math.min(100, stats.percentMapped)) * 10) / 10).toFixed(1)}%`;
   return [
@@ -26,6 +29,7 @@ export function shareText(seed: number, stats: ExpeditionStats, lang?: Lang): st
     `${t('shareSummit', undefined, lang)}: ${summit}`,
     `${t('shareTurns', undefined, lang)}: ${stats.turns}`,
     `${t('shareExplored', undefined, lang)}: ${explored}`,
+    ...(mode === 'explorer' ? [`${t('shareMode', undefined, lang)}: ${t('modeExplorer', undefined, lang)}`] : []),
     `${t('shareGrade', undefined, lang)}: ${stats.grade}`,
     PUBLIC_GAME_URL,
   ].join(' | ');

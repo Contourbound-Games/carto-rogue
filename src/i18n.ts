@@ -178,6 +178,11 @@ const EN = {
   shareTurns: 'Turns',
   shareExplored: 'Explored',
   shareGrade: 'Grade',
+  shareMode: 'Mode',
+  // Expedition mode (title-card toggle, HUD tag, note).
+  modeStandard: 'STANDARD',
+  modeExplorer: 'EXPLORER',
+  explorerNote: 'COSTLY STEPS ECHO ON THE SHEET · NOT RECORDED IN ARCHIVES',
   // Sheet header / fog lettering on the map.
   sheetTitle: 'SURVEY SHEET No. {seed}',
   sheetSpec: 'CONTOUR INTERVAL {c} M · INDEX {i} M · HEIGHTS IN METRES',
@@ -357,6 +362,10 @@ const KO: Record<MessageKey, string> = {
   shareTurns: '턴',
   shareExplored: '탐사',
   shareGrade: '등급',
+  shareMode: '모드',
+  modeStandard: '표준',
+  modeExplorer: '탐험가',
+  explorerNote: '비용이 큰 걸음은 지도에 잠시 되짚어 표시 · 원정 기록실에 남지 않음',
   sheetTitle: '측량 도엽 제{seed}호',
   sheetSpec: '주곡선 {c}M · 계곡선 {i}M · 높이 단위 미터',
   fieldCopy: '현장용',
