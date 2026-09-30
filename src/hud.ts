@@ -2206,8 +2206,12 @@ const DEFEAT_W = 600;
 const DEFEAT_H = 440;
 const VICTORY_W = 600;
 const VICTORY_H = 440;
-/** Baseline of the footer line (cause / pillar note on the left, sheet number on the right). */
-const REPORT_FOOT_Y = 26;
+/**
+ * Top of the footer line (cause / pillar note on the left, sheet number on the right), measured up
+ * from the card's bottom edge. The neatline's inner rule lies 20 px up, so even a 12 px Hangul line
+ * ends 2 px clear of it.
+ */
+const REPORT_FOOT_Y = 34;
 
 function paintDefeatCard(g: Ctx): void {
   paintPaper(g, DEFEAT_W, DEFEAT_H, 404);
