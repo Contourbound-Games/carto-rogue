@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { clientToVirtual, directionToward, keyToUiKey, swipeDirection, SWIPE_MIN_PX } from '../src/input';
+import { clientToVirtual, directionToward, keyToUiKey, swipeDirection, SWIPE_MIN_PX, TOUCH_SLOP_PX, TouchGesture } from '../src/input';
 import { GAME_TITLE, PUBLIC_GAME_URL, seedText, shareText } from '../src/share';
 import type { ExpeditionStats } from '../src/types';
 
@@ -51,6 +51,56 @@ describe('pointer input', () => {
     expect(swipeDirection(SWIPE_MIN_PX - 1, 0)).toBeNull();
     expect(swipeDirection(SWIPE_MIN_PX, 4)).toBe('right');
     expect(swipeDirection(-3, -40)).toBe('up');
+  });
+
+  describe('touch gestures', () => {
+    it('keeps a trembling or rolling fingertip a tap, and lets a still one become a hold', () => {
+      const tap = new TouchGesture(100, 100);
+      for (const [x, y] of [[103, 98], [96, 104], [100, 109]]) expect(tap.move(x, y)).toBeNull();
+      expect(tap.reading).toBe('pending');
+      const held = new TouchGesture(100, 100);
+      held.move(100 + TOUCH_SLOP_PX - 1, 100);
+      expect(held.hold()).toBe(true);
+      expect(held.reading).toBe('hold');
+    });
+
+    it('never turns a finger that has started moving into a hold', () => {
+      const g = new TouchGesture(100, 100);
+      g.move(100 + TOUCH_SLOP_PX, 100);
+      g.move(100, 100); // back where it landed
+      expect(g.hold()).toBe(false);
+      expect(g.reading).toBe('pending'); // still lifts as a tap
+    });
+
+    it('swipes once, on the move that crosses the threshold, in the direction travelled so far', () => {
+      const g = new TouchGesture(100, 100);
+      expect(g.move(100 + SWIPE_MIN_PX - 1, 103)).toBeNull();
+      expect(g.move(100 + SWIPE_MIN_PX, 104)).toBe('right');
+      expect(g.reading).toBe('swipe');
+      // A hook or a return at the end of the stroke fires nothing more, and it can no longer hold.
+      expect(g.move(100, 160)).toBeNull();
+      expect(g.move(100, 100)).toBeNull();
+      expect(g.hold()).toBe(false);
+      expect(new TouchGesture(0, 0).move(-6, -SWIPE_MIN_PX)).toBe('up');
+    });
+
+    it('does not swipe once it is a hold', () => {
+      const g = new TouchGesture(100, 100);
+      expect(g.hold()).toBe(true);
+      expect(g.move(200, 100)).toBeNull();
+      expect(g.reading).toBe('hold');
+    });
+
+    it('retargets a held walk only when the finger slides on, not when it trembles', () => {
+      const g = new TouchGesture(100, 100);
+      expect(g.retarget(130, 100)).toBe(false); // not held yet
+      g.hold();
+      expect(g.retarget(100 + TOUCH_SLOP_PX - 1, 100 - 3)).toBe(false);
+      expect(g.retarget(100, 100 + TOUCH_SLOP_PX)).toBe(true);
+      // The slop now runs from the new target point.
+      expect(g.retarget(100 + 4, 100 + TOUCH_SLOP_PX + 4)).toBe(false);
+      expect(g.retarget(100, 100 + 2 * TOUCH_SLOP_PX)).toBe(true);
+    });
   });
 
   it('maps client coordinates into the letterboxed virtual canvas', () => {

@@ -5,7 +5,7 @@ import { MAP_H, MAP_ORIGIN_X, MAP_ORIGIN_Y, MAP_W, MOVE_REPEAT_MS, PALETTE, TILE
 import { drawText, fitText, loadWebFont } from './font';
 import { Game } from './game';
 import { initLanguage, t, toggleLang } from './i18n';
-import { clientToVirtual, directionToward, keyToAction, keyToUiKey, parseSeed, swipeDirection } from './input';
+import { clientToVirtual, directionToward, keyToAction, keyToUiKey, parseSeed, swipeDirection, TouchGesture } from './input';
 import { generateMap } from './map';
 import { loadMode, saveMode } from './mode';
 import { applyExpedition, countsTowardRecords, loadRecords, RecordKeeper, saveRecords } from './records';
@@ -13,6 +13,7 @@ import { Renderer } from './renderer';
 import type { PauseCommand, PauseItem } from './pause';
 import { SeedEntry } from './seed-entry';
 import { copyText, seedText, shareText } from './share';
+import type { Dir, GameState } from './types';
 import { addTap, buttonAt, closeArchives, openArchives, reportFor, showToast, ui } from './ui';
 import type { ButtonId, EndChoice } from './ui';
 
@@ -40,10 +41,11 @@ const PAUSE_BUTTON_ITEMS: Readonly<Record<PauseButtonId, PauseItem>> = {
   pauseAbandon: 'abandon',
   pauseCancel: 'cancel',
 };
-/** Holding a finger / button on the map keeps walking toward it after this delay... */
-const HOLD_DELAY_MS = 320;
-/** ...one step per this interval (a little slower than a held key, so it stays controllable). */
+/** Holding a finger / button on the map keeps walking toward it, one step per this interval (a little
+ * slower than a held key, so it stays controllable)... */
 const HOLD_STEP_MS = Math.round(MOVE_REPEAT_MS * 1.3);
+/** ...from this long after the press: the first held step, which a quick tap never reaches. */
+const HOLD_DELAY_MS = 3 * HOLD_STEP_MS;
 /** End cards ignore a stray tap this soon after they appear. */
 const END_CARD_TAP_GUARD_MS = 500;
 
@@ -396,13 +398,22 @@ function start(): void {
   });
 
   // ----- Pointer: buttons, tap-to-step, press-and-hold walking, swipes -----
+  // A mouse press acts on the exact pointer: it swipes when released far enough from where it went
+  // down, and a held press follows the pointer tile by tile. A touch (or pen) press is read through
+  // a TouchGesture instead, so a trembling or rolling fingertip still gives the one step it meant.
   interface Press {
     id: number;
     clientX: number;
     clientY: number;
+    /** Where the press went down, in virtual pixels (a touch taps here, not where it lifts). */
+    at: { x: number; y: number };
+    /** Gesture reading for a touch / pen press; null for the mouse. */
+    touch: TouchGesture | null;
     button: ButtonId | null;
     /** Target tile while the press is on the map during play. */
     tile: { x: number; y: number } | null;
+    /** The expedition the press began on; a held walk never carries over to another one. */
+    state: GameState;
     /** Steps already taken by holding (the release then takes no extra tap step). */
     held: number;
     timer: number;
@@ -421,8 +432,31 @@ function start(): void {
     if (dir) game.handleAction(dir, now, repeat);
   };
   const endPress = (): void => {
-    if (press) window.clearInterval(press.timer);
+    if (press) window.clearTimeout(press.timer);
     press = null;
+  };
+  const swipeStep = (dir: Dir, now: number): void => {
+    if (ui.archivesOpen || ui.pause.isOpen) return;
+    const phase = game.state.phase;
+    if (phase === 'playing' || phase === 'title') game.handleAction(dir, now);
+  };
+  /** One held step, then the next one HOLD_STEP_MS later, for as long as the press lasts. */
+  const holdStep = (current: Press): void => {
+    if (press !== current) return;
+    // The walk was aimed at the sheet it began on; a new expedition (R on a keyboard) ends it.
+    if (game.state !== current.state) {
+      endPress();
+      return;
+    }
+    // A touch that has already moved is becoming a swipe or a tap, never a hold.
+    if (current.touch && !current.touch.hold()) return;
+    current.timer = window.setTimeout(() => holdStep(current), HOLD_STEP_MS);
+    if (game.state.phase !== 'playing' || ui.pause.isOpen || !current.tile) return;
+    const now = performance.now();
+    current.held++;
+    addTap(current.tile.x, current.tile.y, now);
+    // Held steps behave like a held key: they stop at fatal steps and fresh discoveries.
+    stepToward(current.tile, now, current.held > 1);
   };
 
   canvas.addEventListener('pointerdown', (e) => {
@@ -434,19 +468,20 @@ function start(): void {
     const v = toVirtual(e);
     const button = buttonAt(v.x, v.y);
     const tile = !button && !ui.archivesOpen && !ui.pause.isOpen && game.state.phase === 'playing' ? tileAt(v) : null;
-    const current: Press = { id: e.pointerId, clientX: e.clientX, clientY: e.clientY, button, tile, held: 0, timer: 0 };
+    const current: Press = {
+      id: e.pointerId,
+      clientX: e.clientX,
+      clientY: e.clientY,
+      at: v,
+      touch: e.pointerType === 'mouse' ? null : new TouchGesture(e.clientX, e.clientY),
+      button,
+      tile,
+      state: game.state,
+      held: 0,
+      timer: 0,
+    };
     press = current;
-    if (tile) {
-      const started = performance.now();
-      current.timer = window.setInterval(() => {
-        const now = performance.now();
-        if (press !== current || now - started < HOLD_DELAY_MS || game.state.phase !== 'playing' || ui.pause.isOpen) return;
-        current.held++;
-        addTap(current.tile?.x ?? tile.x, current.tile?.y ?? tile.y, now);
-        // Held steps behave like a held key: they stop at fatal steps and fresh discoveries.
-        stepToward(current.tile ?? tile, now, current.held > 1);
-      }, HOLD_STEP_MS);
-    }
+    if (tile) current.timer = window.setTimeout(() => holdStep(current), HOLD_DELAY_MS);
     canvas.setPointerCapture?.(e.pointerId);
   });
 
@@ -458,8 +493,18 @@ function start(): void {
       if (ui.hover && ui.hover in PAUSE_BUTTON_ITEMS) ui.pause.focus(PAUSE_BUTTON_ITEMS[ui.hover as PauseButtonId]);
       canvas.style.cursor = ui.hover ? 'pointer' : game.state.phase === 'playing' && tileAt(v) ? 'crosshair' : 'default';
     }
-    // Sliding a held finger retargets the walk.
-    if (press && press.id === e.pointerId && press.tile) press.tile = tileAt(v) ?? press.tile;
+    const p = press;
+    if (!p || p.id !== e.pointerId || p.button) return;
+    if (p.touch) {
+      // A touch swipes the moment it travels far enough, wherever it began on the canvas.
+      const swipe = p.touch.move(e.clientX, e.clientY);
+      if (swipe) swipeStep(swipe, performance.now());
+      // Sliding a held finger retargets the walk; a trembling one keeps its target.
+      else if (p.tile && p.touch.retarget(e.clientX, e.clientY)) p.tile = tileAt(v) ?? p.tile;
+    } else if (p.tile) {
+      // Dragging a held mouse button retargets the walk.
+      p.tile = tileAt(v) ?? p.tile;
+    }
   });
 
   canvas.addEventListener('pointerleave', () => {
@@ -473,12 +518,15 @@ function start(): void {
     endPress();
     const now = performance.now();
     const v = toVirtual(e);
-    const swipe = p.held === 0 ? swipeDirection(e.clientX - p.clientX, e.clientY - p.clientY) : null;
-    if (swipe && !p.button) {
-      if (ui.archivesOpen || ui.pause.isOpen) return;
-      const phase = game.state.phase;
-      if (phase === 'playing' || phase === 'title') game.handleAction(swipe, now);
-      return;
+    if (p.touch) {
+      // The touch already acted: a swipe stepped as it crossed the threshold, a hold while held.
+      if (p.touch.reading !== 'pending') return;
+    } else {
+      const swipe = p.held === 0 ? swipeDirection(e.clientX - p.clientX, e.clientY - p.clientY) : null;
+      if (swipe && !p.button) {
+        swipeStep(swipe, now);
+        return;
+      }
     }
     const hit = buttonAt(v.x, v.y);
     if (p.button) {
@@ -487,21 +535,26 @@ function start(): void {
       if (hit === p.button && !guarded) runButton(hit, now);
       return;
     }
+    // A press on the map whose expedition ended under it (a held walk reaching the summit) or was
+    // replaced does nothing when it lifts.
+    if (p.tile && (game.state !== p.state || game.state.phase !== 'playing')) return;
     if (ui.archivesOpen) {
       closeArchives();
       return;
     }
     // Taps beside the pause card do nothing (the card's own buttons were handled above).
     if (ui.pause.isOpen) return;
+    // A fingertip rolls as it lifts, so a touch taps where it landed; the mouse where it is released.
+    const tapAt = p.touch ? p.at : v;
     const phase = game.state.phase;
     if (phase === 'title') {
       game.handleAction('confirm', now);
     } else if (phase === 'gameover' || phase === 'victory') {
       // Tapping the sheet beside the report tucks the card away (or brings it back); only the
       // card's buttons start another expedition, so studying the map never starts one by accident.
-      if (now - game.state.phaseStart > END_CARD_TAP_GUARD_MS && tileAt(v)) toggleReportCard();
+      if (now - game.state.phaseStart > END_CARD_TAP_GUARD_MS && tileAt(tapAt)) toggleReportCard();
     } else if (phase === 'playing' && p.held === 0) {
-      const tile = tileAt(v);
+      const tile = tileAt(tapAt);
       if (tile) {
         addTap(tile.x, tile.y, now);
         stepToward(tile, now, false);
@@ -509,7 +562,21 @@ function start(): void {
     }
   });
 
-  canvas.addEventListener('pointercancel', endPress);
+  canvas.addEventListener('pointercancel', (e) => {
+    if (press?.id === e.pointerId) endPress();
+  });
+  canvas.addEventListener('lostpointercapture', (e) => {
+    if (press?.id === e.pointerId) endPress();
+  });
+  // Interruptions that can swallow the release (switching apps, focus loss, rotation or another
+  // resize) end the press without acting, so a held walk never runs on unattended.
+  window.addEventListener('blur', endPress);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') endPress();
+  });
+  window.addEventListener('resize', endPress);
+  window.visualViewport?.addEventListener('resize', endPress);
+  window.addEventListener('orientationchange', endPress);
   canvas.addEventListener('contextmenu', (e) => e.preventDefault());
   // Browsers only count pointerup / touchend of a touch as the gesture that may start audio (a
   // touch pointerdown is not one), so unlock on those as well.

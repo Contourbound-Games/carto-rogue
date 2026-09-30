@@ -1,4 +1,4 @@
-// Player input: keyboard -> game action mapping, pointer / touch geometry, and the ?seed URL
+// Player input: keyboard -> game action mapping, pointer / touch geometry and gestures, and the ?seed URL
 // parameter. KeyboardEvent.code (the physical key) is checked first so WASD works on every layout,
 // including the Korean 2-set layout where e.key yields Hangul jamo and IMEs report 'Process'.
 import type { Action, Dir } from './types';
@@ -52,6 +52,61 @@ export const SWIPE_MIN_PX = 28;
 export function swipeDirection(dx: number, dy: number, minPx = SWIPE_MIN_PX): Dir | null {
   if (Math.max(Math.abs(dx), Math.abs(dy)) < minPx) return null;
   return directionToward(dx, dy);
+}
+
+/** Touch travel (CSS px) that still counts as a finger held still: fingertips tremble and roll. */
+export const TOUCH_SLOP_PX = 10;
+
+/** What a touch press has turned out to be so far ('pending' lifts as a tap). */
+export type TouchReading = 'pending' | 'swipe' | 'hold';
+
+/**
+ * One touch (or pen) press on the canvas, read as exactly one gesture. It becomes a swipe on the move
+ * that carries it SWIPE_MIN_PX from where it landed, a hold only if it is still within TOUCH_SLOP_PX
+ * when the hold delay runs out, and otherwise a tap when it lifts. A swipe or a hold never turns into
+ * anything else, so one press never fires two gestures.
+ */
+export class TouchGesture {
+  reading: TouchReading = 'pending';
+  /** Furthest the finger has strayed from where it landed (CSS px, larger axis). */
+  private travel = 0;
+  /** Where a held walk last took its target; it retargets only once the finger slides on from here. */
+  private anchorX: number;
+  private anchorY: number;
+
+  constructor(
+    readonly x: number,
+    readonly y: number,
+  ) {
+    this.anchorX = x;
+    this.anchorY = y;
+  }
+
+  /** Feed a pointer move. Returns the swipe direction on the move that makes this press a swipe, else null. */
+  move(x: number, y: number): Dir | null {
+    const dx = x - this.x;
+    const dy = y - this.y;
+    this.travel = Math.max(this.travel, Math.abs(dx), Math.abs(dy));
+    if (this.reading !== 'pending') return null;
+    const dir = swipeDirection(dx, dy);
+    if (dir) this.reading = 'swipe';
+    return dir;
+  }
+
+  /** At the hold delay (and each held step after it): whether the press is, or now becomes, a hold. */
+  hold(): boolean {
+    if (this.reading === 'pending' && this.travel < TOUCH_SLOP_PX) this.reading = 'hold';
+    return this.reading === 'hold';
+  }
+
+  /** While held: whether the finger has slid far enough from the last target to take a new one. */
+  retarget(x: number, y: number): boolean {
+    if (this.reading !== 'hold') return false;
+    if (Math.max(Math.abs(x - this.anchorX), Math.abs(y - this.anchorY)) < TOUCH_SLOP_PX) return false;
+    this.anchorX = x;
+    this.anchorY = y;
+    return true;
+  }
 }
 
 export interface ClientRect {
