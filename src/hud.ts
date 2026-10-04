@@ -44,7 +44,9 @@ import { SIGHT_EYE_ART } from './sprites';
 import { GRADE_THRESHOLDS, GRADE_WEIGHTS, RESERVE_FULL_MARKS, SURVEY_FULL_MARKS, gradePoints } from './game';
 import { addButton, clearButtons, reportFor, TOAST_MS, ui } from './ui';
 import type { ButtonId } from './ui';
-import { tileIndex, toMeters } from './terrain';
+import { provenSolvable } from './map';
+import { describeStepBetween, tallySteps, tileIndex, toMeters } from './terrain';
+import type { StepKind } from './terrain';
 import { DIR_LIST, DIRS } from './types';
 import type { Dir, ExpeditionStats, GameState, GradeBreakdown, LogTone, MapData, Point, SlopeClass } from './types';
 
@@ -408,14 +410,22 @@ function costColorLit(cost: number): string {
   return RED_LIT;
 }
 
-function slopeWord(slope: SlopeClass): string {
-  const key: Record<SlopeClass, MessageKey> = {
+function stepWord(kind: StepKind): string {
+  const key: Record<StepKind, MessageKey> = {
     flat: 'slopeFlat',
+    downhill: 'slopeDownhill',
     gentle: 'slopeGentle',
     steep: 'slopeSteep',
     cliff: 'slopeCliff',
   };
-  return t(key[slope]);
+  return t(key[kind]);
+}
+
+/** How the last step reads: its slope class, or downhill for a cost-1 step that dropped beyond the flat band. */
+export function lastStepKind(state: GameState, slope: SlopeClass): StepKind {
+  if (slope !== 'flat') return slope;
+  const p = state.player;
+  return describeStepBetween(state.map, { x: p.fromX, y: p.fromY }, p);
 }
 
 function toneColorOnPaper(tone: LogTone): string {
@@ -1289,7 +1299,7 @@ function drawStamina(ctx: Ctx, state: GameState, now: number): void {
   if (lm) {
     const cost = `-${lm.cost}`;
     const w = drawText(ctx, cost, lx, b.y + 44, { color: costColorLit(lm.cost) });
-    drawText(ctx, slopeWord(lm.slope), lx + w + 6, b.y + 44, { color: DIM_TEXT });
+    drawText(ctx, stepWord(lastStepKind(state, lm.slope)), lx + w + 6, b.y + 44, { color: DIM_TEXT });
   } else {
     drawText(ctx, '--', lx, b.y + 44, { color: DIM_TEXT });
   }
@@ -2226,8 +2236,24 @@ function paintDefeatCard(g: Ctx): void {
     shadow: PALETTE.parchmentShade,
     shadowOffset: 2,
   });
-  drawText(g, t('inkBleeds'), mid, 84, { scale: 2, color: PALETTE.redInk, align: 'center' });
+  // The subtitle under the headline depends on the sheet (see defeatSubtitle) and is drawn per frame.
   rule(g, mid, 110, 240, PALETTE.inkFaded, PALETTE.redInk);
+}
+
+/** Top of the defeat card's subtitle, under the headline. */
+const DEFEAT_SUBTITLE_Y = 84;
+/** The defeat card's stat rows: top of the first and the row pitch (six rows clear the summary line). */
+const DEFEAT_ROWS_Y = 122;
+const DEFEAT_ROW_H = 25;
+/** Width of a stat row (name, leader dots, value); it ends well clear of the grade stamp. */
+const DEFEAT_ROW_W = 344;
+
+/**
+ * The defeat card's subtitle: on a sheet the generator proved solvable (every generated one), that a
+ * route to the Trig Pillar existed. Retrospective and route-free: it names no path and no number.
+ */
+export function defeatSubtitle(map: MapData): string {
+  return provenSolvable(map) ? t('sheetHadRoute') : t('inkBleeds');
 }
 
 /**
@@ -2405,16 +2431,6 @@ function drawSheetNo(ctx: Ctx, state: GameState, right: number, y: number): void
   drawText(ctx, t('sheetNo', { seed: state.seed }), right, y, { color: PALETTE.inkFaded, align: 'right' });
 }
 
-/** Steps of each cost (flat, gentle, steep) and the stamina they took, from the recorded step costs. */
-function stepTally(state: GameState): { flat: [number, number]; gentle: [number, number]; steep: [number, number] } {
-  const tally = { flat: [0, 0] as [number, number], gentle: [0, 0] as [number, number], steep: [0, 0] as [number, number] };
-  for (const c of state.stepCosts) {
-    const row = c >= COST_STEEP ? tally.steep : c >= COST_GENTLE ? tally.gentle : tally.flat;
-    row[0]++;
-    row[1] += c;
-  }
-  return tally;
-}
 
 /** Card position for this end: the chosen corner, sliding in from the sheet's middle. */
 function reportPlacement(state: GameState, now: number, w: number, h: number): { x: number; y: number; restY: number } {
@@ -2560,17 +2576,26 @@ function drawGameOver(ctx: Ctx, state: GameState, now: number): void {
   // The paper swallows taps (only its buttons act); tapping the sheet beside it hides it.
   addButton('reportCard', x, y, DEFEAT_W, DEFEAT_H);
   blitCard(ctx, 'defeat', DEFEAT_W, DEFEAT_H, x, y, paintDefeatCard);
+  const subtitle = defeatSubtitle(state.map);
+  drawText(ctx, subtitle, x + Math.floor(DEFEAT_W / 2), y + DEFEAT_SUBTITLE_Y, { scale: 2, color: PALETTE.redInk, align: 'center' });
   drawBleed(ctx, x, y, clamp01((now - state.phaseStart) / 1600));
-  // Where the stamina went: steep steps are what usually empties the pack.
-  const steps = stepTally(state);
+  // Where the stamina went: steep steps are what usually empties the pack. Cost-1 steps are split
+  // into flat ground and descents, which cost the same now but give up height to be climbed again.
+  const steps = tallySteps(state.map, state.trail, state.stepCosts);
+  const row = (key: MessageKey, kind: keyof typeof steps, color?: string): [string, string, string?] => [
+    t(key),
+    t('stepsValue', { n: steps[kind].steps, cost: steps[kind].cost }),
+    color,
+  ];
   const rows: [string, string, string?][] = [
     [t('staminaSpent'), `${s.staminaSpent}`],
-    [t('stepsSteep'), t('stepsValue', { n: steps.steep[0], cost: steps.steep[1] }), PALETTE.redInk],
-    [t('stepsGentle'), t('stepsValue', { n: steps.gentle[0], cost: steps.gentle[1] })],
-    [t('stepsFlat'), t('stepsValue', { n: steps.flat[0], cost: steps.flat[1] })],
+    row('stepsSteep', 'steep', PALETTE.redInk),
+    row('stepsGentle', 'gentle'),
+    row('stepsFlat', 'flat'),
+    row('stepsDownhill', 'downhill'),
     [t('mapped'), formatPercent(s.percentMapped)],
   ];
-  statRows(ctx, rows, x + 40, y + 126, 330, 28);
+  statRows(ctx, rows, x + 40, y + DEFEAT_ROWS_Y, DEFEAT_ROW_W, DEFEAT_ROW_H);
   const sx = x + DEFEAT_W - 118;
   const sy = y + 190;
   drawStamp(ctx, s.grade, 'ink', sx, sy, 50);

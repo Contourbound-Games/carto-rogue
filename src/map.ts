@@ -796,6 +796,15 @@ export function bestArrivalStamina(map: MapData): number {
   return staminaSearch(buildStepCosts(map), spawnIdx, tileIndex(summit.x, summit.y), caches).arrival;
 }
 
+/**
+ * True when the sheet's stored stats record that it passed the full-knowledge feasibility check
+ * (every map generateMap returns does). Reads map.stats only, no search, so an expedition report can
+ * say a route to the Trig Pillar existed without naming the route or the stamina it would leave.
+ */
+export function provenSolvable(map: MapData): boolean {
+  return map.stats.bestArrivalStamina >= FEASIBILITY_MARGIN;
+}
+
 // ---------------------------------------------------------------------------
 // Validation (independent re-check from scratch)
 // ---------------------------------------------------------------------------

@@ -12,7 +12,7 @@ import {
   WATER_LEVEL,
 } from './config';
 import { DIRS, DIR_LIST } from './types';
-import type { Dir, LocalSlope, MapData, SlopeClass } from './types';
+import type { Dir, LocalSlope, MapData, Point, SlopeClass } from './types';
 
 export function tileIndex(x: number, y: number): number {
   return y * MAP_W + x;
@@ -32,6 +32,50 @@ export function classifySlope(delta: number): SlopeClass {
   if (delta <= SLOPE_FLAT_MAX) return 'flat';
   if (delta <= SLOPE_GENTLE_MAX) return 'gentle';
   return 'steep';
+}
+
+/** How a step reads to the player: its slope class, except that a drop beyond the flat band is downhill. */
+export type StepKind = SlopeClass | 'downhill';
+
+/**
+ * Presentation of a resolved step (delta = elev(to) - elev(from)) for the HUD and the report. The cost
+ * is classifySlope's: every drop costs COST_FLAT, but 'flat' only describes a step within the flat
+ * band either way (|delta| <= SLOPE_FLAT_MAX); a step that drops further is 'downhill'.
+ */
+export function describeStep(delta: number): StepKind {
+  const slope = classifySlope(delta);
+  return slope === 'flat' && delta < -SLOPE_FLAT_MAX ? 'downhill' : slope;
+}
+
+/** describeStep for the step from tile `a` to tile `b` (neighbouring land tiles). */
+export function describeStepBetween(map: MapData, a: Point, b: Point): StepKind {
+  return describeStep(map.elevation[tileIndex(b.x, b.y)] - map.elevation[tileIndex(a.x, a.y)]);
+}
+
+/** Steps taken and stamina spent per kind of step, for the expedition report. */
+export type StepTally = Record<Exclude<StepKind, 'cliff'>, { steps: number; cost: number }>;
+
+/**
+ * Tally a walked route: trail[k] -> trail[k + 1] cost stepCosts[k]. Steps are bucketed by what they
+ * cost (8 steep, 3 gentle, 1 flat) and the cost-1 steps that dropped beyond the flat band by
+ * describeStep, so the report never counts a descent as flat ground.
+ */
+export function tallySteps(map: MapData, trail: readonly Point[], stepCosts: readonly number[]): StepTally {
+  const tally: StepTally = {
+    steep: { steps: 0, cost: 0 },
+    gentle: { steps: 0, cost: 0 },
+    flat: { steps: 0, cost: 0 },
+    downhill: { steps: 0, cost: 0 },
+  };
+  stepCosts.forEach((cost, k) => {
+    let kind: keyof StepTally;
+    if (cost >= COST_STEEP) kind = 'steep';
+    else if (cost >= COST_GENTLE) kind = 'gentle';
+    else kind = trail[k + 1] && describeStepBetween(map, trail[k], trail[k + 1]) === 'downhill' ? 'downhill' : 'flat';
+    tally[kind].steps++;
+    tally[kind].cost += cost;
+  });
+  return tally;
 }
 
 /** Stamina cost of a slope class; Infinity for cliffs. */

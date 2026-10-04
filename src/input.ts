@@ -45,6 +45,20 @@ export function directionToward(dx: number, dy: number): Dir | null {
   return dy > 0 ? 'down' : 'up';
 }
 
+/**
+ * The cardinal step a touch at (x, y) asks for, measured from the surveyor's tile centre (cx, cy), all
+ * in the same pixel space: the dominant axis of the offset in pixels rather than whole tiles, so the
+ * four directions are true quarter-planes around the surveyor (a tap on a diagonal tile goes the way
+ * the finger actually leans, not always sideways). Null within `ownHalf` of the centre on both axes,
+ * the surveyor's own tile, where a fingertip says nothing about direction.
+ */
+export function touchStepDirection(x: number, y: number, cx: number, cy: number, ownHalf: number): Dir | null {
+  const dx = x - cx;
+  const dy = y - cy;
+  if (Math.abs(dx) < ownHalf && Math.abs(dy) < ownHalf) return null;
+  return directionToward(dx, dy);
+}
+
 /** Minimum travel (CSS px) for a pointer drag to count as a swipe rather than a tap. */
 export const SWIPE_MIN_PX = 28;
 
