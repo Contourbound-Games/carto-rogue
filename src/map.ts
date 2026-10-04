@@ -1355,10 +1355,12 @@ function assembleMap(
   summit: Point,
   caches: readonly Candidate[],
   stats: MapStats,
+  generator: number,
 ): MapData {
   const cacheSites: CacheSite[] = caches.map((c, id) => ({ id, x: c.x, y: c.y, kind: c.kind }));
   return {
     seed,
+    generator,
     width: MAP_W,
     height: MAP_H,
     elevation: grid.elevation,
@@ -1381,7 +1383,14 @@ const CLIFF_FRACTION_MIN = 0.008;
 const CLIFF_FRACTION_MAX = 0.06;
 
 /** Tries to place objectives on one terrain; returns a validated map or null. */
-function placeObjectives(seed: number, grid: TerrainGrid, rng: Rng, attempt: number, t0: number): MapData | null {
+function placeObjectives(
+  seed: number,
+  generator: number,
+  grid: TerrainGrid,
+  rng: Rng,
+  attempt: number,
+  t0: number,
+): MapData | null {
   const costs = buildStepCosts(grid);
   const { comp, count } = labelComponents(grid);
 
@@ -1457,7 +1466,7 @@ function placeObjectives(seed: number, grid: TerrainGrid, rng: Rng, attempt: num
           cliffEdges: grid.cliffEdges,
           genMs: 0,
         };
-        const map = assembleMap(seed, grid, spawn, summit, caches, stats);
+        const map = assembleMap(seed, grid, spawn, summit, caches, stats, generator);
         const report = validateMap(map);
         if (report.ok) {
           stats.directCost = report.directCost;
@@ -1477,11 +1486,26 @@ function terrainSeedFor(seed: number, attempt: number): number {
 }
 
 /**
- * Generates a complete, validated expedition map for `seed` (deterministic per seed).
- * Always returns a map for which validateMap(...).ok is true; failing terrains are regenerated from
- * derived seeds (hashSeed(seed, attempt)), beyond MAX_GEN_ATTEMPTS if that were ever necessary.
+ * The procedural generator this build produces by default. A mountain's identity is { generator, seed }:
+ * the same pair always gives the same map. Version 1 is the generator whose output the Standard golden
+ * fixture records; any change to that output needs an explicit version decision
+ * (docs/GENERATOR_VERSIONING.md), never a silent golden regeneration.
  */
-export function generateMap(seed: number): MapData {
+export const GENERATOR_VERSION = 1;
+
+/** Generator versions this build can produce. */
+export const SUPPORTED_GENERATORS: readonly number[] = [1];
+
+/**
+ * Generates a complete, validated expedition map for `seed` with generator `generator` (deterministic
+ * per pair). Always returns a map for which validateMap(...).ok is true; failing terrains are regenerated
+ * from derived seeds (hashSeed(seed, attempt)), beyond MAX_GEN_ATTEMPTS if that were ever necessary.
+ * An unsupported generator version throws: a pinned mountain is never quietly replaced by another.
+ */
+export function generateMap(seed: number, generator: number = GENERATOR_VERSION): MapData {
+  if (!SUPPORTED_GENERATORS.includes(generator)) {
+    throw new RangeError(`Unsupported generator version ${generator} (this build supports ${SUPPORTED_GENERATORS.join(', ')})`);
+  }
   const t0 = performance.now();
   for (let attempt = 1; ; attempt++) {
     const terrainSeed = terrainSeedFor(seed, attempt);
@@ -1499,7 +1523,7 @@ export function generateMap(seed: number): MapData {
       continue;
     }
     const rng = mulberry32(hashSeed(terrainSeed, 0x5eed));
-    const map = placeObjectives(seed, grid, rng, attempt, t0);
+    const map = placeObjectives(seed, generator, grid, rng, attempt, t0);
     if (map) return map;
   }
 }

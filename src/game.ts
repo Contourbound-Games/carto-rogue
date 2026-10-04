@@ -306,7 +306,8 @@ export class Game {
   state: GameState;
 
   private readonly audio: AudioEngine;
-  private readonly mapFactory: (seed: number) => MapData;
+  /** Builds the map for a seed: the default generator, or the given one (Retry pins the current map's). */
+  private readonly mapFactory: (seed: number, generator?: number) => MapData;
   /** Mode of the current and every following expedition (the rules never read it). */
   private mode: ExpeditionMode;
 
@@ -329,7 +330,7 @@ export class Game {
     return t('floatCache');
   }
 
-  constructor(audio: AudioEngine, mapFactory: (seed: number) => MapData, options: GameOptions = {}) {
+  constructor(audio: AudioEngine, mapFactory: (seed: number, generator?: number) => MapData, options: GameOptions = {}) {
     this.audio = audio;
     this.mapFactory = mapFactory;
     this.mode = options.mode ?? 'standard';
@@ -390,9 +391,12 @@ export class Game {
     if (s.log.length > LOG_CAP) s.log.splice(0, s.log.length - LOG_CAP);
   }
 
-  /** Start a brand-new expedition on a fresh map and go straight to 'playing'. */
-  newExpedition(now: number, seed?: number): void {
-    this.replaceState(this.mapFactory(seed ?? this.freshSeed()), 'playing', now);
+  /**
+   * Start a brand-new expedition on a fresh map and go straight to 'playing'. Without `generator` the
+   * map comes from the default generator.
+   */
+  newExpedition(now: number, seed?: number, generator?: number): void {
+    this.replaceState(this.mapFactory(seed ?? this.freshSeed(), generator), 'playing', now);
     this.logWelcome(now);
   }
 
@@ -477,17 +481,20 @@ export class Game {
   }
 
   /**
-   * Retry this sheet: a fresh expedition on the current seed, regenerated exactly as any other start
-   * on that seed (same terrain, same rules, graded and recorded like any expedition).
+   * Retry this sheet: a fresh expedition on the current mountain, regenerated from its exact identity
+   * { generator, seed } (same terrain, same rules, graded and recorded like any expedition).
    */
   retrySheet(now: number): void {
-    this.startSeed(now, this.state.seed);
+    this.startSeed(now, this.state.seed, this.state.map.generator);
   }
 
-  /** Begin a fresh expedition on the given seed (R, or a typed seed): lingering sounds stop, the start jingle plays. */
-  startSeed(now: number, seed: number): void {
+  /**
+   * Begin a fresh expedition on the given seed (R, or a typed seed): lingering sounds stop, the start
+   * jingle plays. Without `generator` the default generator builds it.
+   */
+  startSeed(now: number, seed: number, generator?: number): void {
     this.audio.stopAll();
-    this.newExpedition(now, seed);
+    this.newExpedition(now, seed, generator);
     this.audio.expeditionStart();
   }
 

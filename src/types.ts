@@ -75,8 +75,10 @@ export interface MapStats {
 }
 
 export interface MapData {
-  /** The seed the player sees / can share. Same seed => identical map. */
+  /** The seed the player sees / can share. Same { generator, seed } => identical map. */
   seed: number;
+  /** Version of the procedural generator that produced this map (map.ts GENERATOR_VERSION by default). */
+  generator: number;
   width: number; // == MAP_W
   height: number; // == MAP_H
   /** Tile-centre elevation 0..1, length width*height. Equals sampleElevation(x + 0.5, y + 0.5). */

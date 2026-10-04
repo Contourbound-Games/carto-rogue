@@ -403,6 +403,7 @@ function corridorMap(): { map: MapData; path: Point[] } {
   const { passMask, cliffMask, cliffEdges } = computeEdges(elevation, water);
   const map: MapData = {
     seed: 0,
+    generator: 1,
     width: MAP_W,
     height: MAP_H,
     elevation,

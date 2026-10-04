@@ -90,6 +90,7 @@ function buildMap(spec: FixtureSpec = {}): MapData {
   for (let i = 0; i < tiles; i++) waterTiles += water[i];
   return {
     seed: 0,
+    generator: 1,
     width: MAP_W,
     height: MAP_H,
     elevation,

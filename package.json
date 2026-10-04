@@ -21,7 +21,7 @@
     "desktop:zip": "npm run build && electron-builder --config desktop/electron-builder.yml"
   },
   "dependencies": {
-    "simplex-noise": "^4.0.3"
+    "simplex-noise": "4.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
