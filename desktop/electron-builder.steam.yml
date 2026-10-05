@@ -1,0 +1,49 @@
+# electron-builder config for the Steam desktop build: the same Windows shell as electron-builder.yml,
+# serving the Steam web build (dist-steam/, packaged as the app's dist/) instead of the itch one.
+#   npm run desktop:pack:steam  -> release/steam/win-unpacked/ (runnable folder, the Steam depot content)
+#   npm run desktop:zip:steam   -> release/steam/CartoRogue-<version>-win-x64-steam.zip
+#
+# Everything but the renderer, the output folder and the zip name must stay as in electron-builder.yml
+# (tests/edition.test.ts checks it line by line): appId, productName and executableName are the app's
+# identity, and saved data lives in %APPDATA%\games.contourbound.cartorogue (see desktop/app-protocol.js).
+appId: games.contourbound.cartorogue
+productName: The Carto-Rogue
+executableName: CartoRogue
+copyright: Copyright © 2026 Contourbound Games. All rights reserved.
+directories:
+  output: release/steam
+  buildResources: build
+# Only the web build and the shell; the game's npm dependencies are already bundled into dist-steam/.
+files:
+  - from: dist-steam
+    to: dist
+  - desktop/main.js
+  - desktop/app-protocol.js
+  - package.json
+  - "!node_modules/**/*"
+# Refuses to package without the Steam web build (electron-builder would package an empty dist/).
+beforePack: ./desktop/steam-renderer.js
+asar: true
+npmRebuild: false
+publish: null
+electronLanguages:
+  - ko
+  - en-US
+extraFiles:
+  - from: public/THIRD_PARTY_NOTICES.md
+    to: THIRD_PARTY_NOTICES.md
+  - from: desktop/README-Windows.txt
+    to: README.txt
+electronFuses:
+  runAsNode: false
+  enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
+  onlyLoadAppFromAsar: true
+  grantFileProtocolExtraPrivileges: false
+win:
+  target:
+    - target: zip
+      arch:
+        - x64
+  icon: build/icon.png
+  artifactName: CartoRogue-${version}-win-${arch}-steam.${ext}

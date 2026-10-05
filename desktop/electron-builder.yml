@@ -1,6 +1,7 @@
-# electron-builder config for the Windows desktop build.
-#   npm run desktop:pack  -> release/win-unpacked/ (runnable folder, also the future Steam depot content)
+# electron-builder config for the Windows desktop build of the itch edition (the web build in dist/).
+#   npm run desktop:pack  -> release/win-unpacked/ (runnable folder)
 #   npm run desktop:zip   -> release/CartoRogue-<version>-win-x64.zip (submission / download build)
+# The Steam desktop build is electron-builder.steam.yml (desktop:pack:steam / desktop:zip:steam).
 #
 # appId, productName and executableName are the app's identity: saved data lives in
 # %APPDATA%\games.contourbound.cartorogue (see desktop/app-protocol.js). Do not change them in updates.
