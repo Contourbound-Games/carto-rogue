@@ -9,7 +9,9 @@
   "main": "desktop/main.js",
   "scripts": {
     "dev": "vite",
+    "dev:steam": "vite --mode steam",
     "build": "tsc --noEmit && vite build",
+    "build:steam": "tsc --noEmit && vite build --mode steam",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",

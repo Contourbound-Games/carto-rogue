@@ -2,6 +2,7 @@
 // The pure update function is separate from storage so it can be unit tested.
 
 import { MAP_H, MAP_W } from './config';
+import type { ContractId } from './contracts';
 import type { ExpeditionMode, GameState } from './types';
 
 export const RECORDS_STORAGE_KEY = 'carto_rogue_records_v1';
@@ -34,15 +35,18 @@ export interface ExpeditionResult {
   /** Null for abandoned expeditions (they are never graded). */
   grade: string | null;
   mode: ExpeditionMode;
+  /** The Survey Contract the expedition was started as, else null (never stored in the archives). */
+  contract: ContractId | null;
 }
 
 /**
  * Whether a result belongs in these (Standard) archives. Explorer plays by the same rules but adds
- * a learning aid (the Step Echo), so its expeditions are resolved like any other but kept out of the
- * Standard records.
+ * a learning aid (the Step Echo), and a Survey Contract is Standard play on a set sheet with its own
+ * goal, so both are resolved like any other expedition but kept out of the Standard records, whatever
+ * their outcome.
  */
 export function countsTowardRecords(result: ExpeditionResult): boolean {
-  return result.mode === 'standard';
+  return result.mode === 'standard' && result.contract === null;
 }
 
 export function emptyRecords(): CareerRecords {
@@ -54,7 +58,7 @@ export function gradeRank(grade: string | null): number {
 }
 
 /** The records after one more expedition (pure; the input is not modified). */
-export function applyExpedition(rec: CareerRecords, result: Omit<ExpeditionResult, 'mode'>): CareerRecords {
+export function applyExpedition(rec: CareerRecords, result: Omit<ExpeditionResult, 'mode' | 'contract'>): CareerRecords {
   const won = result.outcome === 'victory';
   const bestGrade = gradeRank(result.grade) > gradeRank(rec.bestGrade) ? result.grade : rec.bestGrade;
   return {
@@ -117,7 +121,8 @@ export function saveRecords(rec: CareerRecords): void {
  * It is recorded when it ends (victory or collapse), or as abandoned when it is left behind after
  * at least one step: replaced by R or a new sheet, abandoned from the pause menu, or the page
  * closing. Zero-turn expeditions are never recorded. `sync` and `abandon` are idempotent, so
- * repeated clicks, fast inputs and page teardown cannot record an expedition twice.
+ * repeated clicks, fast inputs and page teardown cannot record an expedition twice. `onRecord` also
+ * receives the expedition's own state, never the one that replaced it.
  */
 export class RecordKeeper {
   private tracked: GameState;
@@ -125,7 +130,7 @@ export class RecordKeeper {
 
   constructor(
     state: GameState,
-    private readonly onRecord: (result: ExpeditionResult) => void,
+    private readonly onRecord: (result: ExpeditionResult, expedition: GameState) => void,
   ) {
     this.tracked = state;
   }
@@ -154,13 +159,17 @@ export class RecordKeeper {
 
   private record(state: GameState, outcome: ExpeditionOutcome, grade: string | null): void {
     this.recorded = true;
-    this.onRecord({
-      outcome,
-      percentMapped: (state.revealedCount / (MAP_W * MAP_H)) * 100,
-      tilesMapped: state.revealedCount,
-      turns: state.turns,
-      grade,
-      mode: state.mode,
-    });
+    this.onRecord(
+      {
+        outcome,
+        percentMapped: (state.revealedCount / (MAP_W * MAP_H)) * 100,
+        tilesMapped: state.revealedCount,
+        turns: state.turns,
+        grade,
+        mode: state.mode,
+        contract: state.contract,
+      },
+      state,
+    );
   }
 }

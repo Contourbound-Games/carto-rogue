@@ -2,6 +2,8 @@
 // career records and the frame loop.
 import { SynthAudio } from './audio';
 import { PALETTE, VIRTUAL_HEIGHT, VIRTUAL_WIDTH } from './config';
+import { completeContract, contractCompletedBy, loadContractProgress, saveContractProgress } from './contract-progress';
+import { EDITION } from './edition';
 import { drawText, fitText, loadWebFont } from './font';
 import { Game } from './game';
 import { initLanguage, t, toggleLang } from './i18n';
@@ -161,8 +163,22 @@ function start(): void {
     startPlaying: urlSeed !== undefined,
     mode: loadMode(),
   });
-  const records = new RecordKeeper(game.state, (result) => {
-    // Explorer expeditions are kept out of the Standard archives.
+  // Survey Contract progress belongs to the Steam edition: the itch edition never reads or writes it.
+  let contractProgress = EDITION === 'steam' ? loadContractProgress() : null;
+  const records = new RecordKeeper(game.state, (result, expedition) => {
+    // A Survey Contract completed by this expedition is kept (saved only when new), before the
+    // archives filter below, which keeps every Contract expedition out.
+    if (EDITION === 'steam' && contractProgress !== null) {
+      const completed = contractCompletedBy(expedition);
+      if (completed !== null) {
+        const next = completeContract(contractProgress, completed);
+        if (next !== contractProgress) {
+          contractProgress = next;
+          saveContractProgress(next);
+        }
+      }
+    }
+    // Only Standard expeditions outside a Survey Contract go into the Standard archives.
     if (!countsTowardRecords(result)) return;
     ui.records = applyExpedition(ui.records, result);
     saveRecords(ui.records);

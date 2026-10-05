@@ -9,7 +9,11 @@
 //                  hidden height
 //
 // A condition breaks on the turn it is exceeded and stays broken; unbroken, it is met on the summit.
+//
+// judgeContract is the one place an expedition is judged as a Contract: only an expedition started as one
+// (state.contract) is, by its definition's conditions, whatever route it took.
 import { COST_STEEP, VISION_HIGH } from './config';
+import { SURVEY_CONTRACTS } from './contracts';
 import { visionRadiusFor } from './game';
 import { tileIndex } from './terrain';
 import type { GameState } from './types';
@@ -77,4 +81,14 @@ export function evaluateContract(run: ContractRun, conditions: readonly Contract
   const status: ConditionStatus =
     anyBroken || (finished && !summit) ? 'broken' : summit && results.every((r) => r.status === 'met') ? 'met' : 'open';
   return { status, summit, conditions: results };
+}
+
+/**
+ * Judge an expedition as the Survey Contract it was started as, in progress or finished: null when it is
+ * no Contract (state.contract null), even on a Contract's sheet and route; otherwise evaluateContract
+ * against that Contract's conditions. Reads only; never mutates.
+ */
+export function judgeContract(run: ContractRun & Pick<GameState, 'contract'>): ContractEvaluation | null {
+  const contract = run.contract === null ? undefined : SURVEY_CONTRACTS.find((c) => c.id === run.contract);
+  return contract ? evaluateContract(run, contract.conditions) : null;
 }

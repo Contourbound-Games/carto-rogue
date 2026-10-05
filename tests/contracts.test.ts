@@ -1,14 +1,22 @@
 // Survey Contracts (src/contracts.ts): the three approved definitions, each locked to the sheet it was
 // chosen on ({generator, seed, mapDigest}), and each proved feasible by a fixed witness route that is
-// replayed step by step through the real Game in Standard mode and judged by evaluateContract.
+// replayed step by step through the real Game in Standard mode and judged by evaluateContract. At runtime
+// judgeContract judges only expeditions started as a Contract, by the same evaluator; no Contract
+// expedition ever reaches the Standard archives, and only a met one completes its Contract.
 import { describe, expect, it } from 'vitest';
-import { evaluateContract } from '../src/contract-conditions';
+import { evaluateContract, judgeContract } from '../src/contract-conditions';
 import type { ContractCondition } from '../src/contract-conditions';
+import { completeContract, contractCompletedBy, emptyContractProgress } from '../src/contract-progress';
+import type { ContractProgress } from '../src/contract-progress';
 import { SURVEY_CONTRACTS } from '../src/contracts';
 import type { ContractId } from '../src/contracts';
 import { Game } from '../src/game';
-import { generateMap } from '../src/map';
-import type { AudioEngine, Dir } from '../src/types';
+import { generateMap, minCostTo } from '../src/map';
+import { applyExpedition, countsTowardRecords, emptyRecords, RecordKeeper } from '../src/records';
+import type { ExpeditionResult } from '../src/records';
+import { stepCost, tileIndex } from '../src/terrain';
+import { DIRS, DIR_LIST } from '../src/types';
+import type { AudioEngine, Dir, GameState } from '../src/types';
 import { mapDigest } from './support/fingerprint';
 
 const silent: AudioEngine = {
@@ -98,5 +106,332 @@ describe.each(SURVEY_CONTRACTS)('Survey Contract $id witness', (c) => {
     const ev = evaluateContract(s, c.conditions);
     expect(ev.status).toBe('met');
     for (const r of ev.conditions) expect(r).toMatchObject({ status: 'met', value: 0, brokenOnTurn: null });
+  });
+});
+
+// ----- Runtime judging (judgeContract) -----
+
+/** Replay a witness string (one letter per step) from turn 0, calling `each` after every step. */
+function replay(game: Game, witness: string, each: (k: number) => void = () => undefined): void {
+  let now = 0;
+  for (const [k, letter] of [...witness].entries()) {
+    game.handleAction(STEP[letter], (now += 200));
+    each(k);
+  }
+  game.update(now + 5000);
+}
+
+/** The full-knowledge cheapest line to the summit: how the sheet is climbed when nobody asks for the Contract. */
+function walkCheapestLine(game: Game): void {
+  const map = game.state.map;
+  const to = minCostTo(map, map.summit.x, map.summit.y);
+  let now = 0;
+  for (let k = 0; k < 500 && game.state.phase === 'playing'; k++) {
+    const { x, y } = game.state.player;
+    const dir = DIR_LIST.find((d) => {
+      const c = stepCost(map, x, y, d);
+      return c !== null && to[tileIndex(x + DIRS[d].dx, y + DIRS[d].dy)] + c === to[tileIndex(x, y)];
+    });
+    if (!dir) break;
+    game.handleAction(dir, (now += 200));
+  }
+  game.update(now + 5000);
+}
+
+/** Pace back and forth beside the spawn until the surveyor collapses. */
+function paceToCollapse(game: Game): void {
+  const s = game.state;
+  const out = DIR_LIST.find((d) => stepCost(s.map, s.player.x, s.player.y, d) !== null) as Dir;
+  const back = DIR_LIST.find((d) => DIRS[d].dx === -DIRS[out].dx && DIRS[d].dy === -DIRS[out].dy) as Dir;
+  let now = 0;
+  for (let k = 0; k < 400 && game.state.phase === 'playing'; k++) game.handleAction(k % 2 === 0 ? out : back, (now += 200));
+  game.update(now + 5000);
+}
+
+const startedAs = (id: ContractId): Game => {
+  const game = new Game(silent, generateMap, { seed: 205, now: 0 });
+  expect(game.startContract(0, id)).toBe(true);
+  return game;
+};
+
+/** A fresh attempt: under way, nothing measured, nothing broken. */
+function expectFreshJudgement(s: GameState): void {
+  expect([s.trail.length, s.stepCosts.length, s.finalStats]).toEqual([1, 0, null]);
+  const judged = judgeContract(s);
+  expect(judged).toMatchObject({ status: 'open', summit: false });
+  for (const r of judged?.conditions ?? []) expect(r).toMatchObject({ status: 'open', value: 0, brokenOnTurn: null });
+}
+
+describe.each(SURVEY_CONTRACTS)('Survey Contract $id judged at runtime', (c) => {
+  it('is open all the way up the witness and met on the summit; a Retry is judged afresh', () => {
+    const game = startedAs(c.id);
+    const { witness } = APPROVED[c.id];
+    expect(judgeContract(game.state)?.status).toBe('open');
+    replay(game, witness, (k) => {
+      if (k < witness.length - 1) expect(judgeContract(game.state)?.status, `step ${k + 1}`).toBe('open');
+    });
+    const s = game.state;
+    expect(s.phase).toBe('victory');
+    // Judging reads only: the frozen run is left exactly as it was.
+    const snapshot = JSON.stringify([s.contract, s.trail, s.stepCosts, s.finalStats]);
+    Object.freeze(s.trail);
+    Object.freeze(s.stepCosts);
+    Object.freeze(s.finalStats);
+    const judged = judgeContract(s);
+    expect(JSON.stringify([s.contract, s.trail, s.stepCosts, s.finalStats])).toBe(snapshot);
+    expect(judged).toMatchObject({ status: 'met', summit: true });
+    expect(judged?.conditions.map((r) => r.status)).toEqual(c.conditions.map(() => 'met'));
+
+    game.retrySheet(60_000);
+    expect(game.state.contract).toBe(c.id);
+    expectFreshJudgement(game.state);
+  });
+
+  it('meets its conditions on the same route from a plain seed, which is still no Contract run', () => {
+    for (const mode of ['standard', 'explorer'] as const) {
+      const game = new Game(silent, generateMap, { seed: c.seed, now: 0, startPlaying: true, mode });
+      replay(game, APPROVED[c.id].witness);
+      expect(evaluateContract(game.state, c.conditions).status, mode).toBe('met');
+      expect(judgeContract(game.state), mode).toBeNull();
+    }
+  });
+});
+
+describe('a Contract run judged broken', () => {
+  it.each(['gentle-ascent', 'hold-the-high-ground'] as const)(
+    '%s: the cheapest line reaches the summit but breaks the Contract on the way; a Retry is judged afresh',
+    (id) => {
+      const game = startedAs(id);
+      walkCheapestLine(game);
+      expect(game.state.finalStats?.outcome).toBe('victory');
+      const judged = judgeContract(game.state);
+      expect(judged).toMatchObject({ status: 'broken', summit: true });
+      expect(judged?.conditions.some((r) => r.status === 'broken' && r.brokenOnTurn !== null)).toBe(true);
+
+      game.retrySheet(60_000);
+      expect(game.state.contract).toBe(id);
+      expectFreshJudgement(game.state);
+    },
+  );
+
+  it('by a collapse, whatever its conditions read', () => {
+    const game = startedAs('master-surveyor');
+    paceToCollapse(game);
+    expect(game.state.finalStats?.outcome).toBe('defeat');
+    expect(judgeContract(game.state)).toMatchObject({ status: 'broken', summit: false });
+  });
+});
+
+// ----- Standard archives (records.ts) -----
+
+/** Every expedition the keeper resolves, and the Standard archives main.ts builds from them. */
+function archive(game: Game) {
+  const results: ExpeditionResult[] = [];
+  const keeper = new RecordKeeper(game.state, (r) => results.push(r));
+  const archives = () => results.filter(countsTowardRecords).reduce(applyExpedition, emptyRecords());
+  return { results, keeper, archives };
+}
+
+/** One step, whichever way is open first. */
+function stepOnce(game: Game, now: number): void {
+  const { map, player, turns } = game.state;
+  game.handleAction(DIR_LIST.find((d) => stepCost(map, player.x, player.y, d) !== null) as Dir, now);
+  expect(game.state.turns).toBe(turns + 1);
+}
+
+describe('a Contract expedition is kept out of the Standard archives', () => {
+  // Whether its conditions were met plays no part: met, broken and still open are all kept out.
+  const endings: [string, ContractId, (game: Game) => void, ExpeditionResult['outcome'], string][] = [
+    ['met on the summit', 'master-surveyor', (game) => replay(game, APPROVED['master-surveyor'].witness), 'victory', 'met'],
+    ['broken on the way to the summit', 'gentle-ascent', walkCheapestLine, 'victory', 'broken'],
+    ['ended by a collapse', 'hold-the-high-ground', paceToCollapse, 'defeat', 'broken'],
+    ['abandoned under way', 'gentle-ascent', (game) => stepOnce(game, 200), 'abandoned', 'open'],
+  ];
+
+  it.each(endings)('%s', (_name, id, play, outcome, judged) => {
+    const game = startedAs(id);
+    const { results, keeper, archives } = archive(game);
+    play(game);
+    keeper.sync(game.state); // the next frame
+    keeper.abandon(); // page teardown
+    expect(judgeContract(game.state)?.status).toBe(judged);
+    expect(results).toEqual([expect.objectContaining({ outcome, mode: 'standard', contract: id })]);
+    expect(countsTowardRecords(results[0])).toBe(false);
+    expect(archives()).toEqual(emptyRecords());
+  });
+
+  it('attempt after attempt: each Retry is resolved once and kept out', () => {
+    const game = startedAs('gentle-ascent');
+    const { results, keeper, archives } = archive(game);
+    walkCheapestLine(game);
+    keeper.sync(game.state);
+    keeper.sync(game.state);
+    game.retrySheet(60_000);
+    keeper.sync(game.state);
+    paceToCollapse(game);
+    keeper.sync(game.state);
+    game.retrySheet(120_000);
+    keeper.sync(game.state);
+    keeper.abandon(); // the third attempt took no step: never recorded
+    expect(results.map((r) => [r.outcome, r.contract])).toEqual([
+      ['victory', 'gentle-ascent'],
+      ['defeat', 'gentle-ascent'],
+    ]);
+    expect(results.some(countsTowardRecords)).toBe(false);
+    expect(archives()).toEqual(emptyRecords());
+  });
+
+  it('left for a plain expedition: the Contract is kept out, the plain expedition after it counts', () => {
+    const game = startedAs('hold-the-high-ground');
+    const { results, keeper, archives } = archive(game);
+    stepOnce(game, 200);
+    game.handleAction('restart', 400); // R / New Expedition
+    keeper.sync(game.state);
+    stepOnce(game, 600);
+    keeper.abandon();
+    expect(results.map((r) => [r.outcome, r.contract])).toEqual([
+      ['abandoned', 'hold-the-high-ground'],
+      ['abandoned', null],
+    ]);
+    expect(results.map((r) => countsTowardRecords(r))).toEqual([false, true]);
+    expect(archives()).toEqual(applyExpedition(emptyRecords(), results[1]));
+  });
+
+  it('started from a plain expedition: the plain expedition counts, the Contract after it is kept out', () => {
+    const game = new Game(silent, generateMap, { seed: 205, now: 0, startPlaying: true });
+    const { results, keeper, archives } = archive(game);
+    stepOnce(game, 200);
+    expect(game.startContract(400, 'gentle-ascent')).toBe(true);
+    keeper.sync(game.state);
+    stepOnce(game, 600);
+    keeper.abandon();
+    expect(results.map((r) => [r.outcome, r.contract])).toEqual([
+      ['abandoned', null],
+      ['abandoned', 'gentle-ascent'],
+    ]);
+    expect(results.map((r) => countsTowardRecords(r))).toEqual([true, false]);
+    expect(archives()).toEqual(applyExpedition(emptyRecords(), results[0]));
+  });
+
+  it.each(SURVEY_CONTRACTS)("$id's sheet climbed from a plain seed counts like any Standard expedition", (c) => {
+    const game = new Game(silent, generateMap, { seed: c.seed, now: 0, startPlaying: true });
+    const { results, keeper, archives } = archive(game);
+    replay(game, APPROVED[c.id].witness);
+    keeper.sync(game.state);
+    expect(results).toEqual([expect.objectContaining({ outcome: 'victory', mode: 'standard', contract: null })]);
+    expect(countsTowardRecords(results[0])).toBe(true);
+    expect(archives()).toMatchObject({ expeditions: 1, summits: 1 });
+  });
+});
+
+// ----- Survey Contract progress (contract-progress.ts) -----
+
+/**
+ * main.ts's expedition callback, progress side: a Contract the resolved expedition completed is added,
+ * and saved only when new. `saves` holds every progress that would have been written.
+ */
+function trackProgress(game: Game) {
+  let progress = emptyContractProgress();
+  const saves: ContractProgress[] = [];
+  const results: ExpeditionResult[] = [];
+  const keeper = new RecordKeeper(game.state, (result, expedition) => {
+    results.push(result);
+    const completed = contractCompletedBy(expedition);
+    if (completed === null) return;
+    const next = completeContract(progress, completed);
+    if (next === progress) return;
+    progress = next;
+    saves.push(next);
+  });
+  return { keeper, saves, results, completed: () => progress.completed };
+}
+
+const witnessOf = (id: ContractId) => (game: Game) => replay(game, APPROVED[id].witness);
+
+describe('Survey Contract progress', () => {
+  it.each(SURVEY_CONTRACTS)('$id is completed by its witness, though the expedition stays out of the archives', (c) => {
+    const game = startedAs(c.id);
+    const t = trackProgress(game);
+    replay(game, APPROVED[c.id].witness);
+    t.keeper.sync(game.state);
+    expect(t.completed()).toEqual([c.id]);
+    expect(t.saves).toHaveLength(1);
+    expect(countsTowardRecords(t.results[0])).toBe(false);
+  });
+
+  const noCompletion: [string, () => Game, (game: Game) => void][] = [
+    ['a summit with the Contract broken', () => startedAs('gentle-ascent'), walkCheapestLine],
+    ['a collapse', () => startedAs('hold-the-high-ground'), paceToCollapse],
+    ['an abandoned attempt', () => startedAs('master-surveyor'), (game) => stepOnce(game, 200)],
+    ['a zero-turn attempt', () => startedAs('gentle-ascent'), (game) => game.handleAction('restart', 200)],
+    ['the witness from a plain Standard seed', () => new Game(silent, generateMap, { seed: 23449, now: 0, startPlaying: true }), witnessOf('hold-the-high-ground')],
+    ['the witness from a plain Explorer seed', () => new Game(silent, generateMap, { seed: 836388, now: 0, startPlaying: true, mode: 'explorer' }), witnessOf('gentle-ascent')],
+  ];
+
+  it.each(noCompletion)('nothing is completed by %s', (_name, begin, play) => {
+    const game = begin();
+    const t = trackProgress(game);
+    play(game);
+    t.keeper.sync(game.state);
+    t.keeper.abandon(); // page teardown
+    expect(t.completed()).toEqual([]);
+    expect(t.saves).toEqual([]);
+  });
+
+  it('a failed attempt changes nothing; the Retry that meets the Contract completes it', () => {
+    const game = startedAs('gentle-ascent');
+    const t = trackProgress(game);
+    walkCheapestLine(game);
+    t.keeper.sync(game.state);
+    expect(t.results.map((r) => r.outcome)).toEqual(['victory']);
+    expect(t.completed()).toEqual([]);
+    game.retrySheet(60_000);
+    replay(game, APPROVED['gentle-ascent'].witness);
+    t.keeper.sync(game.state);
+    expect(t.completed()).toEqual(['gentle-ascent']);
+    expect(t.saves).toHaveLength(1);
+  });
+
+  it('a completion survives later failures, is saved once however often it is met again, and others add to it', () => {
+    const game = startedAs('gentle-ascent');
+    const t = trackProgress(game);
+    replay(game, APPROVED['gentle-ascent'].witness);
+    t.keeper.sync(game.state);
+    // Played again: broken, then abandoned, then met once more (a frame between each).
+    game.retrySheet(60_000);
+    t.keeper.sync(game.state);
+    walkCheapestLine(game);
+    t.keeper.sync(game.state);
+    game.retrySheet(120_000);
+    t.keeper.sync(game.state);
+    stepOnce(game, 120_200);
+    expect(game.startContract(120_400, 'gentle-ascent')).toBe(true);
+    t.keeper.sync(game.state);
+    replay(game, APPROVED['gentle-ascent'].witness);
+    t.keeper.sync(game.state);
+    expect(t.results.map((r) => r.outcome)).toEqual(['victory', 'victory', 'abandoned', 'victory']);
+    expect(t.completed()).toEqual(['gentle-ascent']);
+    expect(t.saves).toHaveLength(1);
+    // Another Contract adds to it.
+    expect(game.startContract(180_000, 'hold-the-high-ground')).toBe(true);
+    replay(game, APPROVED['hold-the-high-ground'].witness);
+    t.keeper.sync(game.state);
+    expect(t.completed()).toEqual(['gentle-ascent', 'hold-the-high-ground']);
+    expect(t.saves.map((p) => p.completed)).toEqual([['gentle-ascent'], ['gentle-ascent', 'hold-the-high-ground']]);
+  });
+
+  it.each([
+    ['R before the next frame', (game: Game, t: ReturnType<typeof trackProgress>) => {
+      game.handleAction('restart', 90_000);
+      t.keeper.sync(game.state);
+    }],
+    ['the page closing before the next frame', (_game: Game, t: ReturnType<typeof trackProgress>) => t.keeper.abandon()],
+  ] as const)('a met summit left by %s still completes the Contract', (_name, leave) => {
+    const game = startedAs('master-surveyor');
+    const t = trackProgress(game);
+    replay(game, APPROVED['master-surveyor'].witness); // no frame between the summit and leaving
+    leave(game, t);
+    expect(t.results.map((r) => [r.outcome, r.contract])).toEqual([['victory', 'master-surveyor']]);
+    expect(t.completed()).toEqual(['master-surveyor']);
   });
 });

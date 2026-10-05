@@ -1,5 +1,6 @@
 // Shared data contracts between map generation, game logic, rendering and audio.
 // All tile coordinates are integers in [0, MAP_W) x [0, MAP_H); index = y * MAP_W + x.
+import type { ContractId } from './contracts';
 
 export interface Point {
   x: number;
@@ -201,6 +202,11 @@ export interface GameState {
   seed: number;
   /** Chosen before the expedition starts and fixed for it; read only by presentation and records. */
   mode: ExpeditionMode;
+  /**
+   * The Survey Contract this expedition was started as (Game.startContract), kept only by Retry; null for
+   * every other start, even on a Contract's seed. The rules never read it.
+   */
+  contract: ContractId | null;
   player: PlayerState;
   stamina: number;
   turns: number;

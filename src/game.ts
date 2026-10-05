@@ -22,6 +22,8 @@ import {
   VISION_MID_MIN,
   WATER_LEVEL,
 } from './config';
+import { SURVEY_CONTRACTS } from './contracts';
+import type { ContractId } from './contracts';
 import { t } from './i18n';
 import { randomSeed } from './rng';
 import { inBounds, localSlopeAt, slopeCost, stepCost, stepSlope, tileIndex, toMeters } from './terrain';
@@ -259,6 +261,7 @@ function createState(map: MapData, phase: Phase, now: number, muted: boolean, mo
     map,
     seed: map.seed,
     mode,
+    contract: null,
     player: {
       x,
       y,
@@ -482,10 +485,26 @@ export class Game {
 
   /**
    * Retry this sheet: a fresh expedition on the current mountain, regenerated from its exact identity
-   * { generator, seed } (same terrain, same rules, graded and recorded like any expedition).
+   * { generator, seed } (same terrain, same rules, graded and recorded like any expedition). A Contract
+   * expedition stays that Contract.
    */
   retrySheet(now: number): void {
+    const contract = this.state.contract;
     this.startSeed(now, this.state.seed, this.state.map.generator);
+    this.state.contract = contract;
+  }
+
+  /**
+   * Begin Survey Contract `id`: a fresh Standard expedition on the Contract's exact { generator, seed },
+   * played by the same rules as any other. Refused in Explorer, leaving everything as it was.
+   * Returns whether it started.
+   */
+  startContract(now: number, id: ContractId): boolean {
+    const contract = SURVEY_CONTRACTS.find((c) => c.id === id);
+    if (!contract || this.mode !== 'standard') return false;
+    this.startSeed(now, contract.seed, contract.generator);
+    this.state.contract = contract.id;
+    return true;
   }
 
   /**
