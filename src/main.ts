@@ -3,10 +3,11 @@
 import { SynthAudio } from './audio';
 import { PALETTE, VIRTUAL_HEIGHT, VIRTUAL_WIDTH } from './config';
 import { completeContract, contractCompletedBy, loadContractProgress, saveContractProgress } from './contract-progress';
+import type { ContractId } from './contracts';
 import { EDITION } from './edition';
 import { drawText, fitText, loadWebFont } from './font';
 import { Game } from './game';
-import { initLanguage, t, toggleLang } from './i18n';
+import { contractText, initLanguage, t, toggleLang } from './i18n';
 import { clientToVirtual, keyToAction, keyToUiKey, parseSeed } from './input';
 import { generateMap } from './map';
 import { loadMode, saveMode } from './mode';
@@ -37,6 +38,8 @@ declare global {
 const LOG_PREFIX = '[carto-rogue]';
 
 type PauseButtonId = 'pauseResume' | 'pauseToTitle' | 'pauseAbandon' | 'pauseCancel';
+/** Survey Contract card rows are buttons named `contract:<id>`. */
+const CONTRACT_BUTTON = 'contract:';
 /** Pause-card buttons and the menu item each one stands for. */
 const PAUSE_BUTTON_ITEMS: Readonly<Record<PauseButtonId, PauseItem>> = {
   pauseResume: 'resume',
@@ -165,6 +168,8 @@ function start(): void {
   });
   // Survey Contract progress belongs to the Steam edition: the itch edition never reads or writes it.
   let contractProgress = EDITION === 'steam' ? loadContractProgress() : null;
+  // The Contract card shows a read-only copy of the completions, never the saved progress itself.
+  if (EDITION === 'steam' && contractProgress !== null) ui.contracts.completed = [...contractProgress.completed];
   const records = new RecordKeeper(game.state, (result, expedition) => {
     // A Survey Contract completed by this expedition is kept (saved only when new), before the
     // archives filter below, which keeps every Contract expedition out.
@@ -175,6 +180,7 @@ function start(): void {
         if (next !== contractProgress) {
           contractProgress = next;
           saveContractProgress(next);
+          ui.contracts.completed = [...next.completed];
         }
       }
     }
@@ -223,8 +229,33 @@ function start(): void {
     void copyText(text).then((ok) => showToast(ok ? t(okKey) : t('toastFailed'), ok ? 'good' : 'bad', performance.now()));
   };
 
+  // ----- Survey Contract card (Steam edition) -----
+  const openContracts = (now: number): void => {
+    if (EDITION !== 'steam' || game.state.phase !== 'title' || ui.archivesOpen) return;
+    ui.hover = null;
+    ui.contracts.open(now);
+  };
+  const beginContract = (id: ContractId, now: number): void => {
+    if (EDITION !== 'steam') return;
+    ui.hover = null;
+    // The game refuses a Contract while Explorer is chosen: the card stays open and says to switch to
+    // Standard on the title card (the saved mode is never changed for the player).
+    if (!ui.contracts.begin(game, now, id)) showToast(contractText('contractsSwitch'), 'bad', now);
+    canvas.focus({ preventScroll: true });
+  };
+
   const runButton = (id: ButtonId, now: number): void => {
+    if (id.startsWith(CONTRACT_BUTTON)) {
+      beginContract(id.slice(CONTRACT_BUTTON.length) as ContractId, now);
+      return;
+    }
     switch (id) {
+      case 'contracts':
+        openContracts(now);
+        return;
+      case 'closeContracts':
+        ui.contracts.close();
+        return;
       case 'lang':
         toggleLang();
         return;
@@ -360,6 +391,20 @@ function start(): void {
       if (!e.repeat) toggleFullscreen();
       return;
     }
+    if (EDITION === 'steam' && ui.contracts.isOpen) {
+      // The Contract card is modal: arrows / W S select, Enter / Space begin, Esc / C close; R closes it
+      // and starts a fresh expedition as usual, M still mutes. Nothing else reaches the title card.
+      const command = e.repeat ? 'handled' : ui.contracts.key(uiKey, action);
+      if (command !== 'pass') {
+        e.preventDefault();
+        if (typeof command === 'object') beginContract(command.start, now);
+        return;
+      }
+    } else if (EDITION === 'steam' && uiKey === 'contracts') {
+      e.preventDefault();
+      if (!e.repeat) openContracts(now);
+      return;
+    }
     if (ui.pause.isOpen) {
       // The pause menu is modal: arrows / WASD select, Enter / Space choose, Esc / P back out;
       // M still mutes and R still restarts at once. Nothing else reaches the game.
@@ -436,6 +481,10 @@ function start(): void {
       ui.hover = buttonAt(s.x, s.y);
       // Hovering a pause-card button highlights it, as the arrow keys would.
       if (ui.hover && ui.hover in PAUSE_BUTTON_ITEMS) ui.pause.focus(PAUSE_BUTTON_ITEMS[ui.hover as PauseButtonId]);
+      // ...and a Contract row, as the arrow keys would.
+      if (EDITION === 'steam' && ui.hover?.startsWith(CONTRACT_BUTTON)) {
+        ui.contracts.focus(ui.hover.slice(CONTRACT_BUTTON.length) as ContractId);
+      }
       canvas.style.cursor = ui.hover ? 'pointer' : game.state.phase === 'playing' && tileAt(s) ? 'crosshair' : 'default';
     }
     pointer.move(s);

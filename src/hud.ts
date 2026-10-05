@@ -34,10 +34,13 @@ import {
   VISION_MID_MIN,
   WATER_LEVEL,
 } from './config';
+import { CONTRACT_ROWS } from './contract-menu';
+import type { ContractId } from './contracts';
+import { EDITION } from './edition';
 import { drawHangulTitle, drawText, fitText, fontEpoch, measureText } from './font';
 import type { TextOptions } from './font';
-import { getLang, langVersion, t } from './i18n';
-import type { MessageKey } from './i18n';
+import { contractText, getLang, langVersion, t } from './i18n';
+import type { ContractTextKey, MessageKey } from './i18n';
 import { gradeRank } from './records';
 import { mulberry32 } from './rng';
 import { SIGHT_EYE_ART } from './sprites';
@@ -1912,8 +1915,19 @@ function keycap(g: Ctx, x: number, y: number, text: string): number {
 const CONTOUR_M = Math.round(CONTOUR_INTERVAL * MAX_ELEV_M);
 
 // Card plus shadow centred on the map area, CARD_INSET inside the neatline: clear of the HUD.
-const TITLE_W = MAP_PX_W - 2 * CARD_INSET - CARD_SHADOW;
+export const TITLE_W = MAP_PX_W - 2 * CARD_INSET - CARD_SHADOW;
 const TITLE_H = 660;
+
+/**
+ * Where the lower part of the title card sits (card-relative y): the begin prompt, the button row and
+ * the footer line. The Steam edition adds a second row for the Survey Contracts, moving the rest up and
+ * the footer down a little; the itch edition keeps its layout exactly.
+ */
+export function titleLayout(steam: boolean): { prompt: number; buttons: number; contracts: number | null; footer: number } {
+  return steam
+    ? { prompt: 526, buttons: 556, contracts: 590, footer: TITLE_H - 34 }
+    : { prompt: 538, buttons: 576, contracts: null, footer: TITLE_H - 42 };
+}
 const TITLE_X = MAP_ORIGIN_X + CARD_INSET;
 const TITLE_Y = MAP_ORIGIN_Y + Math.floor((MAP_PX_H - TITLE_H - CARD_SHADOW) / 2);
 
@@ -2044,9 +2058,10 @@ function drawTitle(ctx: Ctx, state: GameState, now: number): void {
   const y = TITLE_Y + Math.round((1 - e) * 24);
   blitCard(ctx, 'title', TITLE_W, TITLE_H, x, y, paintTitleCard);
   const mid = x + Math.floor(TITLE_W / 2);
+  const layout = titleLayout(EDITION === 'steam');
   const blink = (now - state.phaseStart) % 1100 < 760;
   if (blink) {
-    drawText(ctx, t('pressBegin'), mid, y + 538, {
+    drawText(ctx, t('pressBegin'), mid, y + layout.prompt, {
       scale: 3,
       color: PALETTE.redInk,
       align: 'center',
@@ -2054,13 +2069,15 @@ function drawTitle(ctx: Ctx, state: GameState, now: number): void {
       shadowOffset: 2,
     });
   }
-  drawTitleButtons(ctx, state, mid, y + 576);
-  drawSheetNo(ctx, state, x + TITLE_W - 36, y + TITLE_H - 42);
-  drawText(ctx, t('contourInterval', { m: CONTOUR_M }), x + 36, y + TITLE_H - 42, { color: PALETTE.inkFaded });
+  buttonRow(ctx, titleButtonSpecs(state), mid, y + layout.buttons);
+  if (EDITION === 'steam' && layout.contracts !== null) buttonRow(ctx, [contractsEntrySpec()], mid, y + layout.contracts);
+  const footer = y + layout.footer;
+  drawSheetNo(ctx, state, x + TITLE_W - 36, footer);
+  drawText(ctx, t('contourInterval', { m: CONTOUR_M }), x + 36, footer, { color: PALETTE.inkFaded });
   if (state.mode === 'explorer') {
-    drawText(ctx, t('explorerNote'), mid, y + TITLE_H - 42, { color: PALETTE.redInk, align: 'center' });
+    drawText(ctx, t('explorerNote'), mid, footer, { color: PALETTE.redInk, align: 'center' });
   } else {
-    drawText(ctx, t('archivesHint'), mid, y + TITLE_H - 42, { color: PALETTE.inkFaded, align: 'center' });
+    drawText(ctx, t('archivesHint'), mid, footer, { color: PALETTE.inkFaded, align: 'center' });
   }
   ctx.globalAlpha = prev;
 }
@@ -2636,7 +2653,7 @@ function drawVictory(ctx: Ctx, state: GameState, now: number): void {
 
 // ----- Paper buttons (title and end cards) -----
 
-const BTN_H = 26;
+export const BTN_H = 26;
 const BTN_PAD = 10;
 const BTN_ICON_W = 14;
 
@@ -2724,7 +2741,7 @@ function paperButton(ctx: Ctx, spec: ButtonSpec, x: number, y: number): number {
 
 /** A row of buttons centred on cx. */
 function buttonRow(ctx: Ctx, specs: readonly ButtonSpec[], cx: number, y: number, gap = 14): void {
-  const total = specs.reduce((sum, s) => sum + buttonWidth(s), 0) + gap * (specs.length - 1);
+  const total = buttonRowWidth(specs, gap);
   let x = cx - Math.floor(total / 2);
   for (const spec of specs) x += paperButton(ctx, spec, x, y) + gap;
 }
@@ -2754,14 +2771,25 @@ function modeToggleSpec(state: GameState): ButtonSpec {
   };
 }
 
-function drawTitleButtons(ctx: Ctx, state: GameState, cx: number, y: number): void {
-  buttonRow(ctx, [
+/** The title card's button row, the same in both editions. */
+export function titleButtonSpecs(state: GameState): ButtonSpec[] {
+  return [
     langToggleSpec(),
     modeToggleSpec(state),
     { id: 'copySeed', runs: [[t('copySeed'), PALETTE.ink]], icon: 'pin' },
     { id: 'seedEntry', runs: [[t('enterSeed'), PALETTE.inkSoft]], icon: 'keypad' },
     { id: 'archives', runs: [[t('archives'), PALETTE.ink]], icon: 'seal' },
-  ], cx, y);
+  ];
+}
+
+/** The Steam edition's second title row: the way into the Survey Contract card. */
+export function contractsEntrySpec(): ButtonSpec {
+  return { id: 'contracts', runs: [[contractText('contractsTitle'), PALETTE.ink]] };
+}
+
+/** Width of a buttonRow of `specs` (gap included), for layout checks. */
+export function buttonRowWidth(specs: readonly ButtonSpec[], gap = 14): number {
+  return specs.reduce((sum, s) => sum + buttonWidth(s), 0) + gap * (specs.length - 1);
 }
 
 // ----- Expedition archives (career ledger) -----
@@ -2957,12 +2985,116 @@ function drawPauseCard(ctx: Ctx, now: number): void {
   ctx.globalAlpha = prev;
 }
 
-/** Interface layers above the cards: the archives ledger, the pause menu and toasts. Draw after drawOverlay. */
-export function drawUi(ctx: CanvasRenderingContext2D, _state: GameState, now: number): void {
+// ----- Survey Contract card (Steam edition) -----
+
+export const CONTRACTS_W = 640;
+const CONTRACTS_H = 440;
+const CONTRACT_ROW_TOP = 132;
+const CONTRACT_ROW_H = 60;
+const CONTRACT_ROW_GAP = 12;
+const CONTRACT_ROW_X = 40;
+export const CONTRACT_ROW_W = CONTRACTS_W - 2 * CONTRACT_ROW_X;
+/** Left edge of a row's text (after the selection arrow) and the room kept on the right for the stamp. */
+const CONTRACT_TEXT_X = 34;
+export const CONTRACT_TEXT_W = CONTRACT_ROW_W - CONTRACT_TEXT_X - 110;
+
+/** Each Contract's name and one-line condition on the card. */
+const CONTRACT_LINES: Readonly<Record<ContractId, readonly [ContractTextKey, ContractTextKey]>> = {
+  'gentle-ascent': ['contractGentleName', 'contractGentleGoal'],
+  'hold-the-high-ground': ['contractHoldName', 'contractHoldGoal'],
+  'master-surveyor': ['contractMasterName', 'contractMasterGoal'],
+};
+
+/** A Contract's name and condition line, in the active language. */
+export function contractLines(id: ContractId): [string, string] {
+  const [name, goal] = CONTRACT_LINES[id];
+  return [contractText(name), contractText(goal, { m: toMeters(VISION_HIGH_MIN) })];
+}
+
+function paintContractsCard(g: Ctx): void {
+  const w = CONTRACTS_W;
+  const mid = Math.floor(w / 2);
+  paintPaper(g, w, CONTRACTS_H, 3109);
+  paintNeatline(g, w, CONTRACTS_H, PALETTE.redInk);
+  drawText(g, contractText('contractsSub'), mid, 34, { color: PALETTE.inkFaded, align: 'center' });
+  drawText(g, contractText('contractsTitle'), mid, 56, {
+    scale: 3,
+    color: PALETTE.ink,
+    align: 'center',
+    shadow: PALETTE.parchmentShade,
+    shadowOffset: 2,
+  });
+  rule(g, mid, 98, 220, PALETTE.inkFaded, PALETTE.redInk);
+  drawText(g, contractText('contractsRule'), mid, 110, { color: PALETTE.inkSoft, align: 'center' });
+}
+
+/** One Contract row: the highlighted one gets a red rule and a pointer; a completed one a small stamp. */
+function contractRow(ctx: Ctx, id: ContractId, x: number, y: number, selected: boolean, completed: boolean): void {
+  const w = CONTRACT_ROW_W;
+  const h = CONTRACT_ROW_H;
+  fill(ctx, x + 2, y + 2, w, h, PALETTE.parchmentShade);
+  fill(ctx, x, y, w, h, PALETTE.ink);
+  fill(ctx, x + 1, y + 1, w - 2, h - 2, selected ? PALETTE.parchment : PALETTE.parchmentDark);
+  fill(ctx, x + 1, y + h - 3, w - 2, 2, PALETTE.parchmentShade);
+  if (selected) {
+    outline(ctx, x + 2, y + 2, w - 4, h - 5, PALETTE.redInk, 2);
+    drawText(ctx, '→', x + 12, y + 14, { color: PALETTE.redInk });
+  }
+  const [name, goal] = contractLines(id);
+  drawText(ctx, name, x + CONTRACT_TEXT_X, y + 12, { scale: 2, color: selected ? PALETTE.ink : PALETTE.inkSoft });
+  drawText(ctx, goal, x + CONTRACT_TEXT_X, y + 36, { color: PALETTE.inkSoft });
+  if (completed) {
+    const label = contractText('contractCompleted');
+    const lw = measureText(label, 1) + 12;
+    const sx = x + w - 18 - lw;
+    const sy = y + Math.floor((h - 19) / 2);
+    outline(ctx, sx, sy, lw, 19, PALETTE.redInk);
+    outline(ctx, sx + 2, sy + 2, lw - 4, 15, PALETTE.redInk);
+    drawText(ctx, label, sx + Math.floor(lw / 2), sy + 6, { color: PALETTE.redInk, align: 'center' });
+  }
+  addButton(`contract:${id}`, x, y, w, h);
+}
+
+function drawContracts(ctx: Ctx, state: GameState, now: number): void {
+  // Modal: only the card's own buttons answer while it is open.
+  clearButtons();
+  const menu = ui.contracts;
+  const e = easeOutCubic((now - menu.since) / 300);
+  veil(ctx, e);
+  const prev = ctx.globalAlpha;
+  ctx.globalAlpha = prev * e;
+  const x = MAP_ORIGIN_X + Math.floor((MAP_PX_W - CONTRACTS_W - CARD_SHADOW) / 2);
+  const y = MAP_ORIGIN_Y + Math.floor((MAP_PX_H - CONTRACTS_H - CARD_SHADOW) / 2) + Math.round((1 - e) * 24);
+  blitCard(ctx, 'contracts', CONTRACTS_W, CONTRACTS_H, x, y, paintContractsCard);
+  CONTRACT_ROWS.forEach((id, k) => {
+    const ry = y + CONTRACT_ROW_TOP + k * (CONTRACT_ROW_H + CONTRACT_ROW_GAP);
+    contractRow(ctx, id, x + CONTRACT_ROW_X, ry, menu.selected === id, menu.isCompleted(id));
+  });
+  const mid = x + Math.floor(CONTRACTS_W / 2);
+  if (state.mode === 'explorer') {
+    // Contracts are played by the Standard rules only; the mode is switched on the title card itself.
+    drawText(ctx, contractText('contractsStandardOnly'), mid, y + CONTRACTS_H - 76, { color: PALETTE.redInk, align: 'center' });
+    drawText(ctx, contractText('contractsSwitch'), mid, y + CONTRACTS_H - 62, { color: PALETTE.redInk, align: 'center' });
+  }
+  drawText(ctx, contractText('contractsHint'), mid, y + CONTRACTS_H - 40, { color: PALETTE.inkSoft, align: 'center' });
+  // Close box in the top-right corner, as on the archives ledger.
+  const bx = x + CONTRACTS_W - 50;
+  const by = y + 24;
+  const hover = ui.hover === 'closeContracts';
+  fill(ctx, bx, by, 24, 24, PALETTE.ink);
+  fill(ctx, bx + 1, by + 1, 22, 22, hover ? PALETTE.parchment : PALETTE.parchmentDark);
+  drawText(ctx, 'X', bx + 13, by + 5, { scale: 2, color: hover ? PALETTE.redInk : PALETTE.inkSoft, align: 'center' });
+  addButton('closeContracts', bx, by, 24, 24);
+  ctx.globalAlpha = prev;
+}
+
+/** Interface layers above the cards: the archives ledger, the Contract card, the pause menu and toasts. Draw after drawOverlay. */
+export function drawUi(ctx: CanvasRenderingContext2D, state: GameState, now: number): void {
   const smoothing = ctx.imageSmoothingEnabled;
   ctx.imageSmoothingEnabled = false;
   refreshTextCaches();
   if (ui.archivesOpen) drawArchives(ctx, now);
+  if (EDITION === 'steam' && ui.contracts.isOpen) drawContracts(ctx, state, now);
   if (ui.pause.isOpen) drawPauseCard(ctx, now);
   drawToast(ctx, now);
   ctx.imageSmoothingEnabled = smoothing;

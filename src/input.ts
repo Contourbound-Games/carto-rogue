@@ -3,10 +3,11 @@
 // including the Korean 2-set layout where e.key yields Hangul jamo and IMEs report 'Process'.
 import type { Action, Dir } from './types';
 
-/** Interface keys handled outside the game rules. */
-export type UiKey = 'archives' | 'fullscreen' | 'close' | 'pause' | 'card';
+/** Interface keys handled outside the game rules ('contracts' opens the Survey Contract card in the Steam edition only). */
+export type UiKey = 'archives' | 'fullscreen' | 'close' | 'pause' | 'card' | 'contracts';
 
 const UI_BY_CODE: ReadonlyMap<string, UiKey> = new Map<string, UiKey>([
+  ['KeyC', 'contracts'],
   ['KeyL', 'archives'],
   ['KeyF', 'fullscreen'],
   ['KeyP', 'pause'],
@@ -15,6 +16,8 @@ const UI_BY_CODE: ReadonlyMap<string, UiKey> = new Map<string, UiKey>([
 ]);
 
 const UI_BY_KEY: ReadonlyMap<string, UiKey> = new Map<string, UiKey>([
+  ['c', 'contracts'],
+  ['ㅊ', 'contracts'],
   ['l', 'archives'],
   ['ㅣ', 'archives'],
   ['f', 'fullscreen'],

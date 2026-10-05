@@ -456,3 +456,53 @@ export function t(key: MessageKey, params?: Readonly<Record<string, string | num
 export function messageTables(): Readonly<Record<Lang, Readonly<Record<MessageKey, string>>>> {
   return TABLES;
 }
+
+// Survey Contract card (Steam edition). Kept apart from the tables above and read only by Steam-edition
+// code, so the itch build leaves these strings out entirely.
+const CONTRACT_EN = {
+  contractsTitle: 'SURVEY CONTRACTS',
+  contractsSub: 'THREE SET SHEETS · THE SAME MOUNTAIN EVERY TIME',
+  contractsRule: 'EVERY CONTRACT: REACH THE TRIG PILLAR. A COLLAPSE FAILS IT.',
+  contractGentleName: 'GENTLE ASCENT',
+  contractGentleGoal: 'NO STEEP UPHILL STEP ALL THE WAY UP',
+  contractHoldName: 'HOLD THE HIGH GROUND',
+  contractHoldGoal: 'ONCE ABOVE THE {m} M SIGHT LINE, NEVER STEP BELOW IT',
+  contractMasterName: 'MASTER SURVEYOR',
+  contractMasterGoal: 'BOTH: NO STEEP UPHILL STEP, AND HOLD THE {m} M LINE',
+  contractCompleted: 'COMPLETED',
+  contractsHint: '↑↓ SELECT · ENTER BEGIN · C / ESC CLOSE',
+  contractsStandardOnly: 'SURVEY CONTRACTS USE STANDARD RULES.',
+  contractsSwitch: 'SWITCH TO STANDARD TO BEGIN.',
+};
+
+export type ContractTextKey = keyof typeof CONTRACT_EN;
+
+const CONTRACT_KO: Record<ContractTextKey, string> = {
+  contractsTitle: '측량 계약',
+  contractsSub: '정해진 도엽 세 장 · 언제나 같은 산',
+  contractsRule: '모든 계약: 삼각점 정상 도달. 탈진하면 실패.',
+  contractGentleName: '완만한 등정',
+  contractGentleGoal: '정상까지 가파른 오르막 걸음 없이',
+  contractHoldName: '고지 사수',
+  contractHoldGoal: '{m} M 시야 경계선 위에 오른 뒤 다시 내려가지 않기',
+  contractMasterName: '측량 명인',
+  contractMasterGoal: '두 조건 모두: 가파른 오르막 없이, {m} M 선 지키기',
+  contractCompleted: '완료',
+  contractsHint: '↑↓ 선택 · ENTER 시작 · C / ESC 닫기',
+  contractsStandardOnly: '측량 계약은 표준 규칙으로만 진행합니다.',
+  contractsSwitch: '시작하려면 표준으로 바꾸세요.',
+};
+
+const CONTRACT_TABLES: Record<Lang, Record<ContractTextKey, string>> = { en: CONTRACT_EN, ko: CONTRACT_KO };
+
+/** t() for the Survey Contract card: call it only from Steam-edition code. */
+export function contractText(key: ContractTextKey, params?: Readonly<Record<string, string | number>>, lang: Lang = current): string {
+  const template = CONTRACT_TABLES[lang][key];
+  if (!params) return template;
+  return template.replace(/\{(\w+)\}/g, (whole, name: string) => (name in params ? String(params[name]) : whole));
+}
+
+/** The Survey Contract tables, for tests. */
+export function contractTextTables(): Readonly<Record<Lang, Readonly<Record<ContractTextKey, string>>>> {
+  return CONTRACT_TABLES;
+}

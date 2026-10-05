@@ -120,6 +120,7 @@ function resetUi(): void {
   ui.archivesOpen = false;
   ui.taps = [];
   if (ui.pause.isOpen) ui.pause.close();
+  ui.contracts.close();
 }
 
 describe('touch aim', () => {
@@ -365,6 +366,26 @@ describe('pointer input', () => {
       h.tapTiles(0, -3);
       expect(ui.archivesOpen).toBe(false); // a tap beside the ledger closes it...
       expect(h.turns).toBe(0); // ...and does not step
+    });
+
+    it('the Survey Contract card on the title: nothing behind it begins; a tap beside it closes it, a row runs', () => {
+      h.game.returnToTitle(h.now());
+      const c = h.centre();
+      ui.contracts.open(h.now());
+      // A swipe under the open card neither begins the expedition nor closes the card.
+      h.input.down(h.sample(c.x, c.y));
+      h.input.move(h.sample(c.x, c.y - 100));
+      h.input.up(h.sample(c.x, c.y - 100));
+      expect([h.game.state.phase, ui.contracts.isOpen]).toEqual(['title', true]);
+      // A tap beside the card closes it and does not begin either.
+      h.tapTiles(0, -3);
+      expect([h.game.state.phase, ui.contracts.isOpen, h.turns]).toEqual(['title', false, 0]);
+      // A tap on a Contract row runs that row (main.ts begins it through Game.startContract).
+      ui.contracts.open(h.now());
+      addButton('contract:hold-the-high-ground', c.x - 100, c.y - 20, 200, 40);
+      h.tap(c.x, c.y);
+      expect(h.buttons).toEqual(['contract:hold-the-high-ground']);
+      expect(h.game.state.phase).toBe('title');
     });
   });
 

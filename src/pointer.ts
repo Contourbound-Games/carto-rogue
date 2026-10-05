@@ -112,7 +112,7 @@ export class PointerInput {
   }
 
   private swipeStep(dir: Dir, now: number): void {
-    if (ui.archivesOpen || ui.pause.isOpen) return;
+    if (ui.archivesOpen || ui.contracts.isOpen || ui.pause.isOpen) return;
     const phase = this.game.state.phase;
     if (phase === 'playing' || phase === 'title') this.game.handleAction(dir, now);
   }
@@ -161,7 +161,7 @@ export class PointerInput {
     this.cancel();
     const v = { x: e.x, y: e.y };
     const button = buttonAt(v.x, v.y);
-    const live = !button && !ui.archivesOpen && !ui.pause.isOpen && this.game.state.phase === 'playing';
+    const live = !button && !ui.archivesOpen && !ui.contracts.isOpen && !ui.pause.isOpen && this.game.state.phase === 'playing';
     const current: Press = {
       id: e.id,
       clientX: e.clientX,
@@ -224,6 +224,11 @@ export class PointerInput {
     if ((p.tile || p.aim) && (game.state !== p.state || game.state.phase !== 'playing')) return;
     if (ui.archivesOpen) {
       closeArchives();
+      return;
+    }
+    // Likewise a tap beside the Survey Contract card only closes it.
+    if (ui.contracts.isOpen) {
+      ui.contracts.close();
       return;
     }
     // Taps beside the pause card do nothing (the card's own buttons were handled above).

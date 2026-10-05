@@ -9,6 +9,7 @@ import { build, resolveConfig } from 'vite';
 import { describe, expect, it } from 'vitest';
 import { CONTRACT_PROGRESS_STORAGE_KEY } from '../src/contract-progress';
 import { EDITION } from '../src/edition';
+import { contractTextTables } from '../src/i18n';
 import { RECORDS_STORAGE_KEY } from '../src/records';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -35,7 +36,7 @@ describe('editions', () => {
     expect(EDITION).toBe('itch');
   });
 
-  it('wires Survey Contract progress into the Steam bundle only', async () => {
+  it('wires Survey Contract progress and the Contract card into the Steam bundle only', async () => {
     const [itch, steam] = await Promise.all([bundle('production'), bundle('steam')]);
     for (const code of [itch, steam]) {
       expect(code).not.toContain('__EDITION__');
@@ -44,14 +45,20 @@ describe('editions', () => {
     }
     expect(itch).not.toContain(CONTRACT_PROGRESS_STORAGE_KEY);
     expect(steam).toContain(CONTRACT_PROGRESS_STORAGE_KEY);
+    // The card's words exist only in the Steam bundle (the Contract ids themselves are in both, as data).
+    const { en, ko } = contractTextTables();
+    for (const text of [en.contractsTitle, en.contractHoldName, en.contractsSwitch, ko.contractsTitle, ko.contractMasterName]) {
+      expect(itch, text).not.toContain(text);
+      expect(steam, text).toContain(text);
+    }
   }, 60_000);
 
-  it('is read by the application wiring only, never by the game, its rules, the Contracts or the records', () => {
+  it('is read by the application wiring and the title / card drawing only, never by the game, its rules, the Contracts or the records', () => {
     const readers = fs
       .readdirSync(path.join(root, 'src'))
       .filter((f) => f.endsWith('.ts') && f !== 'edition.ts')
-      .filter((f) => /from '\.\/edition'/.test(read(`src/${f}`)));
-    expect(readers).toEqual(['main.ts']);
+      .filter((f) => /['"]\.\/edition(\.[jt]s)?['"]/.test(read(`src/${f}`)));
+    expect(readers).toEqual(['hud.ts', 'main.ts']);
   });
 
   it('leaves the build commands and the desktop packaging on the default (itch) build in dist/', () => {

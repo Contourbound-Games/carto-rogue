@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { hasBitmapGlyphs } from '../src/font';
-import { getLang, langVersion, messageTables, onLangChange, setLang, t, toggleLang } from '../src/i18n';
+import { contractText, contractTextTables, getLang, langVersion, messageTables, onLangChange, setLang, t, toggleLang } from '../src/i18n';
 import type { MessageKey } from '../src/i18n';
 
 const placeholders = (s: string): string[] => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
@@ -25,10 +25,21 @@ describe('i18n', () => {
 
   it('draws every string from bitmap glyphs (5x7 Latin or extracted Galmuri9), never the web-font fallback', () => {
     for (const lang of ['en', 'ko'] as const) {
-      for (const [key, text] of Object.entries(messageTables()[lang])) {
+      for (const [key, text] of [...Object.entries(messageTables()[lang]), ...Object.entries(contractTextTables()[lang])]) {
         expect(hasBitmapGlyphs(text.replace(/\{\w+\}/g, '')), `${lang}.${key}: run npm run gen:glyphs`).toBe(true);
       }
     }
+  });
+
+  it('has the Survey Contract card in both languages, with the same placeholders', () => {
+    const { en, ko } = contractTextTables();
+    expect(Object.keys(ko).sort()).toEqual(Object.keys(en).sort());
+    for (const key of Object.keys(en) as (keyof typeof en)[]) {
+      expect(ko[key].length, key).toBeGreaterThan(0);
+      expect(placeholders(ko[key]), key).toEqual(placeholders(en[key]));
+    }
+    expect(contractText('contractHoldGoal', { m: 840 })).toBe('ONCE ABOVE THE 840 M SIGHT LINE, NEVER STEP BELOW IT');
+    expect(contractText('contractsTitle', undefined, 'ko')).toBe('측량 계약');
   });
 
   it('translates the HUD labels named in the brief', () => {

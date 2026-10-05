@@ -1,6 +1,8 @@
 // Interface state that lives outside the game rules: clickable canvas buttons, the archives
 // ledger, toasts, tap ripples and window modes. main.ts writes it from input events; hud.ts and
 // renderer.ts read it while drawing (and hud.ts registers the button rectangles each frame).
+import { ContractMenu } from './contract-menu';
+import type { ContractId } from './contracts';
 import { PauseMenu } from './pause';
 import { emptyRecords } from './records';
 import type { CareerRecords } from './records';
@@ -24,7 +26,10 @@ export type ButtonId =
   | 'retrySheet'
   | 'newExpedition'
   | 'toggleCard'
-  | 'reportCard';
+  | 'reportCard'
+  | 'contracts'
+  | 'closeContracts'
+  | `contract:${ContractId}`;
 
 /** The two ways on from an end card: this sheet again, or a fresh one. */
 export type EndChoice = 'retry' | 'new';
@@ -64,6 +69,8 @@ export interface UiState {
   records: CareerRecords;
   /** The in-expedition pause menu (open while the game is paused). */
   pause: PauseMenu;
+  /** The Survey Contract card on the title (Steam edition only; never opened in the itch edition). */
+  contracts: ContractMenu;
   report: ReportUi;
 }
 
@@ -81,6 +88,7 @@ export const ui: UiState = {
   fullscreenAvailable: false,
   records: emptyRecords(),
   pause: new PauseMenu(),
+  contracts: new ContractMenu(),
   report: { of: null, choice: 'new', cardHidden: false },
 };
 
