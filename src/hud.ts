@@ -714,18 +714,47 @@ function drawCartouche(ctx: Ctx): void {
   rivet(ctx, x + w - 4, y + h - 4);
 }
 
+/**
+ * The small label pinned over the cartouche's lower band, centred: the Explorer tag, or in the Steam
+ * edition a Survey Contract's name (a run is never both: Contracts are Standard only).
+ */
+export function runTagBox(text: string): Box {
+  const b = SECTIONS.cart;
+  const w = measureText(text, 1) + 12;
+  return { x: b.x + Math.floor((b.w - w) / 2), y: b.y + b.h - 8, w, h: 13 };
+}
+
+/** The widest run tag that stays clear of the cartouche's corner rivets. */
+export const RUN_TAG_MAX_W = SECTIONS.cart.w - 8;
+
 /** Explorer only: a small red-ink label pinned over the cartouche's lower band. */
 function drawModeTag(ctx: Ctx, state: GameState): void {
   if (state.mode !== 'explorer') return;
-  const b = SECTIONS.cart;
   const text = t('modeExplorer');
-  const w = measureText(text, 1) + 12;
-  const h = 13;
-  const x = b.x + Math.floor((b.w - w) / 2);
-  const y = b.y + b.h - 8;
+  const { x, y, w, h } = runTagBox(text);
   fill(ctx, x, y, w, h, PALETTE.redInk);
   fill(ctx, x + 1, y + 1, w - 2, h - 2, PALETTE.parchment);
   drawText(ctx, text, x + Math.floor(w / 2), y + 3, { color: PALETTE.redInk, align: 'center' });
+}
+
+/**
+ * The Survey Contract tag's text: the Contract's name and nothing else. It takes only the Contract's
+ * identity, so it can never show how the expedition is doing against its conditions.
+ */
+export function contractTagText(id: ContractId): string {
+  return contractText(CONTRACT_LINES[id][0]);
+}
+
+/**
+ * Steam edition, during a Survey Contract: the Contract's name in the Explorer tag's place, drawn in
+ * plain ink with a faded rule so it reads as a label rather than as a third mode.
+ */
+function drawContractTag(ctx: Ctx, id: ContractId): void {
+  const text = contractTagText(id);
+  const { x, y, w, h } = runTagBox(text);
+  fill(ctx, x, y, w, h, PALETTE.parchment);
+  outline(ctx, x, y, w, h, PALETTE.inkFaded);
+  drawText(ctx, text, x + Math.floor(w / 2), y + 3, { color: PALETTE.inkSoft, align: 'center' });
 }
 
 function drawAltimeterStatic(ctx: Ctx): void {
@@ -1556,6 +1585,7 @@ export function drawHud(ctx: CanvasRenderingContext2D, state: GameState, now: nu
   drawStats(ctx, state, now);
   drawLog(ctx, state, now);
   drawModeTag(ctx, state);
+  if (EDITION === 'steam' && state.contract !== null) drawContractTag(ctx, state.contract);
   drawSpeaker(ctx, state.muted, now);
   drawLangButton(ctx);
   drawFullscreenButton(ctx);
