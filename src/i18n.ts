@@ -473,6 +473,16 @@ const CONTRACT_EN = {
   contractsHint: '↑↓ SELECT · ENTER BEGIN · C / ESC CLOSE',
   contractsStandardOnly: 'SURVEY CONTRACTS USE STANDARD RULES.',
   contractsSwitch: 'SWITCH TO STANDARD TO BEGIN.',
+  // The Contract band of the expedition report: this expedition's result, condition by condition.
+  reportContract: 'SURVEY CONTRACT',
+  reportCompleted: 'CONTRACT COMPLETED',
+  reportNotCompleted: 'NOT COMPLETED',
+  conditionSummit: 'REACH THE TRIG PILLAR',
+  conditionNoSteep: 'NO STEEP UPHILL STEP',
+  conditionHoldLine: 'HOLD THE {m} M LINE',
+  reportMet: 'MET',
+  reportBroken: 'BROKEN',
+  reportNotReached: 'NOT REACHED',
 };
 
 export type ContractTextKey = keyof typeof CONTRACT_EN;
@@ -491,6 +501,15 @@ const CONTRACT_KO: Record<ContractTextKey, string> = {
   contractsHint: '↑↓ 선택 · ENTER 시작 · C / ESC 닫기',
   contractsStandardOnly: '측량 계약은 표준 규칙으로만 진행합니다.',
   contractsSwitch: '시작하려면 표준으로 바꾸세요.',
+  reportContract: '측량 계약',
+  reportCompleted: '계약 완료',
+  reportNotCompleted: '계약 미완료',
+  conditionSummit: '삼각점 정상 도달',
+  conditionNoSteep: '가파른 오르막 걸음 없이',
+  conditionHoldLine: '{m} M 선 지키기',
+  reportMet: '달성',
+  reportBroken: '위반',
+  reportNotReached: '미도달',
 };
 
 const CONTRACT_TABLES: Record<Lang, Record<ContractTextKey, string>> = { en: CONTRACT_EN, ko: CONTRACT_KO };

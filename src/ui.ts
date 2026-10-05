@@ -1,6 +1,7 @@
 // Interface state that lives outside the game rules: clickable canvas buttons, the archives
 // ledger, toasts, tap ripples and window modes. main.ts writes it from input events; hud.ts and
 // renderer.ts read it while drawing (and hud.ts registers the button rectangles each frame).
+import { judgeContract } from './contract-conditions';
 import { ContractMenu } from './contract-menu';
 import type { ContractId } from './contracts';
 import { PauseMenu } from './pause';
@@ -94,13 +95,14 @@ export const ui: UiState = {
 
 /**
  * The report state for this finished expedition, fresh for each one: after a collapse the
- * selection starts on retrying the sheet (the learning loop), after a summit on a new expedition.
+ * selection starts on retrying the sheet (the learning loop), after a summit on a new expedition,
+ * unless the summit left its Survey Contract not completed (judged from the expedition itself).
  */
 export function reportFor(state: GameState): ReportUi {
   const r = ui.report;
   if (r.of !== state) {
     r.of = state;
-    r.choice = state.phase === 'gameover' ? 'retry' : 'new';
+    r.choice = state.phase === 'gameover' || judgeContract(state)?.status === 'broken' ? 'retry' : 'new';
     r.cardHidden = false;
   }
   return r;

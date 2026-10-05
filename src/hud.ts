@@ -34,6 +34,8 @@ import {
   VISION_MID_MIN,
   WATER_LEVEL,
 } from './config';
+import { judgeContract } from './contract-conditions';
+import type { ContractCondition, ContractEvaluation } from './contract-conditions';
 import { CONTRACT_ROWS } from './contract-menu';
 import type { ContractId } from './contracts';
 import { EDITION } from './edition';
@@ -2239,11 +2241,22 @@ const VICTORY_H = 440;
  * ends 2 px clear of it.
  */
 const REPORT_FOOT_Y = 34;
+/**
+ * Height of the foot of either report card (summary line, map key, both button rows, prompt, footer),
+ * measured up from the card's bottom edge. Everything above it (headline, stats or breakdown, grade)
+ * ends by DEFEAT_H - REPORT_FOOT_H on a plain card.
+ */
+const REPORT_FOOT_H = 164;
 
-function paintDefeatCard(g: Ctx): void {
-  paintPaper(g, DEFEAT_W, DEFEAT_H, 404);
-  paintNeatline(g, DEFEAT_W, DEFEAT_H, PALETTE.inkFaded);
-  drawText(g, t('causeExhaustion'), 36, DEFEAT_H - REPORT_FOOT_Y, { color: PALETTE.inkFaded });
+/** A plain card's paper is cached as `kind`; one stretched for a Contract band by its height too. */
+function cardKey(kind: 'victory' | 'defeat', h: number, plainH: number): string {
+  return h === plainH ? kind : `${kind}-${h}`;
+}
+
+function paintDefeatCard(g: Ctx, h: number): void {
+  paintPaper(g, DEFEAT_W, h, 404);
+  paintNeatline(g, DEFEAT_W, h, PALETTE.inkFaded);
+  drawText(g, t('causeExhaustion'), 36, h - REPORT_FOOT_Y, { color: PALETTE.inkFaded });
   const mid = Math.floor(DEFEAT_W / 2);
   drawText(g, t('finalEntry'), mid, 34, { color: PALETTE.inkFaded, align: 'center' });
   drawText(g, t('collapsed'), mid, 52, {
@@ -2350,17 +2363,18 @@ function dripBulb(ctx: Ctx, x: number, y: number, big: boolean): void {
   }
 }
 
-/** The ink bleeds out: blots spread over ~1.6 s after the card appears. */
-function drawBleed(ctx: Ctx, x: number, y: number, t: number): void {
+/** The ink bleeds out: blots spread over ~1.6 s after the card appears. The lower blots keep to the
+ * bottom corners of a card `h` tall. */
+function drawBleed(ctx: Ctx, x: number, y: number, h: number, t: number): void {
   BLOTS.forEach(([bx, by, r, delay], k) => {
     const grow = easeOutCubic(clamp01((t - delay * 0.5) / 0.5));
-    inkBlot(ctx, x + bx, y + by, r, grow, 900 + k);
+    inkBlot(ctx, x + bx, y + by + (by > DEFEAT_H / 2 ? h - DEFEAT_H : 0), r, grow, 900 + k);
   });
 }
 
-function paintVictoryCard(g: Ctx): void {
-  paintPaper(g, VICTORY_W, VICTORY_H, 1200);
-  paintNeatline(g, VICTORY_W, VICTORY_H, PALETTE.redInk);
+function paintVictoryCard(g: Ctx, h: number): void {
+  paintPaper(g, VICTORY_W, h, 1200);
+  paintNeatline(g, VICTORY_W, h, PALETTE.redInk);
   const mid = Math.floor(VICTORY_W / 2);
   drawText(g, t('expeditionComplete'), mid, 34, { color: PALETTE.inkFaded, align: 'center' });
   drawText(g, t('summitReached'), mid, 48, {
@@ -2375,7 +2389,7 @@ function paintVictoryCard(g: Ctx): void {
   symTrig(g, mid + Math.floor(tw / 2) + 22, 53);
   drawText(g, t('ancientTrig'), mid, 88, { scale: 2, color: PALETTE.redInk, align: 'center' });
   rule(g, mid, 112, 240, PALETTE.inkFaded, PALETTE.redInk);
-  drawText(g, t('pillarOccupied'), 36, VICTORY_H - REPORT_FOOT_Y, { color: PALETTE.inkFaded });
+  drawText(g, t('pillarOccupied'), 36, h - REPORT_FOOT_Y, { color: PALETTE.inkFaded });
 }
 
 /** Clear sheet wanted between the summit and the victory card (the radiance disc is ~42 px). */
@@ -2583,19 +2597,22 @@ function drawBreakdown(ctx: Ctx, b: GradeBreakdown, s: ExpeditionStats, x: numbe
 function drawGameOver(ctx: Ctx, state: GameState, now: number): void {
   const e = endCardAnim(state, now);
   const s = statsFor(state, now);
-  const { x, y, restY } = reportPlacement(state, now, DEFEAT_W, DEFEAT_H);
+  // A Survey Contract expedition (Steam edition) adds its result band; any other keeps the plain card.
+  const contract = EDITION === 'steam' ? contractReport(state) : null;
+  const h = reportCardHeight(DEFEAT_H, contract);
+  const { x, y, restY } = reportPlacement(state, now, DEFEAT_W, h);
   if (reportFor(state).cardHidden) {
-    drawReportTab(ctx, x, restY, DEFEAT_W, DEFEAT_H);
+    drawReportTab(ctx, x, restY, DEFEAT_W, h);
     return;
   }
   const prev = ctx.globalAlpha;
   ctx.globalAlpha = prev * e;
   // The paper swallows taps (only its buttons act); tapping the sheet beside it hides it.
-  addButton('reportCard', x, y, DEFEAT_W, DEFEAT_H);
-  blitCard(ctx, 'defeat', DEFEAT_W, DEFEAT_H, x, y, paintDefeatCard);
+  addButton('reportCard', x, y, DEFEAT_W, h);
+  blitCard(ctx, cardKey('defeat', h, DEFEAT_H), DEFEAT_W, h, x, y, (g) => paintDefeatCard(g, h));
   const subtitle = defeatSubtitle(state.map);
   drawText(ctx, subtitle, x + Math.floor(DEFEAT_W / 2), y + DEFEAT_SUBTITLE_Y, { scale: 2, color: PALETTE.redInk, align: 'center' });
-  drawBleed(ctx, x, y, clamp01((now - state.phaseStart) / 1600));
+  drawBleed(ctx, x, y, h, clamp01((now - state.phaseStart) / 1600));
   // Where the stamina went: steep steps are what usually empties the pack. Cost-1 steps are split
   // into flat ground and descents, which cost the same now but give up height to be climbed again.
   const steps = tallySteps(state.map, state.trail, state.stepCosts);
@@ -2617,22 +2634,25 @@ function drawGameOver(ctx: Ctx, state: GameState, now: number): void {
   const sy = y + 190;
   drawStamp(ctx, s.grade, 'ink', sx, sy, 50);
   drawText(ctx, t('grade'), sx + 1, sy + 62, { scale: 2, color: PALETTE.inkSoft, align: 'center' });
-  drawReportFoot(ctx, state, s, x, y, DEFEAT_W, DEFEAT_H);
+  if (contract) drawContractBand(ctx, contract, x, y + DEFEAT_H - REPORT_FOOT_H, DEFEAT_W);
+  drawReportFoot(ctx, state, s, x, y, DEFEAT_W, h);
   ctx.globalAlpha = prev;
 }
 
 function drawVictory(ctx: Ctx, state: GameState, now: number): void {
   const e = endCardAnim(state, now);
   const s = statsFor(state, now);
-  const { x, y, restY } = reportPlacement(state, now, VICTORY_W, VICTORY_H);
+  const contract = EDITION === 'steam' ? contractReport(state) : null;
+  const h = reportCardHeight(VICTORY_H, contract);
+  const { x, y, restY } = reportPlacement(state, now, VICTORY_W, h);
   if (reportFor(state).cardHidden) {
-    drawReportTab(ctx, x, restY, VICTORY_W, VICTORY_H);
+    drawReportTab(ctx, x, restY, VICTORY_W, h);
     return;
   }
   const prev = ctx.globalAlpha;
   ctx.globalAlpha = prev * e;
-  addButton('reportCard', x, y, VICTORY_W, VICTORY_H);
-  blitCard(ctx, 'victory', VICTORY_W, VICTORY_H, x, y, paintVictoryCard);
+  addButton('reportCard', x, y, VICTORY_W, h);
+  blitCard(ctx, cardKey('victory', h, VICTORY_H), VICTORY_W, h, x, y, (g) => paintVictoryCard(g, h));
   if (s.breakdown) drawBreakdown(ctx, s.breakdown, s, x + 36, y + 124);
   // The wax seal drops in shortly after the card settles.
   const since = now - state.phaseStart;
@@ -2647,8 +2667,108 @@ function drawVictory(ctx: Ctx, state: GameState, now: number): void {
     drawText(ctx, t('grade'), sx + 1, sealY + 72, { scale: 2, color: PALETTE.inkSoft, align: 'center' });
     ctx.globalAlpha = a;
   }
-  drawReportFoot(ctx, state, s, x, y, VICTORY_W, VICTORY_H);
+  if (contract) drawContractBand(ctx, contract, x, y + VICTORY_H - REPORT_FOOT_H, VICTORY_W);
+  drawReportFoot(ctx, state, s, x, y, VICTORY_W, h);
   ctx.globalAlpha = prev;
+}
+
+// ----- Survey Contract band (Steam edition): this expedition's Contract result -----
+
+/**
+ * Room the Contract band takes, between a report card's body and its foot (the card grows by this).
+ * Offsets inside it: a rule, the section label and the Contract's name with the result stamp beside
+ * it, then one row per condition.
+ */
+export const CONTRACT_BAND_H = 92;
+export const CONTRACT_BAND = { rule: 6, label: 12, name: 24, stampH: 28, rows: 46, rowPitch: 14, margin: 40 } as const;
+
+/** One condition of the Contract and how this expedition left it. */
+export interface ContractReportRow {
+  label: string;
+  status: 'met' | 'broken' | 'notReached';
+}
+
+/** The Contract band's content: which Contract, whether this expedition completed it, and why. */
+export interface ContractReportView {
+  name: string;
+  completed: boolean;
+  rows: ContractReportRow[];
+}
+
+/**
+ * A condition's short label on the report. Every approved maxSteepSteps condition allows none
+ * (max 0), which is what its label says; the sight line is the drawn 840 m one.
+ */
+export function conditionLabel(condition: ContractCondition): string {
+  return condition.kind === 'maxSteepSteps'
+    ? contractText('conditionNoSteep')
+    : contractText('conditionHoldLine', { m: toMeters(VISION_HIGH_MIN) });
+}
+
+/**
+ * The band for Contract `id` judged as `evaluation`: the summit first, then each condition met or
+ * broken. A condition still open (unbroken when the surveyor collapsed) is left out: it was never
+ * decided. No turn or count is shown.
+ */
+export function contractReportView(id: ContractId, evaluation: ContractEvaluation): ContractReportView {
+  const rows: ContractReportRow[] = [
+    { label: contractText('conditionSummit'), status: evaluation.summit ? 'met' : 'notReached' },
+  ];
+  for (const r of evaluation.conditions) {
+    if (r.status !== 'open') rows.push({ label: conditionLabel(r.condition), status: r.status });
+  }
+  return { name: contractLines(id)[0], completed: evaluation.status === 'met', rows };
+}
+
+/** The finished expedition's Contract band, judged afresh from the expedition itself; null for any other. */
+export function contractReport(state: GameState): ContractReportView | null {
+  const evaluation = judgeContract(state);
+  return evaluation && state.contract !== null ? contractReportView(state.contract, evaluation) : null;
+}
+
+/** A report card's height: `plainH`, or taller by the Contract band when there is one. */
+export function reportCardHeight(plainH: number, contract: ContractReportView | null): number {
+  return contract ? plainH + CONTRACT_BAND_H : plainH;
+}
+
+const CONTRACT_STATUS_TEXT: Readonly<Record<ContractReportRow['status'], ContractTextKey>> = {
+  met: 'reportMet',
+  broken: 'reportBroken',
+  notReached: 'reportNotReached',
+};
+
+/** The result stamp's text and width (double rule, scale-2 text). */
+export function contractStamp(completed: boolean): { text: string; w: number } {
+  const text = contractText(completed ? 'reportCompleted' : 'reportNotCompleted');
+  return { text, w: measureText(text, 2) + 20 };
+}
+
+/** The Contract band of a report card `w` wide, its top at `top` (where the plain card's foot began). */
+function drawContractBand(ctx: Ctx, view: ContractReportView, x: number, top: number, w: number): void {
+  const B = CONTRACT_BAND;
+  const left = x + B.margin;
+  const right = x + w - B.margin;
+  rule(ctx, x + Math.floor(w / 2), top + B.rule, Math.floor(w / 2) - B.margin, PALETTE.inkFaded, PALETTE.redInk);
+  drawText(ctx, contractText('reportContract'), left, top + B.label, { color: PALETTE.inkFaded });
+  drawText(ctx, view.name, left, top + B.name, { scale: 2, color: PALETTE.ink });
+  // The result as a stamp: red when the Contract was completed, plain ink when it was not.
+  const stamp = contractStamp(view.completed);
+  const color = view.completed ? PALETTE.redInk : PALETTE.inkSoft;
+  const sx = right - stamp.w;
+  const sy = top + B.label;
+  outline(ctx, sx, sy, stamp.w, B.stampH, color);
+  outline(ctx, sx + 2, sy + 2, stamp.w - 4, B.stampH - 4, color);
+  drawText(ctx, stamp.text, sx + Math.floor(stamp.w / 2), sy + 7, { scale: 2, color, align: 'center' });
+  view.rows.forEach((row, k) => {
+    const ry = top + B.rows + k * B.rowPitch;
+    const value = contractText(CONTRACT_STATUS_TEXT[row.status]);
+    const valueColor = row.status === 'met' ? PALETTE.ink : PALETTE.redInk;
+    drawText(ctx, row.label, left + 12, ry, { color: PALETTE.inkSoft });
+    drawText(ctx, value, right, ry, { color: valueColor, align: 'right' });
+    for (let xx = left + 12 + measureText(row.label) + 6; xx < right - measureText(value) - 6; xx += 4) {
+      px(ctx, xx, ry + 6, PALETTE.inkPale);
+    }
+  });
 }
 
 // ----- Paper buttons (title and end cards) -----

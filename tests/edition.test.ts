@@ -36,7 +36,7 @@ describe('editions', () => {
     expect(EDITION).toBe('itch');
   });
 
-  it('wires Survey Contract progress and the Contract card into the Steam bundle only', async () => {
+  it('wires Survey Contract progress, the Contract card and the report band into the Steam bundle only', async () => {
     const [itch, steam] = await Promise.all([bundle('production'), bundle('steam')]);
     for (const code of [itch, steam]) {
       expect(code).not.toContain('__EDITION__');
@@ -45,9 +45,12 @@ describe('editions', () => {
     }
     expect(itch).not.toContain(CONTRACT_PROGRESS_STORAGE_KEY);
     expect(steam).toContain(CONTRACT_PROGRESS_STORAGE_KEY);
-    // The card's words exist only in the Steam bundle (the Contract ids themselves are in both, as data).
+    // The card's and the report band's words exist only in the Steam bundle (the Contract ids themselves
+    // are in both, as data).
     const { en, ko } = contractTextTables();
-    for (const text of [en.contractsTitle, en.contractHoldName, en.contractsSwitch, ko.contractsTitle, ko.contractMasterName]) {
+    const card = [en.contractsTitle, en.contractHoldName, en.contractsSwitch, ko.contractsTitle, ko.contractMasterName];
+    const report = [en.reportCompleted, en.reportNotCompleted, en.conditionSummit, en.reportNotReached, ko.reportNotCompleted, ko.conditionNoSteep];
+    for (const text of [...card, ...report]) {
       expect(itch, text).not.toContain(text);
       expect(steam, text).toContain(text);
     }
