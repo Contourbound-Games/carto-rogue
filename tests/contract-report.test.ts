@@ -22,7 +22,7 @@ import {
   reportCardHeight,
 } from '../src/hud';
 import { contractText, setLang } from '../src/i18n';
-import { generateMap, minCostTo } from '../src/map';
+import { GENERATOR_VERSION, generateMap, minCostTo } from '../src/map';
 import { stepCost, tileIndex, toMeters } from '../src/terrain';
 import { DIRS, DIR_LIST } from '../src/types';
 import type { AudioEngine, Dir, ExpeditionMode } from '../src/types';
@@ -301,13 +301,26 @@ describe('the report choice and the ways on', () => {
     }
   });
 
-  it('New Expedition from a Contract report is a plain expedition on a fresh sheet', () => {
-    const game = contractGame('gentle-ascent');
-    replay(game, WITNESS['gentle-ascent']);
-    game.handleAction('restart', 60_000);
-    expect([game.state.phase, game.state.contract]).toEqual(['playing', null]);
-    expect(game.state.seed).not.toBe(definition('gentle-ascent').seed);
-    expect(contractReport(game.state)).toBeNull();
+  it('New Expedition (and R) from a Contract report, completed or not, is a plain expedition on a fresh sheet', () => {
+    const completed = contractGame('gentle-ascent');
+    replay(completed, WITNESS['gentle-ascent']);
+    const broken = contractGame('hold-the-high-ground');
+    walkCheapestLine(broken);
+    const collapsed = contractGame('master-surveyor');
+    paceToCollapse(collapsed);
+    // R never follows the report's selection: Retry is selected on the reports left not completed.
+    expect([completed, broken, collapsed].map((g) => [g.state.phase, contractReport(g.state)?.completed, reportFor(g.state).choice])).toEqual([
+      ['victory', true, 'new'],
+      ['victory', false, 'retry'],
+      ['gameover', false, 'retry'],
+    ]);
+    for (const game of [completed, broken, collapsed]) {
+      const left = definition(game.state.contract!);
+      game.handleAction('restart', 60_000);
+      expect([game.state.phase, game.state.contract, game.state.map.generator]).toEqual(['playing', null, GENERATOR_VERSION]);
+      expect(game.state.seed).not.toBe(left.seed);
+      expect(contractReport(game.state)).toBeNull();
+    }
   });
 });
 

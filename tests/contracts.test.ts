@@ -2,16 +2,19 @@
 // chosen on ({generator, seed, mapDigest}), and each proved feasible by a fixed witness route that is
 // replayed step by step through the real Game in Standard mode and judged by evaluateContract. At runtime
 // judgeContract judges only expeditions started as a Contract, by the same evaluator; no Contract
-// expedition ever reaches the Standard archives, and only a met one completes its Contract.
+// expedition ever reaches the Standard archives, and only a met one completes its Contract. R keeps its
+// meaning in a Contract: it leaves the Contract for a plain random expedition, and the Contract can be
+// started again from the title card.
 import { describe, expect, it } from 'vitest';
 import { evaluateContract, judgeContract } from '../src/contract-conditions';
 import type { ContractCondition } from '../src/contract-conditions';
+import { ContractMenu } from '../src/contract-menu';
 import { completeContract, contractCompletedBy, emptyContractProgress } from '../src/contract-progress';
 import type { ContractProgress } from '../src/contract-progress';
 import { SURVEY_CONTRACTS } from '../src/contracts';
-import type { ContractId } from '../src/contracts';
+import type { ContractId, SurveyContract } from '../src/contracts';
 import { Game } from '../src/game';
-import { generateMap, minCostTo } from '../src/map';
+import { GENERATOR_VERSION, generateMap, minCostTo } from '../src/map';
 import { applyExpedition, countsTowardRecords, emptyRecords, RecordKeeper } from '../src/records';
 import type { ExpeditionResult } from '../src/records';
 import { stepCost, tileIndex } from '../src/terrain';
@@ -111,14 +114,17 @@ describe.each(SURVEY_CONTRACTS)('Survey Contract $id witness', (c) => {
 
 // ----- Runtime judging (judgeContract) -----
 
-/** Replay a witness string (one letter per step) from turn 0, calling `each` after every step. */
-function replay(game: Game, witness: string, each: (k: number) => void = () => undefined): void {
+/**
+ * Replay a witness string (one letter per step) from turn 0, calling `each` after every step. With
+ * `settle` false no frame follows the last step, so a summit is left in its end animation.
+ */
+function replay(game: Game, witness: string, each: (k: number) => void = () => undefined, settle = true): void {
   let now = 0;
   for (const [k, letter] of [...witness].entries()) {
     game.handleAction(STEP[letter], (now += 200));
     each(k);
   }
-  game.update(now + 5000);
+  if (settle) game.update(now + 5000);
 }
 
 /** The full-knowledge cheapest line to the summit: how the sheet is climbed when nobody asks for the Contract. */
@@ -138,14 +144,14 @@ function walkCheapestLine(game: Game): void {
   game.update(now + 5000);
 }
 
-/** Pace back and forth beside the spawn until the surveyor collapses. */
-function paceToCollapse(game: Game): void {
+/** Pace back and forth beside the spawn until the surveyor collapses (`settle` false: left in the collapse animation). */
+function paceToCollapse(game: Game, settle = true): void {
   const s = game.state;
   const out = DIR_LIST.find((d) => stepCost(s.map, s.player.x, s.player.y, d) !== null) as Dir;
   const back = DIR_LIST.find((d) => DIRS[d].dx === -DIRS[out].dx && DIRS[d].dy === -DIRS[out].dy) as Dir;
   let now = 0;
   for (let k = 0; k < 400 && game.state.phase === 'playing'; k++) game.handleAction(k % 2 === 0 ? out : back, (now += 200));
-  game.update(now + 5000);
+  if (settle) game.update(now + 5000);
 }
 
 const startedAs = (id: ContractId): Game => {
@@ -433,5 +439,123 @@ describe('Survey Contract progress', () => {
     leave(game, t);
     expect(t.results.map((r) => [r.outcome, r.contract])).toEqual([['victory', 'master-surveyor']]);
     expect(t.completed()).toEqual(['master-surveyor']);
+  });
+});
+
+// ----- R during a Contract (Game.handleAction('restart'), the action R and New Expedition share) -----
+
+const definition = (id: ContractId): SurveyContract => SURVEY_CONTRACTS.find((c) => c.id === id) as SurveyContract;
+
+/** What R starts, from a Contract as from anywhere: a plain Standard expedition under way on a new random sheet. */
+function expectPlainFreshExpedition(s: GameState, left: SurveyContract): void {
+  expect(s.contract).toBeNull();
+  expect([s.phase, s.turns, s.mode, s.pausedAt, s.finalStats]).toEqual(['playing', 0, 'standard', null, null]);
+  expect(s.seed).not.toBe(left.seed);
+  expect([s.map.seed, s.map.generator]).toEqual([s.seed, GENERATOR_VERSION]);
+  expect(mapDigest(s.map)).toBe(mapDigest(generateMap(s.seed)));
+  expect(judgeContract(s)).toBeNull();
+}
+
+describe('R leaves a Contract for a plain random expedition', () => {
+  it.each(SURVEY_CONTRACTS)('$id under way: nothing completed, the attempt kept out of the archives; a held R does nothing', (c) => {
+    const game = startedAs(c.id);
+    const t = trackProgress(game);
+    stepOnce(game, 200);
+    stepOnce(game, 400);
+    expect([game.state.contract, game.state.turns]).toEqual([c.id, 2]);
+    // Auto-repeat of a held R key never leaves the Contract, nor regenerates the sheet after it.
+    game.handleAction('restart', 500, true);
+    expect([game.state.contract, game.state.turns]).toEqual([c.id, 2]);
+    game.handleAction('restart', 600);
+    const fresh = game.state;
+    expectPlainFreshExpedition(fresh, c);
+    game.handleAction('restart', 700, true);
+    expect(game.state).toBe(fresh);
+    t.keeper.sync(game.state); // the next frame
+    t.keeper.abandon(); // page teardown: the fresh expedition took no step
+    expect(t.results).toEqual([expect.objectContaining({ outcome: 'abandoned', turns: 2, mode: 'standard', contract: c.id })]);
+    expect(countsTowardRecords(t.results[0])).toBe(false);
+    expect(t.completed()).toEqual([]);
+    expect(t.saves).toEqual([]);
+  });
+
+  it('paused: R unpauses into a plain random expedition (the game side of R on the pause card)', () => {
+    const c = definition('hold-the-high-ground');
+    const game = startedAs(c.id);
+    stepOnce(game, 200);
+    expect(game.pause(300)).toBe(true);
+    game.handleAction('restart', 400, true);
+    expect([game.isPaused, game.state.contract, game.state.turns]).toEqual([true, c.id, 1]);
+    game.handleAction('restart', 500);
+    expect(game.isPaused).toBe(false);
+    expectPlainFreshExpedition(game.state, c);
+  });
+
+  it('in the summit animation of a met Contract: the completion is kept, the next expedition is plain', () => {
+    const c = definition('master-surveyor');
+    const game = startedAs(c.id);
+    const t = trackProgress(game);
+    replay(game, APPROVED[c.id].witness, undefined, false); // no frame after the summit
+    expect(game.state.phase).toBe('summiting');
+    expect(game.state.finalStats?.outcome).toBe('victory');
+    game.handleAction('restart', 30_000);
+    expectPlainFreshExpedition(game.state, c);
+    t.keeper.sync(game.state);
+    t.keeper.abandon();
+    expect(t.results.map((r) => [r.outcome, r.contract])).toEqual([['victory', c.id]]);
+    expect(t.completed()).toEqual([c.id]);
+    expect(t.saves).toHaveLength(1);
+  });
+
+  it('in the collapse animation: nothing is completed, the next expedition is plain', () => {
+    const c = definition('gentle-ascent');
+    const game = startedAs(c.id);
+    const t = trackProgress(game);
+    paceToCollapse(game, false); // no frame after the collapse
+    expect(game.state.phase).toBe('collapsing');
+    expect(game.state.finalStats?.outcome).toBe('defeat');
+    game.handleAction('restart', 100_000);
+    expectPlainFreshExpedition(game.state, c);
+    t.keeper.sync(game.state);
+    t.keeper.abandon();
+    expect(t.results.map((r) => [r.outcome, r.contract])).toEqual([['defeat', c.id]]);
+    expect(t.completed()).toEqual([]);
+    expect(t.saves).toEqual([]);
+  });
+
+  it('a Contract already completed stays completed when a later attempt is left by R', () => {
+    const c = definition('gentle-ascent');
+    const game = startedAs(c.id);
+    const t = trackProgress(game);
+    replay(game, APPROVED[c.id].witness);
+    t.keeper.sync(game.state);
+    expect(t.completed()).toEqual([c.id]);
+    game.retrySheet(60_000);
+    t.keeper.sync(game.state);
+    stepOnce(game, 60_200);
+    game.handleAction('restart', 60_400);
+    t.keeper.sync(game.state);
+    t.keeper.abandon();
+    expect(t.results.map((r) => [r.outcome, r.contract])).toEqual([
+      ['victory', c.id],
+      ['abandoned', c.id],
+    ]);
+    expect(t.completed()).toEqual([c.id]);
+    expect(t.saves).toHaveLength(1);
+  });
+
+  it.each(SURVEY_CONTRACTS)('$id left by R is started again from the title card on its exact sheet', (c) => {
+    const game = startedAs(c.id);
+    stepOnce(game, 200);
+    game.handleAction('restart', 400);
+    expect(game.state.contract).toBeNull();
+    game.returnToTitle(600); // pause menu: RETURN TO TITLE
+    expect([game.state.phase, game.state.contract]).toEqual(['title', null]);
+    expect(new ContractMenu().begin(game, 800, c.id)).toBe(true);
+    const s = game.state;
+    expect([s.contract, s.phase, s.turns, s.mode]).toEqual([c.id, 'playing', 0, 'standard']);
+    expect([s.seed, s.map.seed, s.map.generator]).toEqual([c.seed, c.seed, c.generator]);
+    expect(mapDigest(s.map)).toBe(c.mapDigest);
+    expectFreshJudgement(s);
   });
 });
