@@ -483,6 +483,11 @@ const CONTRACT_EN = {
   reportMet: 'MET',
   reportBroken: 'BROKEN',
   reportNotReached: 'NOT REACHED',
+  // The Contract result as shared (copied as text, so in sentence case like the other share fields).
+  shareSurveyContract: 'Survey Contract',
+  shareContract: 'Contract',
+  shareCompleted: 'Completed',
+  shareNotCompleted: 'Not completed',
 };
 
 export type ContractTextKey = keyof typeof CONTRACT_EN;
@@ -510,6 +515,10 @@ const CONTRACT_KO: Record<ContractTextKey, string> = {
   reportMet: '달성',
   reportBroken: '위반',
   reportNotReached: '미도달',
+  shareSurveyContract: '측량 계약',
+  shareContract: '계약',
+  shareCompleted: '완료',
+  shareNotCompleted: '미완료',
 };
 
 const CONTRACT_TABLES: Record<Lang, Record<ContractTextKey, string>> = { en: CONTRACT_EN, ko: CONTRACT_KO };

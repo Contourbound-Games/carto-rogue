@@ -7,6 +7,7 @@ import type { ContractId } from './contracts';
 import { EDITION } from './edition';
 import { drawText, fitText, loadWebFont } from './font';
 import { Game } from './game';
+import { contractReport } from './hud';
 import { contractText, initLanguage, t, toggleLang } from './i18n';
 import { clientToVirtual, keyToAction, keyToUiKey, parseSeed } from './input';
 import { generateMap } from './map';
@@ -17,7 +18,7 @@ import { applyExpedition, countsTowardRecords, loadRecords, RecordKeeper, saveRe
 import { Renderer } from './renderer';
 import type { PauseCommand, PauseItem } from './pause';
 import { SeedEntry } from './seed-entry';
-import { copyText, seedText, shareText } from './share';
+import { contractShareText, copyText, seedText, shareText } from './share';
 import { buttonAt, closeArchives, openArchives, reportFor, showToast, ui } from './ui';
 import type { ButtonId, EndChoice } from './ui';
 
@@ -270,7 +271,14 @@ function start(): void {
         return;
       case 'share': {
         const stats = game.state.finalStats;
-        if (stats) copyAndToast(shareText(game.state.seed, stats, undefined, game.state.mode), 'toastResult');
+        if (!stats) return;
+        // A Survey Contract expedition (Steam edition) shares its Contract result, judged from this
+        // expedition as its report shows it; any other shares the sheet's result as before.
+        const contract = EDITION === 'steam' ? contractReport(game.state) : null;
+        const text = contract
+          ? contractShareText(contract.name, contract.completed, stats)
+          : shareText(game.state.seed, stats, undefined, game.state.mode);
+        copyAndToast(text, 'toastResult');
         return;
       }
       case 'mode': {

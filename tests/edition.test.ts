@@ -36,7 +36,7 @@ describe('editions', () => {
     expect(EDITION).toBe('itch');
   });
 
-  it('wires Survey Contract progress, the Contract card and the report band into the Steam bundle only', async () => {
+  it('wires Survey Contract progress, the Contract card, the report band and the Contract share into the Steam bundle only', async () => {
     const [itch, steam] = await Promise.all([bundle('production'), bundle('steam')]);
     for (const code of [itch, steam]) {
       expect(code).not.toContain('__EDITION__');
@@ -50,7 +50,10 @@ describe('editions', () => {
     const { en, ko } = contractTextTables();
     const card = [en.contractsTitle, en.contractHoldName, en.contractsSwitch, ko.contractsTitle, ko.contractMasterName];
     const report = [en.reportCompleted, en.reportNotCompleted, en.conditionSummit, en.reportNotReached, ko.reportNotCompleted, ko.conditionNoSteep];
-    for (const text of [...card, ...report]) {
+    // The Contract share's own words (sentence case: the card and the report band are upper case, and
+    // the Korean share words are all also report words).
+    const share = [en.shareSurveyContract, en.shareNotCompleted];
+    for (const text of [...card, ...report, ...share]) {
       expect(itch, text).not.toContain(text);
       expect(steam, text).toContain(text);
     }
