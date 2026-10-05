@@ -3,7 +3,7 @@
 ## Git and publishing
 - Commit or push only when explicitly asked.
 - Upload, publish or post to external platforms (YouTube, itch.io, Steam, X, Reddit, etc.) only when explicitly asked.
-- Until a public Steam store page exists, say "Coming to Steam". Never write "Wishlist on Steam".
+- Until the public Steam store page is ready, don't use "Coming to Steam", "Wishlist on Steam", a Steam call to action, the Steam logo or a Steam link in public-facing copy. Revisit Steam messaging and links only once a real store page URL exists and the developer explicitly approves. Never invent a Steam URL.
 
 ## Promo assets
 - Keep `promo/` git-ignored. Its videos, masters and capture tooling never go into the repository.
