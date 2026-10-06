@@ -1,6 +1,6 @@
 // Editions (src/edition.ts): the itch.io and Steam builds differ only by the build mode. The default build
 // is itch, into dist/; `--mode steam` is Steam, into dist-steam/. Built bundles are checked in memory (nothing
-// is written): only the Steam bundle wires Survey Contract progress. Only the application wiring reads the
+// is written): only the Steam bundle wires Survey Contract progress and Today's Expedition. Only the application wiring reads the
 // edition. The desktop shell is packaged once per edition: desktop:pack / desktop:zip from dist/,
 // desktop:pack:steam / desktop:zip:steam from dist-steam/ (each package holds exactly one web build).
 import fs from 'node:fs';
@@ -11,8 +11,9 @@ import { build, resolveConfig } from 'vite';
 import { describe, expect, it } from 'vitest';
 import { STEAM_RENDERER_DIR, requireSteamRenderer } from '../desktop/steam-renderer.js';
 import { CONTRACT_PROGRESS_STORAGE_KEY } from '../src/contract-progress';
+import { DAILY_RECORDS_STORAGE_KEY } from '../src/daily-records';
 import { EDITION } from '../src/edition';
-import { contractTextTables } from '../src/i18n';
+import { contractTextTables, dailyTextTables } from '../src/i18n';
 import { RECORDS_STORAGE_KEY } from '../src/records';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -57,6 +58,33 @@ describe('editions', () => {
     // the Korean share words are all also report words).
     const share = [en.shareSurveyContract, en.shareNotCompleted];
     for (const text of [...card, ...report, ...share]) {
+      expect(itch, text).not.toContain(text);
+      expect(steam, text).toContain(text);
+    }
+  }, 60_000);
+
+  it("wires Today's Expedition (its records, title entry, card, HUD tag, report band and share) into the Steam bundle only", async () => {
+    const [itch, steam] = await Promise.all([bundle('production'), bundle('steam')]);
+    expect(itch).not.toContain(DAILY_RECORDS_STORAGE_KEY);
+    expect(steam).toContain(DAILY_RECORDS_STORAGE_KEY);
+    const { en, ko } = dailyTextTables();
+    const words = [
+      en.dailyTitle, // the title entry and the card
+      en.dailyRuleRetry,
+      en.dailyNoBest,
+      en.dailyTag, // the HUD tag
+      en.bandEnded, // the report band and its buttons
+      en.newDayOpen,
+      en.nextSheet,
+      en.restartDaily,
+      en.shareEnded, // the share
+      en.shareStaminaLeft,
+      ko.dailyTitle,
+      ko.newDayOpen,
+      ko.restartDaily,
+      ko.bandEnded,
+    ];
+    for (const text of words) {
       expect(itch, text).not.toContain(text);
       expect(steam, text).toContain(text);
     }

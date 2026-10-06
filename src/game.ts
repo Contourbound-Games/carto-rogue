@@ -31,6 +31,8 @@ import { DIRS, DIR_LIST } from './types';
 import type {
   Action,
   AudioEngine,
+  DailyIdentity,
+  DailySheetSummary,
   Dir,
   DiscoveryKind,
   EffectKind,
@@ -80,6 +82,12 @@ export interface GameOptions {
   startPlaying?: boolean;
   /** Expedition mode (defaults to 'standard'); every later expedition keeps it until setMode. */
   mode?: ExpeditionMode;
+  /**
+   * Called once an expedition ends (summit or collapse), synchronously on the step that ended it and
+   * right after its final stats are set, with that expedition's state. main.ts records the result here,
+   * so it is kept before the input returns rather than on the next frame. The rules never depend on it.
+   */
+  onEnd?: (expedition: GameState) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -251,6 +259,15 @@ export function gradePoints(b: GradeBreakdown): GradePoints {
   return { route: parts[0], reserve: parts[1], survey: parts[2], total };
 }
 
+/**
+ * A summited sheet as a Today's Expedition counts it: its grade, its gradePoints total, its turns and the
+ * stamina left at the pillar. Null for a collapse (only summits count).
+ */
+export function dailySheetSummary(stats: ExpeditionStats): DailySheetSummary | null {
+  if (stats.outcome !== 'victory' || !stats.breakdown) return null;
+  return { grade: stats.grade, points: gradePoints(stats.breakdown).total, turns: stats.turns, staminaLeft: stats.staminaLeft };
+}
+
 /** A complete, fresh GameState for `map` with the player standing on the spawn tile. */
 function createState(map: MapData, phase: Phase, now: number, muted: boolean, mode: ExpeditionMode): GameState {
   const tiles = MAP_W * MAP_H;
@@ -262,6 +279,7 @@ function createState(map: MapData, phase: Phase, now: number, muted: boolean, mo
     seed: map.seed,
     mode,
     contract: null,
+    daily: null,
     player: {
       x,
       y,
@@ -313,6 +331,8 @@ export class Game {
   private readonly mapFactory: (seed: number, generator?: number) => MapData;
   /** Mode of the current and every following expedition (the rules never read it). */
   private mode: ExpeditionMode;
+  /** GameOptions.onEnd: told of each expedition's end on the step that ends it. */
+  private readonly onEnd: ((expedition: GameState) => void) | undefined;
 
   // Per-expedition bookkeeping that the renderer does not need.
   private lastMoveTime = -Infinity;
@@ -337,6 +357,7 @@ export class Game {
     this.audio = audio;
     this.mapFactory = mapFactory;
     this.mode = options.mode ?? 'standard';
+    this.onEnd = options.onEnd;
     const now = options.now ?? 0;
     const map = mapFactory(options.seed ?? randomSeed());
     this.state = createState(map, 'title', now, audio.muted, this.mode);
@@ -486,12 +507,55 @@ export class Game {
   /**
    * Retry this sheet: a fresh expedition on the current mountain, regenerated from its exact identity
    * { generator, seed } (same terrain, same rules, graded and recorded like any expedition). A Contract
-   * expedition stays that Contract.
+   * expedition stays that Contract. A Today's Expedition sheet is never retried on its own (the attempt
+   * restarts from Sheet 1 instead, restartDaily): refused, leaving everything as it was.
+   * Returns whether it restarted.
    */
-  retrySheet(now: number): void {
+  retrySheet(now: number): boolean {
+    if (this.state.daily !== null) return false;
     const contract = this.state.contract;
     this.startSeed(now, this.state.seed, this.state.map.generator);
     this.state.contract = contract;
+    return true;
+  }
+
+  /**
+   * Begin a Today's Expedition attempt for `daily` (daily.ts dailyIdentity): Sheet 1 as a fresh Standard
+   * expedition on { daily.generator, daily.seeds[0] }, played by the same rules as any other. Refused in
+   * Explorer, leaving everything as it was. The game never reads a clock: the date comes with `daily`.
+   * Returns whether it started.
+   */
+  startDaily(now: number, daily: DailyIdentity): boolean {
+    if (this.mode !== 'standard') return false;
+    const { date, revision, generator, seeds } = daily;
+    this.startSeed(now, seeds[0], generator);
+    this.state.daily = { date, revision, generator, seeds: [seeds[0], seeds[1], seeds[2]], sheet: 0, done: [] };
+    return true;
+  }
+
+  /**
+   * After a summit on Sheet 1 or 2 of an attempt: the next sheet as a fresh expedition (full stamina,
+   * nothing carried over but the attempt itself and this sheet's summary). Refused anywhere else.
+   * Returns whether it moved on.
+   */
+  nextDailySheet(now: number): boolean {
+    const s = this.state;
+    const daily = s.daily;
+    const summary = s.finalStats ? dailySheetSummary(s.finalStats) : null;
+    if (daily === null || s.phase !== 'victory' || summary === null || daily.sheet === 2) return false;
+    const sheet = daily.sheet === 0 ? 1 : 2;
+    this.startSeed(now, daily.seeds[sheet], daily.generator);
+    this.state.daily = { ...daily, sheet, done: [...daily.done, summary] };
+    return true;
+  }
+
+  /**
+   * RESTART DAILY: the same attempt identity (the same UTC date, never re-read) again from Sheet 1.
+   * Refused outside a Today's Expedition. Returns whether it restarted.
+   */
+  restartDaily(now: number): boolean {
+    const daily = this.state.daily;
+    return daily !== null && this.startDaily(now, daily);
   }
 
   /**
@@ -545,6 +609,7 @@ export class Game {
     this.audio.victory();
     this.addEffect('summit-flare', s.map.summit.x, s.map.summit.y, now, VICTORY_ANIM_MS);
     this.log(t('logReached'), 'good', now);
+    this.onEnd?.(s);
   }
 
   private finishCollapse(now: number): void {
@@ -556,6 +621,7 @@ export class Game {
     s.finalStats = this.buildStats('defeat');
     this.audio.defeat();
     this.log(t('logCollapse'), 'bad', now);
+    this.onEnd?.(s);
   }
 
   private buildStats(outcome: 'victory' | 'defeat'): ExpeditionStats {

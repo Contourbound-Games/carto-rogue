@@ -37,16 +37,18 @@ export interface ExpeditionResult {
   mode: ExpeditionMode;
   /** The Survey Contract the expedition was started as, else null (never stored in the archives). */
   contract: ContractId | null;
+  /** The UTC date of the Today's Expedition attempt this sheet belonged to, else null (never stored in the archives). */
+  daily: string | null;
 }
 
 /**
  * Whether a result belongs in these (Standard) archives. Explorer plays by the same rules but adds
- * a learning aid (the Step Echo), and a Survey Contract is Standard play on a set sheet with its own
- * goal, so both are resolved like any other expedition but kept out of the Standard records, whatever
- * their outcome.
+ * a learning aid (the Step Echo), a Survey Contract is Standard play on a set sheet with its own goal,
+ * and a Today's Expedition sheet is one of a day's three set sheets with its own result, so all three
+ * are resolved like any other expedition but kept out of the Standard records, whatever their outcome.
  */
 export function countsTowardRecords(result: ExpeditionResult): boolean {
-  return result.mode === 'standard' && result.contract === null;
+  return result.mode === 'standard' && result.contract === null && result.daily === null;
 }
 
 export function emptyRecords(): CareerRecords {
@@ -58,7 +60,7 @@ export function gradeRank(grade: string | null): number {
 }
 
 /** The records after one more expedition (pure; the input is not modified). */
-export function applyExpedition(rec: CareerRecords, result: Omit<ExpeditionResult, 'mode' | 'contract'>): CareerRecords {
+export function applyExpedition(rec: CareerRecords, result: Omit<ExpeditionResult, 'mode' | 'contract' | 'daily'>): CareerRecords {
   const won = result.outcome === 'victory';
   const bestGrade = gradeRank(result.grade) > gradeRank(rec.bestGrade) ? result.grade : rec.bestGrade;
   return {
@@ -135,7 +137,10 @@ export class RecordKeeper {
     this.tracked = state;
   }
 
-  /** Call whenever the game state may have changed (every frame, and right after a swap). */
+  /**
+   * Call whenever the game state may have changed (every frame, right after a swap, and from the game's
+   * onEnd on the step that ends an expedition).
+   */
   sync(state: GameState): void {
     if (state !== this.tracked) {
       this.abandon();
@@ -168,6 +173,7 @@ export class RecordKeeper {
         grade,
         mode: state.mode,
         contract: state.contract,
+        daily: state.daily?.date ?? null,
       },
       state,
     );

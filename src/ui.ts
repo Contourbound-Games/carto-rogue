@@ -4,6 +4,8 @@
 import { judgeContract } from './contract-conditions';
 import { ContractMenu } from './contract-menu';
 import type { ContractId } from './contracts';
+import { DailyMenu } from './daily-menu';
+import type { Game } from './game';
 import { PauseMenu } from './pause';
 import { emptyRecords } from './records';
 import type { CareerRecords } from './records';
@@ -30,10 +32,19 @@ export type ButtonId =
   | 'reportCard'
   | 'contracts'
   | 'closeContracts'
-  | `contract:${ContractId}`;
+  | `contract:${ContractId}`
+  | 'daily'
+  | 'closeDaily'
+  | 'beginDaily'
+  | 'nextSheet'
+  | 'restartDaily';
 
-/** The two ways on from an end card: this sheet again, or a fresh one. */
-export type EndChoice = 'retry' | 'new';
+/**
+ * The ways on from an end card: this sheet again ('retry'), or a fresh one ('new'). In a Today's
+ * Expedition the first way is the attempt's own instead: on to its next sheet after a summit on Sheet 1
+ * or 2 ('next'), or the whole attempt again from Sheet 1 ('restart'). New, like R, always leaves it.
+ */
+export type EndChoice = 'retry' | 'new' | 'next' | 'restart';
 
 /** Expedition report (end-card) interface state, kept for one finished expedition. */
 export interface ReportUi {
@@ -72,6 +83,8 @@ export interface UiState {
   pause: PauseMenu;
   /** The Survey Contract card on the title (Steam edition only; never opened in the itch edition). */
   contracts: ContractMenu;
+  /** The Today's Expedition card on the title (Steam edition only; never opened in the itch edition). */
+  daily: DailyMenu;
   report: ReportUi;
 }
 
@@ -90,22 +103,55 @@ export const ui: UiState = {
   records: emptyRecords(),
   pause: new PauseMenu(),
   contracts: new ContractMenu(),
+  daily: new DailyMenu(),
   report: { of: null, choice: 'new', cardHidden: false },
 };
 
 /**
+ * The two ways on from this finished expedition's report, left to right: the first is the run's own
+ * (retry the sheet; in a Today's Expedition the next sheet after Sheet 1 or 2, else the attempt again),
+ * the second always a new expedition.
+ */
+export function endChoices(state: GameState): readonly [EndChoice, 'new'] {
+  const daily = state.daily;
+  if (daily === null) return ['retry', 'new'];
+  return [state.phase === 'victory' && daily.sheet < 2 ? 'next' : 'restart', 'new'];
+}
+
+/**
  * The report state for this finished expedition, fresh for each one: after a collapse the
- * selection starts on retrying the sheet (the learning loop), after a summit on a new expedition,
- * unless the summit left its Survey Contract not completed (judged from the expedition itself).
+ * selection starts on the first way (retrying the sheet, the learning loop; restarting a Daily attempt),
+ * after a summit on a new expedition, unless the summit left its Survey Contract not completed (judged
+ * from the expedition itself), or is Sheet 1 or 2 of a Daily attempt, which goes on to the next sheet.
  */
 export function reportFor(state: GameState): ReportUi {
   const r = ui.report;
   if (r.of !== state) {
+    const [first] = endChoices(state);
     r.of = state;
-    r.choice = state.phase === 'gameover' || judgeContract(state)?.status === 'broken' ? 'retry' : 'new';
+    r.choice = state.phase === 'gameover' || judgeContract(state)?.status === 'broken' || first === 'next' ? first : 'new';
     r.cardHidden = false;
   }
   return r;
+}
+
+/** Carry out an end-card choice on `game`. Returns whether a new expedition began. */
+export function applyEndChoice(
+  game: Pick<Game, 'retrySheet' | 'nextDailySheet' | 'restartDaily' | 'handleAction'>,
+  choice: EndChoice,
+  now: number,
+): boolean {
+  switch (choice) {
+    case 'retry':
+      return game.retrySheet(now);
+    case 'next':
+      return game.nextDailySheet(now);
+    case 'restart':
+      return game.restartDaily(now);
+    case 'new':
+      game.handleAction('restart', now);
+      return true;
+  }
 }
 
 export function clearButtons(): void {

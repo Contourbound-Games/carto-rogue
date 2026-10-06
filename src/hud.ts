@@ -38,22 +38,27 @@ import { judgeContract } from './contract-conditions';
 import type { ContractCondition, ContractEvaluation } from './contract-conditions';
 import { CONTRACT_ROWS } from './contract-menu';
 import type { ContractId } from './contracts';
+import { compareDaily, dailyCompletedBy, DAILY_REVISION } from './daily';
+import type { DailyResult } from './daily';
+import type { DailyMenu } from './daily-menu';
+import { dailyBestFor } from './daily-records';
+import type { DailyBest } from './daily-records';
 import { EDITION } from './edition';
 import { drawHangulTitle, drawText, fitText, fontEpoch, measureText } from './font';
 import type { TextOptions } from './font';
-import { contractText, getLang, langVersion, t } from './i18n';
+import { contractText, dailyText, getLang, langVersion, t } from './i18n';
 import type { ContractTextKey, MessageKey } from './i18n';
 import { gradeRank } from './records';
 import { mulberry32 } from './rng';
 import { SIGHT_EYE_ART } from './sprites';
-import { GRADE_THRESHOLDS, GRADE_WEIGHTS, RESERVE_FULL_MARKS, SURVEY_FULL_MARKS, gradePoints } from './game';
-import { addButton, clearButtons, reportFor, TOAST_MS, ui } from './ui';
-import type { ButtonId } from './ui';
+import { GRADE_THRESHOLDS, GRADE_WEIGHTS, RESERVE_FULL_MARKS, SURVEY_FULL_MARKS, dailySheetSummary, gradePoints } from './game';
+import { addButton, clearButtons, endChoices, reportFor, TOAST_MS, ui } from './ui';
+import type { ButtonId, EndChoice } from './ui';
 import { provenSolvable } from './map';
 import { describeStepBetween, tallySteps, tileIndex, toMeters } from './terrain';
 import type { StepKind } from './terrain';
 import { DIR_LIST, DIRS } from './types';
-import type { Dir, ExpeditionStats, GameState, GradeBreakdown, LogTone, MapData, Point, SlopeClass } from './types';
+import type { DailyRun, Dir, ExpeditionStats, GameState, GradeBreakdown, LogTone, MapData, Point, SlopeClass } from './types';
 
 type Ctx = CanvasRenderingContext2D;
 type Pt = readonly [number, number];
@@ -751,6 +756,20 @@ export function contractTagText(id: ContractId): string {
  */
 function drawContractTag(ctx: Ctx, id: ContractId): void {
   const text = contractTagText(id);
+  const { x, y, w, h } = runTagBox(text);
+  fill(ctx, x, y, w, h, PALETTE.parchment);
+  outline(ctx, x, y, w, h, PALETTE.inkFaded);
+  drawText(ctx, text, x + Math.floor(w / 2), y + 3, { color: PALETTE.inkSoft, align: 'center' });
+}
+
+/** The Today's Expedition tag's text: the attempt's UTC date and the sheet being played ("2026-10-06 UTC · SHEET 1/3"). */
+export function dailyTagText(daily: Pick<DailyRun, 'date' | 'sheet'>): string {
+  return dailyText('dailyTag', { date: daily.date, n: daily.sheet + 1 });
+}
+
+/** Steam edition, during Today's Expedition: its date and sheet in the run tag's place, drawn like the Contract tag. */
+function drawDailyTag(ctx: Ctx, daily: DailyRun): void {
+  const text = dailyTagText(daily);
   const { x, y, w, h } = runTagBox(text);
   fill(ctx, x, y, w, h, PALETTE.parchment);
   outline(ctx, x, y, w, h, PALETTE.inkFaded);
@@ -1586,6 +1605,7 @@ export function drawHud(ctx: CanvasRenderingContext2D, state: GameState, now: nu
   drawLog(ctx, state, now);
   drawModeTag(ctx, state);
   if (EDITION === 'steam' && state.contract !== null) drawContractTag(ctx, state.contract);
+  if (EDITION === 'steam' && state.daily !== null) drawDailyTag(ctx, state.daily);
   drawSpeaker(ctx, state.muted, now);
   drawLangButton(ctx);
   drawFullscreenButton(ctx);
@@ -1952,7 +1972,7 @@ const TITLE_H = 660;
 
 /**
  * Where the lower part of the title card sits (card-relative y): the begin prompt, the button row and
- * the footer line. The Steam edition adds a second row for the Survey Contracts, moving the rest up and
+ * the footer line. The Steam edition adds a second row for Today's Expedition and the Survey Contracts, moving the rest up and
  * the footer down a little; the itch edition keeps its layout exactly.
  */
 export function titleLayout(steam: boolean): { prompt: number; buttons: number; contracts: number | null; footer: number } {
@@ -2102,7 +2122,7 @@ function drawTitle(ctx: Ctx, state: GameState, now: number): void {
     });
   }
   buttonRow(ctx, titleButtonSpecs(state), mid, y + layout.buttons);
-  if (EDITION === 'steam' && layout.contracts !== null) buttonRow(ctx, [contractsEntrySpec()], mid, y + layout.contracts);
+  if (EDITION === 'steam' && layout.contracts !== null) buttonRow(ctx, [dailyEntrySpec(), contractsEntrySpec()], mid, y + layout.contracts);
   const footer = y + layout.footer;
   drawSheetNo(ctx, state, x + TITLE_W - 36, footer);
   drawText(ctx, t('contourInterval', { m: CONTOUR_M }), x + 36, footer, { color: PALETTE.inkFaded });
@@ -2527,15 +2547,20 @@ function drawReportFoot(ctx: Ctx, state: GameState, s: ExpeditionStats, x: numbe
     { color: PALETTE.inkSoft },
   );
   drawReportKey(ctx, x + 36, y + h - 148);
-  buttonRow(ctx, [
-    { id: 'retrySheet', runs: [[t('retrySheet'), PALETTE.redInk]], selected: report.choice === 'retry' },
-    { id: 'newExpedition', runs: [[t('newExpedition'), PALETTE.ink]], selected: report.choice === 'new' },
-  ], cx, y + h - 124);
-  buttonRow(ctx, [
-    { id: 'copySeed', runs: [[t('copySeed'), PALETTE.ink]], icon: 'pin' },
-    { id: 'share', runs: [[t('shareResult'), PALETTE.ink]], icon: 'share' },
-    { id: 'toggleCard', runs: [[t('hideCard'), PALETTE.inkSoft]] },
-  ], cx, y + h - 90);
+  // A Today's Expedition sheet (Steam edition) has its attempt's ways on; any other keeps the plain rows.
+  const [ways, tools] = (EDITION === 'steam' ? dailyReportButtons(state, report.choice) : null) ?? [
+    [
+      { id: 'retrySheet', runs: [[t('retrySheet'), PALETTE.redInk]], selected: report.choice === 'retry' },
+      { id: 'newExpedition', runs: [[t('newExpedition'), PALETTE.ink]], selected: report.choice === 'new' },
+    ],
+    [
+      { id: 'copySeed', runs: [[t('copySeed'), PALETTE.ink]], icon: 'pin' },
+      { id: 'share', runs: [[t('shareResult'), PALETTE.ink]], icon: 'share' },
+      { id: 'toggleCard', runs: [[t('hideCard'), PALETTE.inkSoft]] },
+    ],
+  ];
+  buttonRow(ctx, ways, cx, y + h - 124);
+  buttonRow(ctx, tools, cx, y + h - 90);
   drawText(ctx, t('endPrompt'), cx, y + h - 54, { color: PALETTE.inkFaded, align: 'center' });
   drawSheetNo(ctx, state, x + w - 36, y + h - REPORT_FOOT_Y);
 }
@@ -2629,7 +2654,9 @@ function drawGameOver(ctx: Ctx, state: GameState, now: number): void {
   const s = statsFor(state, now);
   // A Survey Contract expedition (Steam edition) adds its result band; any other keeps the plain card.
   const contract = EDITION === 'steam' ? contractReport(state) : null;
-  const h = reportCardHeight(DEFEAT_H, contract);
+  // ...and a Today's Expedition sheet its attempt's band (a run is never both).
+  const daily = EDITION === 'steam' ? dailyReportView(state) : null;
+  const h = reportCardHeight(DEFEAT_H, contract) + (daily ? dailyBandHeight(daily) : 0);
   const { x, y, restY } = reportPlacement(state, now, DEFEAT_W, h);
   if (reportFor(state).cardHidden) {
     drawReportTab(ctx, x, restY, DEFEAT_W, h);
@@ -2665,6 +2692,7 @@ function drawGameOver(ctx: Ctx, state: GameState, now: number): void {
   drawStamp(ctx, s.grade, 'ink', sx, sy, 50);
   drawText(ctx, t('grade'), sx + 1, sy + 62, { scale: 2, color: PALETTE.inkSoft, align: 'center' });
   if (contract) drawContractBand(ctx, contract, x, y + DEFEAT_H - REPORT_FOOT_H, DEFEAT_W);
+  if (daily) drawDailyBand(ctx, daily, x, y + DEFEAT_H - REPORT_FOOT_H, DEFEAT_W);
   drawReportFoot(ctx, state, s, x, y, DEFEAT_W, h);
   ctx.globalAlpha = prev;
 }
@@ -2673,7 +2701,8 @@ function drawVictory(ctx: Ctx, state: GameState, now: number): void {
   const e = endCardAnim(state, now);
   const s = statsFor(state, now);
   const contract = EDITION === 'steam' ? contractReport(state) : null;
-  const h = reportCardHeight(VICTORY_H, contract);
+  const daily = EDITION === 'steam' ? dailyReportView(state) : null;
+  const h = reportCardHeight(VICTORY_H, contract) + (daily ? dailyBandHeight(daily) : 0);
   const { x, y, restY } = reportPlacement(state, now, VICTORY_W, h);
   if (reportFor(state).cardHidden) {
     drawReportTab(ctx, x, restY, VICTORY_W, h);
@@ -2698,6 +2727,7 @@ function drawVictory(ctx: Ctx, state: GameState, now: number): void {
     ctx.globalAlpha = a;
   }
   if (contract) drawContractBand(ctx, contract, x, y + VICTORY_H - REPORT_FOOT_H, VICTORY_W);
+  if (daily) drawDailyBand(ctx, daily, x, y + VICTORY_H - REPORT_FOOT_H, VICTORY_W);
   drawReportFoot(ctx, state, s, x, y, VICTORY_W, h);
   ctx.globalAlpha = prev;
 }
@@ -2799,6 +2829,152 @@ function drawContractBand(ctx: Ctx, view: ContractReportView, x: number, top: nu
       px(ctx, xx, ry + 6, PALETTE.inkPale);
     }
   });
+}
+
+// ----- Today's Expedition band (Steam edition): the attempt this sheet belongs to -----
+
+/** Offsets inside the Daily band, as in the Contract band: a rule, the label, the headline with a stamp, then rows. */
+export const DAILY_BAND = { rule: 6, label: 12, headline: 24, stampH: 28, rows: 46, rowPitch: 14, foot: 4, margin: 40 } as const;
+
+/** Which end of a sheet the report shows: after Sheet 1 or 2 ('next'), after all three ('final'), or a collapse ('failed'). */
+export type DailyReportKind = 'next' | 'final' | 'failed';
+
+export interface DailyReportRow {
+  label: string;
+  value: string;
+  tone: 'ink' | 'red' | 'soft';
+}
+
+/** The Daily band's content. */
+export interface DailyReportView {
+  kind: DailyReportKind;
+  /** "TODAY'S EXPEDITION · 2026-10-06 UTC" */
+  label: string;
+  headline: string;
+  stamp: { text: string; red: boolean } | null;
+  rows: DailyReportRow[];
+  /** The new-day line, when the attempt's date is no longer the current UTC date (after the last sheet or a collapse). */
+  notice: string | null;
+}
+
+const sheetValue = (s: { grade: string; points: number; turns: number; staminaLeft: number }): string =>
+  dailyText('rowResult', { g: s.grade, p: s.points, t: s.turns, s: s.staminaLeft });
+
+/**
+ * The band of a finished Daily sheet: one row per sheet (its result, the collapse, or what is still to
+ * come), and after the last summit the attempt's total, plus this date's best when the attempt did not
+ * match it (NEW BEST when it just became it). `menu` holds the kept bests and the latest UTC date read
+ * for the new-day notice. Null for any other expedition, and before the expedition has ended.
+ */
+export function dailyReportView(
+  state: GameState,
+  menu: Pick<DailyMenu, 'days' | 'newBestOf' | 'today'> = ui.daily,
+): DailyReportView | null {
+  const daily = state.daily;
+  if (daily === null || (state.phase !== 'victory' && state.phase !== 'gameover')) return null;
+  const kind: DailyReportKind = state.phase === 'gameover' ? 'failed' : daily.sheet < 2 ? 'next' : 'final';
+  const rows: DailyReportRow[] = [0, 1, 2].map((k) => {
+    const label = dailyText('rowSheet', { n: k + 1 });
+    if (k < daily.sheet) return { label, value: sheetValue(daily.done[k]), tone: 'ink' };
+    if (k === daily.sheet) {
+      const summary = state.finalStats ? dailySheetSummary(state.finalStats) : null;
+      if (kind === 'failed' || !summary) return { label, value: dailyText('rowCollapsed'), tone: 'red' };
+      return { label, value: sheetValue(summary), tone: 'ink' };
+    }
+    if (kind === 'failed') return { label, value: dailyText('rowNotReached'), tone: 'soft' };
+    return k === daily.sheet + 1 ? { label, value: dailyText('rowNext'), tone: 'red' } : { label, value: dailyText('rowLater'), tone: 'soft' };
+  });
+  let headline: string;
+  let stamp: DailyReportView['stamp'] = null;
+  if (kind === 'next') {
+    headline = dailyText('bandCleared', { n: daily.sheet + 1 });
+  } else if (kind === 'failed') {
+    headline = dailyText('bandEnded', { n: daily.sheet + 1 });
+    stamp = { text: dailyText('stampNotRecorded'), red: false };
+  } else {
+    headline = dailyText('bandAllSummits');
+    stamp = { text: dailyText('stampCompleted'), red: true };
+    const result = dailyCompletedBy(state);
+    if (result) {
+      const totals = (r: DailyResult): Record<string, number> => ({ p: r.totalPoints, t: r.totalTurns, s: r.totalStaminaLeft });
+      rows.push({ label: dailyText('rowTotal'), value: dailyText('rowTotalValue', totals(result)), tone: 'ink' });
+      const best = dailyBestFor(menu.days, result.date, result.revision);
+      if (menu.newBestOf === state) {
+        rows.push({ label: dailyText('rowBest'), value: dailyText('rowNewBest'), tone: 'red' });
+      } else if (best && compareDaily(best, result) !== 0) {
+        rows.push({ label: dailyText('rowBest'), value: dailyText('rowBestValue', totals(best)), tone: 'soft' });
+      }
+    }
+  }
+  const notice = kind !== 'next' && menu.today !== null && menu.today !== daily.date ? dailyText('newDayOpen') : null;
+  return { kind, label: dailyText('bandLabel', { date: daily.date }), headline, stamp, rows, notice };
+}
+
+/** Room the Daily band takes between a report card's body and its foot (the card grows by this). */
+export function dailyBandHeight(view: DailyReportView): number {
+  const B = DAILY_BAND;
+  return B.rows + (view.rows.length + (view.notice ? 1 : 0)) * B.rowPitch + B.foot;
+}
+
+/** The band's stamp: its text and width (double rule, scale-2 text, as the Contract stamp). */
+export function dailyStampWidth(text: string): number {
+  return measureText(text, 2) + 20;
+}
+
+const DAILY_TONE: Readonly<Record<DailyReportRow['tone'], string>> = {
+  ink: PALETTE.ink,
+  red: PALETTE.redInk,
+  soft: PALETTE.inkSoft,
+};
+
+/** The Daily band of a report card `w` wide, its top at `top` (where the plain card's foot began). */
+function drawDailyBand(ctx: Ctx, view: DailyReportView, x: number, top: number, w: number): void {
+  const B = DAILY_BAND;
+  const left = x + B.margin;
+  const right = x + w - B.margin;
+  rule(ctx, x + Math.floor(w / 2), top + B.rule, Math.floor(w / 2) - B.margin, PALETTE.inkFaded, PALETTE.redInk);
+  drawText(ctx, view.label, left, top + B.label, { color: PALETTE.inkFaded });
+  drawText(ctx, view.headline, left, top + B.headline, { scale: 2, color: PALETTE.ink });
+  if (view.stamp) {
+    const sw = dailyStampWidth(view.stamp.text);
+    const color = view.stamp.red ? PALETTE.redInk : PALETTE.inkSoft;
+    const sx = right - sw;
+    const sy = top + B.label;
+    outline(ctx, sx, sy, sw, B.stampH, color);
+    outline(ctx, sx + 2, sy + 2, sw - 4, B.stampH - 4, color);
+    drawText(ctx, view.stamp.text, sx + Math.floor(sw / 2), sy + 7, { scale: 2, color, align: 'center' });
+  }
+  view.rows.forEach((row, k) => {
+    const ry = top + B.rows + k * B.rowPitch;
+    drawText(ctx, row.label, left + 12, ry, { color: PALETTE.inkSoft });
+    drawText(ctx, row.value, right, ry, { color: DAILY_TONE[row.tone], align: 'right' });
+    for (let xx = left + 12 + measureText(row.label) + 6; xx < right - measureText(row.value) - 6; xx += 4) {
+      px(ctx, xx, ry + 6, PALETTE.inkPale);
+    }
+  });
+  if (view.notice) drawText(ctx, view.notice, left + 12, top + B.rows + view.rows.length * B.rowPitch, { color: PALETTE.redInk });
+}
+
+/**
+ * A Daily sheet's report button rows: its attempt's way on (NEXT SHEET after Sheet 1 or 2, else
+ * RESTART DAILY) beside NEW EXPEDITION, then COPY SEED, SHARE RESULT (never between sheets) and
+ * HIDE CARD. `choice` is the keyboard selection. Null for any other expedition.
+ */
+export function dailyReportButtons(state: GameState, choice: EndChoice): [ButtonSpec[], ButtonSpec[]] | null {
+  if (state.daily === null) return null;
+  const [first] = endChoices(state);
+  const next = first === 'next';
+  return [
+    [
+      { id: next ? 'nextSheet' : 'restartDaily', runs: [[dailyText(next ? 'nextSheet' : 'restartDaily'), PALETTE.redInk]], selected: choice === first },
+      { id: 'newExpedition', runs: [[t('newExpedition'), PALETTE.ink]], selected: choice === 'new' },
+    ],
+    [
+      { id: 'copySeed', runs: [[t('copySeed'), PALETTE.ink]], icon: 'pin' },
+      ...(next ? [] : [{ id: 'share', runs: [[t('shareResult'), PALETTE.ink]], icon: 'share' } as ButtonSpec]),
+      { id: 'toggleCard', runs: [[t('hideCard'), PALETTE.inkSoft]] },
+    ],
+  ];
 }
 
 // ----- Paper buttons (title and end cards) -----
@@ -2935,6 +3111,11 @@ export function titleButtonSpecs(state: GameState): ButtonSpec[] {
 /** The Steam edition's second title row: the way into the Survey Contract card. */
 export function contractsEntrySpec(): ButtonSpec {
   return { id: 'contracts', runs: [[contractText('contractsTitle'), PALETTE.ink]] };
+}
+
+/** The Steam edition's second title row, before the Contracts: the way into the Today's Expedition card. */
+export function dailyEntrySpec(): ButtonSpec {
+  return { id: 'daily', runs: [[dailyText('dailyTitle'), PALETTE.ink]] };
 }
 
 /** Width of a buttonRow of `specs` (gap included), for layout checks. */
@@ -3238,6 +3419,94 @@ function drawContracts(ctx: Ctx, state: GameState, now: number): void {
   ctx.globalAlpha = prev;
 }
 
+// ----- Today's Expedition card (Steam edition) -----
+
+export const DAILY_CARD_W = 640;
+export const DAILY_CARD_H = 400;
+/** Card-relative tops of the card's lines (the paper is painted once; the rest per frame). */
+export const DAILY_CARD = { sub: 34, title: 56, rule: 98, date: 112, rules: 146, rulePitch: 16, best: 204, bestH: 52, begin: 280 } as const;
+/** The card's text width: inside the neatline with a margin. */
+export const DAILY_CARD_TEXT_W = DAILY_CARD_W - 80;
+
+/** The card's three rule lines, top to bottom. */
+export function dailyCardRules(): [string, string, string] {
+  return [dailyText('dailyRuleSheets'), dailyText('dailyRuleRetry'), dailyText('dailyRuleResult')];
+}
+
+/** The best line on the card for `date`: the kept best's totals, or that there is none yet. */
+export function dailyCardBest(days: readonly DailyBest[], date: string): string {
+  const best = dailyBestFor(days, date, DAILY_REVISION);
+  return best
+    ? dailyText('dailyBestValue', { p: best.totalPoints, t: best.totalTurns, s: best.totalStaminaLeft })
+    : dailyText('dailyNoBest');
+}
+
+/** The card's BEGIN button. */
+export function dailyBeginSpec(): ButtonSpec {
+  return { id: 'beginDaily', runs: [[dailyText('dailyBegin'), PALETTE.redInk]], selected: true };
+}
+
+function paintDailyCard(g: Ctx): void {
+  const w = DAILY_CARD_W;
+  const mid = Math.floor(w / 2);
+  paintPaper(g, w, DAILY_CARD_H, 2610);
+  paintNeatline(g, w, DAILY_CARD_H, PALETTE.redInk);
+  drawText(g, dailyText('dailySub'), mid, DAILY_CARD.sub, { color: PALETTE.inkFaded, align: 'center' });
+  drawText(g, dailyText('dailyTitle'), mid, DAILY_CARD.title, {
+    scale: 3,
+    color: PALETTE.ink,
+    align: 'center',
+    shadow: PALETTE.parchmentShade,
+    shadowOffset: 2,
+  });
+  rule(g, mid, DAILY_CARD.rule, 220, PALETTE.inkFaded, PALETTE.redInk);
+  dailyCardRules().forEach((line, k) => {
+    drawText(g, line, mid, DAILY_CARD.rules + k * DAILY_CARD.rulePitch, { color: PALETTE.inkSoft, align: 'center' });
+  });
+}
+
+function drawDailyCard(ctx: Ctx, state: GameState, now: number): void {
+  // Modal: only the card's own buttons answer while it is open.
+  clearButtons();
+  const menu = ui.daily;
+  const e = easeOutCubic((now - menu.since) / 300);
+  veil(ctx, e);
+  const prev = ctx.globalAlpha;
+  ctx.globalAlpha = prev * e;
+  const x = MAP_ORIGIN_X + Math.floor((MAP_PX_W - DAILY_CARD_W - CARD_SHADOW) / 2);
+  const y = MAP_ORIGIN_Y + Math.floor((MAP_PX_H - DAILY_CARD_H - CARD_SHADOW) / 2) + Math.round((1 - e) * 24);
+  blitCard(ctx, 'daily', DAILY_CARD_W, DAILY_CARD_H, x, y, paintDailyCard);
+  const mid = x + Math.floor(DAILY_CARD_W / 2);
+  const date = menu.date ?? '';
+  drawText(ctx, dailyText('dailyDate', { date }), mid, y + DAILY_CARD.date, { scale: 2, color: PALETTE.redInk, align: 'center' });
+  // This date's best, on a ruled slip like a Contract row.
+  const bx = x + 40;
+  const by = y + DAILY_CARD.best;
+  const bw = DAILY_CARD_W - 80;
+  const bh = DAILY_CARD.bestH;
+  fill(ctx, bx + 2, by + 2, bw, bh, PALETTE.parchmentShade);
+  fill(ctx, bx, by, bw, bh, PALETTE.ink);
+  fill(ctx, bx + 1, by + 1, bw - 2, bh - 2, PALETTE.parchmentDark);
+  drawText(ctx, dailyText('dailyBest'), bx + 16, by + 10, { color: PALETTE.inkFaded });
+  drawText(ctx, dailyCardBest(menu.days, date), bx + 16, by + 26, { scale: 2, color: PALETTE.ink });
+  buttonRow(ctx, [dailyBeginSpec()], mid, y + DAILY_CARD.begin);
+  if (state.mode === 'explorer') {
+    // Today's Expedition is played by the Standard rules only; the mode is switched on the title card itself.
+    drawText(ctx, dailyText('dailyStandardOnly'), mid, y + DAILY_CARD_H - 76, { color: PALETTE.redInk, align: 'center' });
+    drawText(ctx, dailyText('dailySwitch'), mid, y + DAILY_CARD_H - 62, { color: PALETTE.redInk, align: 'center' });
+  }
+  drawText(ctx, dailyText('dailyHint'), mid, y + DAILY_CARD_H - 40, { color: PALETTE.inkSoft, align: 'center' });
+  // Close box in the top-right corner, as on the Contract card.
+  const cx = x + DAILY_CARD_W - 50;
+  const cy = y + 24;
+  const hover = ui.hover === 'closeDaily';
+  fill(ctx, cx, cy, 24, 24, PALETTE.ink);
+  fill(ctx, cx + 1, cy + 1, 22, 22, hover ? PALETTE.parchment : PALETTE.parchmentDark);
+  drawText(ctx, 'X', cx + 13, cy + 5, { scale: 2, color: hover ? PALETTE.redInk : PALETTE.inkSoft, align: 'center' });
+  addButton('closeDaily', cx, cy, 24, 24);
+  ctx.globalAlpha = prev;
+}
+
 /** Interface layers above the cards: the archives ledger, the Contract card, the pause menu and toasts. Draw after drawOverlay. */
 export function drawUi(ctx: CanvasRenderingContext2D, state: GameState, now: number): void {
   const smoothing = ctx.imageSmoothingEnabled;
@@ -3245,6 +3514,7 @@ export function drawUi(ctx: CanvasRenderingContext2D, state: GameState, now: num
   refreshTextCaches();
   if (ui.archivesOpen) drawArchives(ctx, now);
   if (EDITION === 'steam' && ui.contracts.isOpen) drawContracts(ctx, state, now);
+  if (EDITION === 'steam' && ui.daily.isOpen) drawDailyCard(ctx, state, now);
   if (ui.pause.isOpen) drawPauseCard(ctx, now);
   drawToast(ctx, now);
   ctx.imageSmoothingEnabled = smoothing;

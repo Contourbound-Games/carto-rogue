@@ -194,6 +194,32 @@ export interface ExpeditionStats {
   breakdown: GradeBreakdown | null;
 }
 
+/**
+ * One UTC day's Today's Expedition: the date, the Daily revision and the three sheets it names, each
+ * { generator, seeds[k] } (built by daily.ts dailyIdentity).
+ */
+export interface DailyIdentity {
+  /** UTC calendar date, 'YYYY-MM-DD'. */
+  date: string;
+  revision: number;
+  generator: number;
+  seeds: readonly [number, number, number];
+}
+
+/** How one summited sheet of a Daily attempt finished (gradePoints total, never the elapsed time). */
+export interface DailySheetSummary {
+  grade: string;
+  points: number;
+  turns: number;
+  staminaLeft: number;
+}
+
+/** A Daily attempt in progress: its identity, the sheet being played (0..2) and the sheets summited before it. */
+export interface DailyRun extends DailyIdentity {
+  sheet: 0 | 1 | 2;
+  done: readonly DailySheetSummary[];
+}
+
 export interface GameState {
   phase: Phase;
   /** performance.now() when the current phase began (drives overlay/end animations). */
@@ -207,6 +233,11 @@ export interface GameState {
    * every other start, even on a Contract's seed. The rules never read it.
    */
   contract: ContractId | null;
+  /**
+   * The Today's Expedition attempt this sheet belongs to (Game.startDaily), carried to the next sheet and
+   * by RESTART DAILY; null for every other start. Never set together with `contract`. The rules never read it.
+   */
+  daily: DailyRun | null;
   player: PlayerState;
   stamina: number;
   turns: number;

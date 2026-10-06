@@ -14,6 +14,8 @@ Changing the feature lists below means a new scope decision. Tuning within them 
 3. Debrief, Grade Breakdown, Same-seed Retry and readability fixes belong to the shared core.
 4. The same seed keeps representing the same mountain wherever possible (see GENERATOR_VERSIONING.md).
 5. New generic roguelite systems are not added without a new scope decision.
+   Today's Expedition is not a roguelite run or meta system: it is a combined challenge of three Standard
+   sheets, with no carry-over, build, inventory or meta progression between them.
 
 ## Shared Core (itch + Steam)
 
@@ -64,6 +66,38 @@ approved Contracts, each on one fixed sheet; every Contract also requires the su
   warning. The end report judges the finished run itself, never the saved progress.
 - Contract runs are kept out of the Standard Archives.
 
+## Today's Expedition (Steam only)
+
+A daily challenge identity on top of unchanged Standard gameplay: three generated sheets per UTC day.
+
+- Each sheet plays by the Standard rules on generator 1 and starts with stamina 100. Nothing carries over
+  between sheets. There is no Explorer Today's Expedition.
+- Attempts are unlimited and always start at Sheet 1. A summit on Sheet 1 or 2 leads to the next sheet. A
+  collapse ends the attempt at once. No single sheet can be retried.
+- Only an attempt that summits all three sheets is a result. Results rank by total gradePoints (higher),
+  then total turns (fewer), then total stamina left at the pillars (more). A tie keeps the earlier result.
+  Elapsed time is neither stored nor compared.
+- Identity, revision 1 (frozen once shipped; changing it is a new Daily revision):
+  `DAILY_REVISION = 1`, `DAILY_GENERATOR = 1`, `DAILY_NAMESPACE = 0x43524459`;
+  `epochDay = floor(Date.UTC(y, m-1, d) / 86400000)`, `base = hashSeed(DAILY_NAMESPACE, DAILY_REVISION)`,
+  `daySeed = hashSeed(base, epochDay)`, then `hashSeed(daySeed, c)` for c = 0, 1, 2, … skipping 0 and
+  repeats until three seeds. Every seed is a full 32-bit seed (the 1..999999 range of random seeds does not
+  apply). tests/daily.test.ts locks the constants, dated seeds and map digests.
+- The date is the UTC calendar day. The game reads the current UTC date when the Today's Expedition card
+  opens and when BEGIN is chosen (that date names the attempt), and on a failed or completed attempt's
+  report only to say that a new day's expedition is open. An attempt keeps its date to the end. NEXT
+  SHEET and RESTART DAILY keep it too, also after midnight. Its result belongs to that date.
+- R, New Expedition and Return to title leave Today's Expedition for a fresh normal expedition. Only
+  RESTART DAILY replays the attempt, from Sheet 1.
+- Records: `carto_rogue_daily_v1`, apart from the Standard Archives and the Contract progress. The best
+  completed attempt of each date is kept indefinitely, with no pruning. Attempts and failures are not
+  stored. A completed attempt is saved on the Sheet 3 summit step itself, before its report or any
+  later frame.
+- Share: a completed attempt shares its date, Completed, score / 300, turns, stamina left and the three
+  grades. A failed one shares its date and the sheet it ended on. There is no share between sheets, and
+  the share carries no seed and no link. COPY SEED keeps the existing seed-copy policy for the sheet shown.
+- Today's Expedition sheets are kept out of the Standard Archives.
+
 ## Steam Desktop Build
 
 - Web builds: itch in `dist/` (`npm run build`), Steam in `dist-steam/` (`npm run build:steam`).
@@ -72,6 +106,8 @@ approved Contracts, each on one fixed sheet; every Contract also requires the su
   (desktop/electron-builder.steam.yml). It packages `dist-steam/` only, as the app's runtime `dist/`, and
   refuses to package when the Steam web build is missing.
 - The packaged executable is `CartoRogue.exe`; it takes no launch arguments.
+- Only the Steam build holds the Today's Expedition records key (`carto_rogue_daily_v1`) and its words (its
+  own text tables, read only by Steam-edition code). tests/edition.test.ts checks both bundles.
 
 ## Not in Steam 1.0
 
@@ -84,6 +120,13 @@ None of these block Steam 1.0. Each needs its own scope decision before any work
 - Expanded long-term Records / statistics: the existing Records / Archives stay as they are.
 - Gamepad / Steam Deck support: a later milestone once verified or approved.
 - Contract candidates: Wide Survey deferred; Red Line and Selective Resupply cut.
+- Leaderboards and route viewing (including for Today's Expedition) are conditional and outside Steam 1.0
+  until they are decided. Notes for that decision:
+  - RESTART DAILY replays past dates without limit, so a leaderboard needs a rule that results for a
+    past date are not uploaded.
+  - Other players' Daily routes become visible only after that UTC day has ended.
+  - The client can compute future Daily seeds; whether that is acceptable is decided then.
+  - Leaderboard details versus UGC storage for routes is decided after a Steamworks spike.
 - Systems outside the game's design: starting equipment / loadouts, inventory, random weather, altitude
   sickness, meta stat progression, combat, generic roguelite item systems.
 
@@ -115,5 +158,7 @@ These do not hold back Steam 1.0:
 - `npm run lint` errors in the git-ignored promo/ folder.
 - The itch and Steam desktop builder configs duplicate each other (a test keeps them in step).
 - The Windows README does not describe the Survey Contract shortcut.
+- The Windows README does not describe the Today's Expedition shortcut (T).
+- A Today's Expedition attempt in progress does not carry over to a later session.
 - Code signing: reviewed separately once a certificate or a distribution requirement exists.
 - Steamworks SDK: not needed by any Steam 1.0 feature.

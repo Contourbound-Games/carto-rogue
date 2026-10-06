@@ -534,3 +534,112 @@ export function contractText(key: ContractTextKey, params?: Readonly<Record<stri
 export function contractTextTables(): Readonly<Record<Lang, Readonly<Record<ContractTextKey, string>>>> {
   return CONTRACT_TABLES;
 }
+
+// Today's Expedition (Steam edition). Kept apart like the Contract tables and read only by Steam-edition
+// code, so the itch build leaves these strings out entirely. {date} is a UTC 'YYYY-MM-DD' date.
+const DAILY_EN = {
+  dailyTitle: "TODAY'S EXPEDITION",
+  dailySub: 'THREE NEW SHEETS EVERY UTC DAY · THE SAME FOR EVERY SURVEYOR',
+  dailyDate: '{date} UTC',
+  dailyRuleSheets: 'STANDARD RULES ON ALL THREE SHEETS · STAMINA 100 ON EACH',
+  dailyRuleRetry: 'NO SHEET RETRY · A COLLAPSE ENDS THE ATTEMPT',
+  dailyRuleResult: 'ONLY THREE SUMMITS MAKE A RESULT · RETRY THE DAY AS OFTEN AS YOU LIKE',
+  dailyBest: 'BEST',
+  dailyBestValue: '{p}/300 · {t} TURNS · {s} STAMINA LEFT',
+  dailyNoBest: 'NO COMPLETED ATTEMPT YET',
+  dailyBegin: 'BEGIN SHEET 1',
+  dailyHint: 'ENTER BEGIN · T / ESC CLOSE',
+  dailyStandardOnly: "TODAY'S EXPEDITION USES STANDARD RULES.",
+  dailySwitch: 'SWITCH TO STANDARD TO BEGIN.',
+  dailyDateChanged: 'A NEW UTC DAY: {date}',
+  // The run tag on the HUD.
+  dailyTag: '{date} UTC · SHEET {n}/3',
+  // The Daily band of the expedition report.
+  bandLabel: "TODAY'S EXPEDITION · {date} UTC",
+  bandCleared: 'SHEET {n} OF 3 SUMMITED',
+  bandEnded: 'ENDED ON SHEET {n} OF 3',
+  bandAllSummits: 'ALL THREE SUMMITS',
+  stampCompleted: 'COMPLETED',
+  stampNotRecorded: 'NOT RECORDED',
+  rowSheet: 'SHEET {n}',
+  rowResult: '{g} · {p} PTS · {t} TURNS · {s} LEFT',
+  rowNext: 'NEXT',
+  rowLater: 'TO COME',
+  rowCollapsed: 'COLLAPSED',
+  rowNotReached: 'NOT REACHED',
+  rowTotal: 'TOTAL',
+  rowTotalValue: '{p}/300 · {t} TURNS · {s} LEFT',
+  rowBest: 'BEST ON THIS DATE',
+  rowBestValue: '{p}/300 · {t} TURNS · {s} LEFT',
+  rowNewBest: 'NEW BEST',
+  newDayOpen: "A NEW TODAY'S EXPEDITION IS OPEN",
+  nextSheet: 'NEXT SHEET',
+  restartDaily: 'RESTART DAILY',
+  // The Daily result as shared (copied as text, so in sentence case like the other share fields).
+  shareDaily: "Today's Expedition",
+  shareCompleted: 'Completed',
+  shareScore: 'Score',
+  shareStaminaLeft: 'Stamina left',
+  shareSheets: 'Sheets',
+  shareEnded: 'Ended on sheet {n} of 3',
+};
+
+export type DailyTextKey = keyof typeof DAILY_EN;
+
+const DAILY_KO: Record<DailyTextKey, string> = {
+  dailyTitle: '오늘의 원정',
+  dailySub: 'UTC 기준 매일 새로 열리는 도엽 세 장 · 모두에게 같은 산',
+  dailyDate: '{date} UTC',
+  dailyRuleSheets: '세 장 모두 표준 규칙 · 장마다 체력 100으로 출발',
+  dailyRuleRetry: '도엽별 재도전 없음 · 탈진하면 그 도전은 끝',
+  dailyRuleResult: '세 정상 모두 올라야 기록 · 하루 안에 몇 번이든 다시 도전',
+  dailyBest: '최고 기록',
+  dailyBestValue: '{p}/300 · {t}턴 · 남은 체력 {s}',
+  dailyNoBest: '아직 완주 기록 없음',
+  dailyBegin: '1장 출발',
+  dailyHint: 'ENTER 출발 · T / ESC 닫기',
+  dailyStandardOnly: '오늘의 원정은 표준 규칙으로만 진행합니다.',
+  dailySwitch: '시작하려면 표준으로 바꾸세요.',
+  dailyDateChanged: 'UTC 날짜가 바뀌었습니다: {date}',
+  dailyTag: '{date} UTC · 도엽 {n}/3',
+  bandLabel: '오늘의 원정 · {date} UTC',
+  bandCleared: '도엽 {n}/3 정상 도달',
+  bandEnded: '도엽 {n}/3에서 종료',
+  bandAllSummits: '세 정상 모두 도달',
+  stampCompleted: '완주',
+  stampNotRecorded: '기록 안 됨',
+  rowSheet: '도엽 {n}',
+  rowResult: '{g} · {p}점 · {t}턴 · 체력 {s}',
+  rowNext: '다음',
+  rowLater: '대기',
+  rowCollapsed: '탈진',
+  rowNotReached: '미도달',
+  rowTotal: '합계',
+  rowTotalValue: '{p}/300 · {t}턴 · 체력 {s}',
+  rowBest: '이 날짜 최고 기록',
+  rowBestValue: '{p}/300 · {t}턴 · 체력 {s}',
+  rowNewBest: '최고 기록 갱신',
+  newDayOpen: '새 오늘의 원정이 열렸습니다',
+  nextSheet: '다음 도엽',
+  restartDaily: '처음부터 다시',
+  shareDaily: '오늘의 원정',
+  shareCompleted: '완주',
+  shareScore: '점수',
+  shareStaminaLeft: '남은 체력',
+  shareSheets: '도엽',
+  shareEnded: '도엽 {n}/3에서 종료',
+};
+
+const DAILY_TABLES: Record<Lang, Record<DailyTextKey, string>> = { en: DAILY_EN, ko: DAILY_KO };
+
+/** t() for Today's Expedition: call it only from Steam-edition code. */
+export function dailyText(key: DailyTextKey, params?: Readonly<Record<string, string | number>>, lang: Lang = current): string {
+  const template = DAILY_TABLES[lang][key];
+  if (!params) return template;
+  return template.replace(/\{(\w+)\}/g, (whole, name: string) => (name in params ? String(params[name]) : whole));
+}
+
+/** The Today's Expedition tables, for tests. */
+export function dailyTextTables(): Readonly<Record<Lang, Readonly<Record<DailyTextKey, string>>>> {
+  return DAILY_TABLES;
+}

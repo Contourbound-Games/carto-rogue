@@ -1,6 +1,7 @@
 // Seed and result summaries for sharing, plus a clipboard helper that also works in embedded
 // iframes where the async Clipboard API is blocked.
-import { contractText, t } from './i18n';
+import { DAILY_MAX_POINTS } from './daily';
+import { contractText, dailyText, t } from './i18n';
 import type { Lang } from './i18n';
 import type { ExpeditionMode, ExpeditionStats } from './types';
 
@@ -47,6 +48,31 @@ export function contractShareText(name: string, completed: boolean, stats: Exped
     `${contractText('shareContract', undefined, lang)}: ${result}`,
     ...outcome,
     grade,
+  ].join(' | ');
+}
+
+/** What a Today's Expedition report shares: the attempt's UTC date and either its result or where it ended. */
+export type DailyShare =
+  | { date: string; completed: true; totalPoints: number; totalTurns: number; totalStaminaLeft: number; grades: readonly string[] }
+  | { date: string; completed: false; endedOnSheet: number };
+
+/**
+ * A Today's Expedition attempt (Steam edition), as its report shows it:
+ * "The Carto-Rogue: 등고선 탐사대 | Today's Expedition: 2026-10-06 UTC | Completed | Score: 211/300 | Turns: 140 | Stamina left: 75 | Sheets: A / S / B"
+ * "The Carto-Rogue: 등고선 탐사대 | Today's Expedition: 2026-10-06 UTC | Ended on sheet 2 of 3"
+ * The date names the three sheets, so no seed is given, and no link (no public page plays Today's
+ * Expedition yet), as with the Contract share. Call it only from Steam-edition code.
+ */
+export function dailyShareText(share: DailyShare, lang?: Lang): string {
+  const head = [GAME_TITLE, `${dailyText('shareDaily', undefined, lang)}: ${dailyText('dailyDate', { date: share.date }, lang)}`];
+  if (!share.completed) return [...head, dailyText('shareEnded', { n: share.endedOnSheet }, lang)].join(' | ');
+  return [
+    ...head,
+    dailyText('shareCompleted', undefined, lang),
+    `${dailyText('shareScore', undefined, lang)}: ${share.totalPoints}/${DAILY_MAX_POINTS}`,
+    `${t('shareTurns', undefined, lang)}: ${share.totalTurns}`,
+    `${dailyText('shareStaminaLeft', undefined, lang)}: ${share.totalStaminaLeft}`,
+    `${dailyText('shareSheets', undefined, lang)}: ${share.grades.join(' / ')}`,
   ].join(' | ');
 }
 

@@ -4,11 +4,13 @@ import { SynthAudio } from './audio';
 import { PALETTE, VIRTUAL_HEIGHT, VIRTUAL_WIDTH } from './config';
 import { completeContract, contractCompletedBy, loadContractProgress, saveContractProgress } from './contract-progress';
 import type { ContractId } from './contracts';
+import { dailyShareOf, utcDateKey } from './daily';
+import { loadDailyRecords, recordDailyExpedition, saveDailyRecords } from './daily-records';
 import { EDITION } from './edition';
 import { drawText, fitText, loadWebFont } from './font';
 import { Game } from './game';
 import { contractReport } from './hud';
-import { contractText, initLanguage, t, toggleLang } from './i18n';
+import { contractText, dailyText, initLanguage, t, toggleLang } from './i18n';
 import { clientToVirtual, keyToAction, keyToUiKey, parseSeed } from './input';
 import { generateMap } from './map';
 import { loadMode, saveMode } from './mode';
@@ -18,8 +20,8 @@ import { applyExpedition, countsTowardRecords, loadRecords, RecordKeeper, saveRe
 import { Renderer } from './renderer';
 import type { PauseCommand, PauseItem } from './pause';
 import { SeedEntry } from './seed-entry';
-import { contractShareText, copyText, seedText, shareText } from './share';
-import { buttonAt, closeArchives, openArchives, reportFor, showToast, ui } from './ui';
+import { contractShareText, copyText, dailyShareText, seedText, shareText } from './share';
+import { applyEndChoice, buttonAt, closeArchives, endChoices, openArchives, reportFor, showToast, ui } from './ui';
 import type { ButtonId, EndChoice } from './ui';
 
 /** Handles exposed as window.__carto when the page is opened with ?debug (automated testing). */
@@ -166,12 +168,31 @@ function start(): void {
     now: performance.now(),
     startPlaying: urlSeed !== undefined,
     mode: loadMode(),
+    // An expedition's result is recorded on the step that ends it, before that input returns, so no
+    // later frame, report, R or page close is needed to keep it. (The game never ends an expedition
+    // while it is being built, so `records` exists before this can run.)
+    onEnd: (expedition) => records.sync(expedition),
   });
   // Survey Contract progress belongs to the Steam edition: the itch edition never reads or writes it.
   let contractProgress = EDITION === 'steam' ? loadContractProgress() : null;
   // The Contract card shows a read-only copy of the completions, never the saved progress itself.
   if (EDITION === 'steam' && contractProgress !== null) ui.contracts.completed = [...contractProgress.completed];
+  // Today's Expedition records belong to the Steam edition too; the card shows a read-only copy of them.
+  let dailyRecords = EDITION === 'steam' ? loadDailyRecords() : null;
+  if (EDITION === 'steam' && dailyRecords !== null) ui.daily.days = [...dailyRecords.days];
   const records = new RecordKeeper(game.state, (result, expedition) => {
+    // A Today's Expedition attempt this expedition completed (its Sheet 3 summit) is kept as its date's
+    // best when it ranks above the one kept (saved only then). It runs from the game's onEnd on the
+    // summit step itself, so the best is saved before that input returns.
+    if (EDITION === 'steam' && dailyRecords !== null) {
+      const next = recordDailyExpedition(dailyRecords, expedition);
+      if (next !== dailyRecords) {
+        dailyRecords = next;
+        saveDailyRecords(next);
+        ui.daily.days = [...next.days];
+        ui.daily.newBestOf = expedition;
+      }
+    }
     // A Survey Contract completed by this expedition is kept (saved only when new), before the
     // archives filter below, which keeps every Contract expedition out.
     if (EDITION === 'steam' && contractProgress !== null) {
@@ -185,7 +206,7 @@ function start(): void {
         }
       }
     }
-    // Only Standard expeditions outside a Survey Contract go into the Standard archives.
+    // Only Standard expeditions outside a Survey Contract and Today's Expedition go into the Standard archives.
     if (!countsTowardRecords(result)) return;
     ui.records = applyExpedition(ui.records, result);
     saveRecords(ui.records);
@@ -232,9 +253,28 @@ function start(): void {
 
   // ----- Survey Contract card (Steam edition) -----
   const openContracts = (now: number): void => {
-    if (EDITION !== 'steam' || game.state.phase !== 'title' || ui.archivesOpen) return;
+    if (EDITION !== 'steam' || game.state.phase !== 'title' || ui.archivesOpen || ui.daily.isOpen) return;
     ui.hover = null;
     ui.contracts.open(now);
+  };
+
+  // ----- Today's Expedition card (Steam edition) -----
+  // The current UTC date is read when the card opens and when BEGIN is chosen (that one names the
+  // attempt), and only otherwise for a Daily end report's new-day notice (frame loop below).
+  const openDaily = (now: number): void => {
+    if (EDITION !== 'steam' || game.state.phase !== 'title' || ui.archivesOpen || ui.contracts.isOpen) return;
+    ui.hover = null;
+    ui.daily.open(now, Date.now());
+  };
+  const beginDaily = (now: number): void => {
+    if (EDITION !== 'steam') return;
+    ui.hover = null;
+    const begun = ui.daily.begin(game, now, Date.now());
+    // Refused while Explorer is chosen: the card stays open and says to switch to Standard (the saved
+    // mode is never changed for the player). Past the midnight after the card opened, it says the day changed.
+    if (!begun.started) showToast(dailyText('dailySwitch'), 'bad', now);
+    else if (begun.dateChanged) showToast(dailyText('dailyDateChanged', { date: begun.date }), 'good', now);
+    canvas.focus({ preventScroll: true });
   };
   const beginContract = (id: ContractId, now: number): void => {
     if (EDITION !== 'steam') return;
@@ -257,6 +297,21 @@ function start(): void {
       case 'closeContracts':
         ui.contracts.close();
         return;
+      case 'daily':
+        openDaily(now);
+        return;
+      case 'closeDaily':
+        ui.daily.close();
+        return;
+      case 'beginDaily':
+        beginDaily(now);
+        return;
+      case 'nextSheet':
+        runEndChoice('next', now);
+        return;
+      case 'restartDaily':
+        runEndChoice('restart', now);
+        return;
       case 'lang':
         toggleLang();
         return;
@@ -275,6 +330,13 @@ function start(): void {
         // A Survey Contract expedition (Steam edition) shares its Contract result, judged from this
         // expedition as its report shows it; any other shares the sheet's result as before.
         const contract = EDITION === 'steam' ? contractReport(game.state) : null;
+        // A Today's Expedition sheet shares its attempt: completed after the third summit, else where
+        // it ended (there is no share between sheets).
+        if (EDITION === 'steam' && game.state.daily !== null) {
+          const daily = dailyShareOf(game.state);
+          if (daily) copyAndToast(dailyShareText(daily), 'toastResult');
+          return;
+        }
         const text = contract
           ? contractShareText(contract.name, contract.completed, stats)
           : shareText(game.state.seed, stats, undefined, game.state.mode);
@@ -324,8 +386,9 @@ function start(): void {
   // ----- Expedition report (end cards) -----
   const runEndChoice = (choice: EndChoice, now: number): void => {
     if (!onEndCard()) return;
-    if (choice === 'retry') game.retrySheet(now);
-    else game.handleAction('restart', now);
+    // Retry / NEXT SHEET / RESTART DAILY stay with the run (each refused where it does not apply);
+    // New Expedition, like R, always leaves it for a fresh normal expedition.
+    applyEndChoice(game, choice, now);
     canvas.focus({ preventScroll: true });
   };
   const toggleReportCard = (): void => {
@@ -408,9 +471,22 @@ function start(): void {
         if (typeof command === 'object') beginContract(command.start, now);
         return;
       }
+    } else if (EDITION === 'steam' && ui.daily.isOpen) {
+      // The Today's Expedition card is modal: Enter / Space begin, Esc / T close; R closes it and starts
+      // a fresh expedition as usual, M still mutes. Nothing else reaches the title card.
+      const command = e.repeat ? 'handled' : ui.daily.key(uiKey, action);
+      if (command !== 'pass') {
+        e.preventDefault();
+        if (command === 'begin') beginDaily(now);
+        return;
+      }
     } else if (EDITION === 'steam' && uiKey === 'contracts') {
       e.preventDefault();
       if (!e.repeat) openContracts(now);
+      return;
+    } else if (EDITION === 'steam' && uiKey === 'daily') {
+      e.preventDefault();
+      if (!e.repeat) openDaily(now);
       return;
     }
     if (ui.pause.isOpen) {
@@ -441,9 +517,11 @@ function start(): void {
       return;
     }
     if (onEndCard()) {
-      // The report: H tucks the card away, arrows pick retry / new, Enter / Space run the pick.
-      // R stays "new expedition" (handled by the game below), M still mutes.
+      // The report: H tucks the card away, arrows pick between its two ways on (retry / new; in Today's
+      // Expedition next sheet or restart / new), Enter / Space run the pick. R stays "new expedition"
+      // (handled by the game below), M still mutes.
       const report = reportFor(game.state);
+      const [first] = endChoices(game.state);
       if (uiKey === 'card') {
         e.preventDefault();
         if (!e.repeat) toggleReportCard();
@@ -452,7 +530,7 @@ function start(): void {
       if (action === 'up' || action === 'down' || action === 'left' || action === 'right') {
         e.preventDefault();
         if (!e.repeat) {
-          report.choice = report.choice === 'retry' ? 'new' : 'retry';
+          report.choice = report.choice === 'new' ? first : 'new';
           report.cardHidden = false;
         }
         return;
@@ -535,6 +613,9 @@ function start(): void {
     try {
       game.update(now);
       records.sync(game.state);
+      // While a Today's Expedition report is up, the current UTC date decides only whether its band says
+      // a new day's expedition is open; it never changes the attempt (RESTART DAILY keeps its date).
+      if (EDITION === 'steam' && game.state.daily !== null && onEndCard()) ui.daily.today = utcDateKey(Date.now());
       renderer.render(game.state, now);
     } catch (err) {
       if (!frameErrorReported) {
