@@ -1,6 +1,6 @@
 작업: Claude Code 통합 개발 플로우 문서화 및 GitHub Actions CI 추가
-결과: 검증 대기
-다음 할 일: 작업 브랜치 `chore/dev-flow-ci`의 GitHub Actions 결과 확인
+결과: 완료
+다음 할 일: 개발자가 GitHub "Protect main" 룰셋에 PR 필수와 필수 체크 `Test and build`를 추가한 뒤, PR을 검토·병합
 
 ## 핵심 변경
 
@@ -10,7 +10,7 @@
 - `docs/DECISIONS.md` (신규): 승인된 결정 기록이다. 기존 결정 문서(Steam 1.0 Scope, Generator Versioning)를 연결하고, 2026-10-10 개발 플로우·CI 결정을 기록했다.
 - `docs/REPORT.md` (신규): 이 파일이다.
 - `.github/workflows/ci.yml` (신규): 모든 push와 pull_request에서 실행한다. 경로 필터와 AI API 호출은 없다.
-  - Windows(`windows-latest`), Node 24에서 `npm ci` → lint → `npm test` (`vitest run`) → `npm run build` → `npm run build:steam` 순서로 실행한다. 제한 시간은 20분이다.
+  - Windows(`windows-latest`), Node 24에서 `npm ci` → lint → `npm test -- --testTimeout=60000` (`vitest run`) → `npm run build` → `npm run build:steam` 순서로 실행한다. 제한 시간은 20분이다.
   - concurrency: 작업 브랜치와 PR은 같은 이벤트·ref의 이전 실행을 취소한다. main은 실행마다 고유 그룹이라 취소되지 않는다.
   - 체크 이름은 `Test and build`이다.
 
@@ -46,7 +46,10 @@
   - 조치: 테스트와 `vite.config.ts`는 바꾸지 않았다(고위험). CI에서만 `npm test -- --testTimeout=60000`을 쓴다.
     - 시간을 검사하는 테스트는 없어서 어떤 assertion도 바뀌지 않는다.
     - 전체 실행은 여전히 job의 `timeout-minutes: 20`으로 제한된다.
-- 시간 제한 조정 후 결과: 확인 중.
+- `022d6dd` (windows-latest), run 38013701955: **성공**.
+  - `npm ci`, lint, 테스트(30개 파일 통과·1개 생략, 432개 통과·2개 생략), itch 빌드, Steam 빌드가 모두 통과했다.
+  - 테스트 단계는 74초 걸렸다.
+- 이 보고서는 코드 변경 커밋(`022d6dd`)까지의 CI 결과만 기록한다. 보고서만 갱신한 push의 CI는 확인만 하고 여기에 다시 쓰지 않는다.
 
 ## 수행하지 못한 검증과 영향
 
@@ -60,6 +63,9 @@
 - GitHub "Protect main" 룰셋은 삭제와 강제 push만 막는다. PR 필수 규칙과 필수 상태 체크(`Test and build`)가 없다. 개발자가 GitHub에서 직접 설정해야 한다.
 - 미추적 파일 `tests/advanced-sweep.test.ts`, `tests/support/advanced.ts`는 이번 작업과 무관해서 커밋하지 않았다.
 
-## 커밋
+## 커밋 (브랜치 `chore/dev-flow-ci`)
 
-- 확인 중.
+- `96be310` ci: add test and build workflow and Claude Code dev flow
+- `058c084` ci: run on Windows, the shipping platform
+- `022d6dd` ci: allow slow hosted runners a longer per-test timeout
+- 이후 커밋: 이 보고서의 최종 갱신(보고서만 변경)
