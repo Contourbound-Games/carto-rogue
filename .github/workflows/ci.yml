@@ -1,0 +1,54 @@
+# Test and build on every push and pull request. No path filters: a push that only touches docs still runs,
+# so every commit gets the same check. No AI or other paid API calls.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+# On work branches and PRs, runs for the same event on the same ref share a group, so a newer push cancels
+# the older run and the newer commit gets its own full run. push and pull_request runs never share a group.
+# Every main run gets a unique group, so no main commit's run is ever cancelled, in progress or pending,
+# and no check is left missing or waiting.
+concurrency:
+  group: ${{ github.ref == 'refs/heads/main' && format('ci-main-{0}', github.run_id) || format('ci-{0}-{1}', github.event_name, github.ref) }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  test-and-build:
+    name: Test and build
+    # Windows is the development and shipping platform (the desktop builds are win x64 only), and
+    # tests/desktop-protocol.test.ts pins Windows path semantics such as backslash separators and drive letters.
+    runs-on: windows-latest
+    timeout-minutes: 20
+    env:
+      # Tests and builds never launch Electron, so skip its ~100 MB binary download in npm ci.
+      ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      # `vitest run` exits when done; it never enters watch mode. The hosted runner is several times slower
+      # than a dev machine, and CPU-heavy map tests that pass locally in ~1.6 s exceeded vitest's 5 s default
+      # per-test timeout there. No test asserts on timing, so a longer timeout changes no assertion; the job's
+      # timeout-minutes still bounds the run.
+      - name: Test
+        run: npm test -- --testTimeout=60000
+
+      - name: Build (itch edition, includes typecheck)
+        run: npm run build
+
+      - name: Build (Steam edition, includes typecheck)
+        run: npm run build:steam
