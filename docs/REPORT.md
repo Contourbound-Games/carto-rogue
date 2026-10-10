@@ -1,6 +1,6 @@
 작업: PR #1 후속, 병합 규칙·모델 운영 규칙 수정과 서브에이전트 정의
-결과: 검증 대기
-다음 할 일: 작업 브랜치 `chore/dev-flow-ci`의 GitHub Actions 결과 확인
+결과: 완료
+다음 할 일: 개발자가 PR #1을 승인하고 병합을 지시한다. 그 전에 `gh pr merge` deny를 ask로 옮기고, "Protect main" 룰셋을 설정한다.
 
 ## 이번 작업: 병합·모델 운영 규칙
 
@@ -83,11 +83,15 @@
 
 ### GitHub Actions 결과
 
-- 확인 중.
+- `b43c282` (windows-latest)에서 두 실행 모두 **성공**했다.
+  - push run 38014715180, pull_request run 38014719332.
+  - lint, 테스트(432개 통과·2개 생략), itch 빌드, Steam 빌드가 모두 통과했다.
+- 이 보고서는 코드·규칙 변경 커밋(`b43c282`)까지의 CI만 기록한다. 이후 보고서만 갱신한 push의 CI는 확인만 한다.
 
 ### 커밋
 
-- 확인 중.
+- `b43c282` docs: merge only on explicit instruction; Opus 5.5 model rules
+- 이후 커밋: 이 보고서의 최종 갱신(보고서만 변경)
 
 ## 이전 작업: 개발 플로우 문서화와 GitHub Actions CI 추가 (같은 PR)
 
