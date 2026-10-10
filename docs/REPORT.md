@@ -39,7 +39,14 @@
   - 원인: 이 테스트는 Windows 경로 규칙을 전제로 한다. `..\..\package.json`과 `C:\Windows\win.ini`가 웹 빌드 밖으로 나가는지 검사한다. Linux에서는 `\`가 일반 파일명 문자라서 `resolveAppFile`이 루트 안의 경로를 반환한다.
   - 제품 결함이 아니라 실행 플랫폼 차이다. 데스크톱 빌드는 win x64 전용이다.
   - 조치: 기존 테스트나 프로토콜 코드는 바꾸지 않았다(고위험). CI 실행 환경을 배포 플랫폼인 `windows-latest`로 바꿨다.
-- Windows 실행 결과: 확인 중.
+- `058c084` (windows-latest), run 38013470796: **실패**.
+  - `desktop-protocol`은 통과했다.
+  - `tests/map.test.ts` > "samples a continuous, bounded field"가 6.7초 걸려 vitest의 기본 테스트 제한 시간(5초)을 넘었다. 로컬(12코어)에서는 1.6초 걸린다. 앞의 실패와는 다른 문제다.
+  - 원인: 호스팅 러너의 CPU가 느리고, 병렬로 실행되는 테스트 파일들과 경합한다.
+  - 조치: 테스트와 `vite.config.ts`는 바꾸지 않았다(고위험). CI에서만 `npm test -- --testTimeout=60000`을 쓴다.
+    - 시간을 검사하는 테스트는 없어서 어떤 assertion도 바뀌지 않는다.
+    - 전체 실행은 여전히 job의 `timeout-minutes: 20`으로 제한된다.
+- 시간 제한 조정 후 결과: 확인 중.
 
 ## 수행하지 못한 검증과 영향
 

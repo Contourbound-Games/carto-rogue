@@ -40,9 +40,12 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      # `vitest run` exits when done; it never enters watch mode.
+      # `vitest run` exits when done; it never enters watch mode. The hosted runner is several times slower
+      # than a dev machine, and CPU-heavy map tests that pass locally in ~1.6 s exceeded vitest's 5 s default
+      # per-test timeout there. No test asserts on timing, so a longer timeout changes no assertion; the job's
+      # timeout-minutes still bounds the run.
       - name: Test
-        run: npm test
+        run: npm test -- --testTimeout=60000
 
       - name: Build (itch edition, includes typecheck)
         run: npm run build
