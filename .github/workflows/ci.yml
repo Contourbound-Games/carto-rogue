@@ -20,7 +20,9 @@ concurrency:
 jobs:
   test-and-build:
     name: Test and build
-    runs-on: ubuntu-latest
+    # Windows is the development and shipping platform (the desktop builds are win x64 only), and
+    # tests/desktop-protocol.test.ts pins Windows path semantics such as backslash separators and drive letters.
+    runs-on: windows-latest
     timeout-minutes: 20
     env:
       # Tests and builds never launch Electron, so skip its ~100 MB binary download in npm ci.

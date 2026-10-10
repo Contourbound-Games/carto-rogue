@@ -10,7 +10,7 @@
 - `docs/DECISIONS.md` (신규): 승인된 결정 기록이다. 기존 결정 문서(Steam 1.0 Scope, Generator Versioning)를 연결하고, 2026-10-10 개발 플로우·CI 결정을 기록했다.
 - `docs/REPORT.md` (신규): 이 파일이다.
 - `.github/workflows/ci.yml` (신규): 모든 push와 pull_request에서 실행한다. 경로 필터와 AI API 호출은 없다.
-  - Node 24에서 `npm ci` → lint → `npm test` (`vitest run`) → `npm run build` → `npm run build:steam` 순서로 실행한다. 제한 시간은 20분이다.
+  - Windows(`windows-latest`), Node 24에서 `npm ci` → lint → `npm test` (`vitest run`) → `npm run build` → `npm run build:steam` 순서로 실행한다. 제한 시간은 20분이다.
   - concurrency: 작업 브랜치와 PR은 같은 이벤트·ref의 이전 실행을 취소한다. main은 실행마다 고유 그룹이라 취소되지 않는다.
   - 체크 이름은 `Test and build`이다.
 
@@ -33,11 +33,17 @@
 
 ## GitHub Actions 결과
 
-- 확인 중.
+- `96be310` (ubuntu-latest), run 38013318263: **실패 (1회째)**.
+  - `npm ci`와 lint는 통과했다.
+  - `tests/desktop-protocol.test.ts` > "never resolves outside the web build"에서 테스트 1건이 실패했다.
+  - 원인: 이 테스트는 Windows 경로 규칙을 전제로 한다. `..\..\package.json`과 `C:\Windows\win.ini`가 웹 빌드 밖으로 나가는지 검사한다. Linux에서는 `\`가 일반 파일명 문자라서 `resolveAppFile`이 루트 안의 경로를 반환한다.
+  - 제품 결함이 아니라 실행 플랫폼 차이다. 데스크톱 빌드는 win x64 전용이다.
+  - 조치: 기존 테스트나 프로토콜 코드는 바꾸지 않았다(고위험). CI 실행 환경을 배포 플랫폼인 `windows-latest`로 바꿨다.
+- Windows 실행 결과: 확인 중.
 
 ## 수행하지 못한 검증과 영향
 
-- 로컬에는 Linux 환경이 없어 Ubuntu 실행 결과는 CI로만 확인한다.
+- Linux에서는 `desktop-protocol` 테스트가 실패하므로 CI는 Windows에서만 실행한다. Linux 데스크톱은 배포 대상이 아니라서 영향이 없다.
 
 ## 미해결 문제
 
