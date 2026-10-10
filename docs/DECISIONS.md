@@ -24,3 +24,18 @@ These documents hold earlier approved decisions in full. They remain the source 
   filters and no AI API calls.
 - `docs/REPORT.md` records CI results only up to the commit that changed code. CI for a report-only push is
   checked but not written back.
+
+## 2026-10-10 — PR merges and model use
+
+This entry supersedes the merge rule in [Development flow and CI](#2026-10-10--development-flow-and-ci)
+("The developer merges on GitHub").
+
+- Claude Code merges a PR only when the developer explicitly tells it in chat to merge that PR. The
+  preconditions are in `CLAUDE.md`: the base branch, a successful CI run for the PR's current head commit,
+  and a Codex review covering the final high-risk changes. Direct pushes to `main`, merges without that
+  instruction, auto-merge, and working around a permission rule or branch protection stay forbidden.
+- The main session runs on Opus (currently 5.5) by default. Fable 5.1 is used only when the developer asks
+  for it for a task, and the developer does the switching; there is no automatic switching.
+- Small changes are done by the main session. Complex implementation goes to the `implementer` subagent
+  only when needed, and the fresh-context `reviewer` subagent is used only when a change needs it. Both
+  run on Opus (currently 5.5).
